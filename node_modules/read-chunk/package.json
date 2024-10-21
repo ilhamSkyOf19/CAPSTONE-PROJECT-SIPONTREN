@@ -1,0 +1,50 @@
+{
+	"name": "read-chunk",
+	"version": "5.0.0",
+	"description": "Read a chunk from a file",
+	"license": "MIT",
+	"repository": "sindresorhus/read-chunk",
+	"funding": "https://github.com/sponsors/sindresorhus",
+	"author": {
+		"name": "Sindre Sorhus",
+		"email": "sindresorhus@gmail.com",
+		"url": "https://sindresorhus.com"
+	},
+	"type": "module",
+	"exports": {
+		"types": "./index.d.ts",
+		"default": "./index.js"
+	},
+	"sideEffects": false,
+	"engines": {
+		"node": ">=18"
+	},
+	"scripts": {
+		"test": "xo && ava && tsd"
+	},
+	"files": [
+		"index.js",
+		"index.d.ts"
+	],
+	"keywords": [
+		"read",
+		"file",
+		"readfile",
+		"fs",
+		"chunk",
+		"slice",
+		"part",
+		"head",
+		"tail",
+		"buffer",
+		"fd",
+		"open"
+	],
+	"devDependencies": {
+		"ava": "^6.1.3",
+		"sinon": "^18.0.0",
+		"tsd": "^0.31.1",
+		"uint8array-extras": "^1.1.0",
+		"xo": "^0.58.0"
+	}
+}
