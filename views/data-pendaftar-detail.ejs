@@ -1,0 +1,54 @@
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Detail Contact</h2>
+            <% if (!idPendaftar) { %>
+              <div class="alert alert-danger fw-bold" role="alert">
+                Data Tidak Ada! <br> <a href="/data-pendaftar" class="alert-link fw-normal">Kembali</a>.
+              </div>
+            <% } else { %>
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Data Siswa </h5>
+                  <p class="card-text">Nama: <%= idPendaftar.nama_lengkap  %> </p>
+                  <p class="card-text">NISN: <%= idPendaftar.nisn  %> </p>
+                  <p class="card-text">NIK: <%= idPendaftar.nik  %> </p>
+                  <p class="card-text">Jenis Kelamin: <%= idPendaftar.jenis_kelamin %> </p>
+                  <p class="card-text">Usia :<%= idPendaftar.usia %> </p>
+                  <p class="card-text">Tempat Tanggal Lahir : </p>
+                  <div class="mb-3" style="margin-left: 30px;">
+                      <p class="card-text "><%= idPendaftar.tempat_tanggal_lahir.tempat_lahir %> /<%= idPendaftar.tempat_tanggal_lahir.tanggal_lahir %> </p>
+                  </div>
+                  <p class="card-text">Nomor Hp: <%= idPendaftar.nomor_telephone %> </p>
+                  <p>Alamat :</p>
+                  <div class="mb-3" style="margin-left: 30px;">
+                      <p class="card-text">Desa: <%= idPendaftar.alamat.desa %> </p>
+                      <p class="card-text">Rw: <%= idPendaftar.alamat.rw %> </p>
+                      <p class="card-text">Rt: <%= idPendaftar.alamat.rt %> </p>
+                      <p class="card-text">Kecamatan: <%= idPendaftar.alamat.kecamatan %> </p>
+                      <p class="card-text">Kabupaten: <%= idPendaftar.alamat.kabupaten %> </p>
+                      <p class="card-text">Provinsi <%= idPendaftar.alamat.provinsi %> </p>
+                      <p class="card-text">Kode Pos <%= idPendaftar.kode_pos %> </p>
+                    </div>
+                  <p class="card-text">Anak ke :<%= idPendaftar.anak_ke %></p>
+                  <p class="card-text">Jumlah Saudara :<%= idPendaftar.jumlah_saudara %></p>
+                  <p class="card-text">Alumni sd :<%= idPendaftar.alumni_sd %></p>
+                  <p class="card-text">alamat sekolah asal :<%= idPendaftar.alamat_sekolah_asal %></p>
+                  <p class="card-text">Nama Lengkap Ayah :<%= idPendaftar.nama_lengkap_ayah %></p>
+                  <p class="card-text">Nama Lengkap Ibu :<%= idPendaftar.nama_lengkap_ibu %></p>
+                  <p class="card-text">Nama Lengkap Wali :<%= idPendaftar.nama_lengkap_wali %></p>
+                  <form id="delete_data" method="POST" action="/data?_method=DELETE" class="d-inline">
+                    <input type="hidden" name="id" value="<%= idPendaftar.id %>">
+                    <button type="submit" class="btn btn-danger" id="submitBtn">Delete</button>
+                  </form>
+                  <a class="btn btn-danger" href="/ubah-data-pendaftar/<%= idPendaftar._id %>">Ubah</a>
+                  <a href="/data-pendaftar" class="card-link d-block mt-4">Kembali ke halaman</a>
+                </div>
+              </div>
+              <% } %>
+        </div>
+    </div>
+  </div>
+
+ 
+  
