@@ -1,4 +1,4 @@
-import { body, validationResult } from 'express-validator';
+import { check, body, validationResult } from 'express-validator';
 import { Pendaftaran } from '../models/pendaftaran.js';
 import multer from 'multer';
 import { validatorResult, capitalizeWords } from '../utils/validator.js';
@@ -7,8 +7,14 @@ import { Upload, Upload2 } from '../middleware/uploadFile.js';
 import FileValidator from '../middleware/checkFile.js';
 import path from 'node:path';
 import fs from 'fs/promises';
+import { User } from '../models/skemaLogin.js';
+import csrf from 'csrf';
 
+// konfigurasi crsf
+const csrfProtection = new csrf();
+const secret = csrfProtection.secretSync();
 
+// router
 const router = express.Router();
 
 // Middleware untuk menangani rute yang tidak ditemukan (404)
@@ -22,18 +28,178 @@ router.get(' ',(req, res, next) => {
 
 
 // Halaman home pendaftaran
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
+    let dataUsername = ''; // Variabel untuk menyimpan nama pengguna, default-nya kosong
+
     if (req.session.loggedIn) {
-        return res.redirect('/data-pendaftar');
-    };
+        try {
+            const user = await User.findOne({ _id: req.session.loggedIn }); // Ambil data pengguna jika ada userId
+            if (user) {
+                dataUsername = user.username; // Jika pengguna ditemukan, simpan username
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
     return res.render('index', {
+        layout:'layouts/main-ejs-layouts',
+        title: 'halaman utama',
+        dataUsername,
+    });
+});
+
+// login pendaftaran
+router.get('/login-pendaftaran', (req, res) => {
+    if (req.session.loggedIn) {
+        return res.redirect('/form-pendaftaran');
+    };
+    if (req.session.userId) {
+        return res.redirect('/data-pendaftar');
+    }
+    const token = csrfProtection.create(secret);
+    return res.render('login-pendaftaran', {
         layout: 'layouts/main-ejs-layouts',
-        title: 'form',
+        title: 'form pendaftaran',
+        data: req.body,
+        csrfToken: token, // kirim token crsf ke view
+        msg: req.flash('msg'),
+    });
+});
+
+// form login pendaftaran
+router.post('/login-pendaftaran', 
+    body('username').custom(async (value) => {
+        const username = await User.findOne({ username: value });
+        if (!username) {
+            throw new Error('Username tidak terdaftar!');
+        }
+        return true;
+    }),
+    [
+        // cek validasi untuk username dan password
+        check('username', 'username harus berisi huruf!').isAlpha('en-US'),
+        check('password', 'password berisi angka dan huruf').matches(/^[a-zA-Z0-9 ]+$/)
+    ], 
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.render('login-pendaftaran', {
+                layout: 'layouts/main-ejs-layouts',
+                title: 'halaman login',
+                errors: errors.array(),
+                data: req.body,
+                csrfToken: req.body._csrf,
+            });
+        } else {
+            try {
+                const { username, password, _csrf } = req.body; // Ambil username dan password dari req.body
+                // cek token crsf
+                if (!csrfProtection.verify(secret, _csrf)) {
+                    return res.status(403).send('CSRF token tidak valid!');
+                }
+                const user = await User.findOne({ username }); // Temukan pengguna berdasarkan username
+                let errorMsg;
+
+                if (!user) {
+                    errorMsg = 'Username tidak terdaftar!';
+                    return res.render('login-pendaftaran', {
+                        title: 'halaman login',
+                        layout: 'layouts/main-ejs-layouts',
+                        errors: [{ msg: errorMsg }],
+                        data: req.body,
+                        csrfToken: req.body._csrf
+                    });
+                }
+
+                const isPasswordValid = await user.comparePassword(password); // Gunakan instance user untuk membandingkan password
+                if (!isPasswordValid) {
+                    errorMsg = 'Terjadi kesalahan password!';
+                    return res.render('login-pendaftaran', {
+                        layout: 'layouts/main-ejs-layouts',
+                        title: 'halaman login',
+                        errors: [{ msg: errorMsg }],
+                        data: req.body,
+                        csrfToken: req.body._csrf
+                    });
+                };
+
+
+            // Regenerate session untuk mengacak session ID
+                req.session.regenerate((err) => {
+                    if (err) {
+                        console.error('Error regenerating session:', err);
+                        return res.status(500).send('Internal server error');
+                    }
+                });
+
+                req.session.loggedIn = user._id;
+                req.flash('msg', 'Berhasil masuk');
+                res.redirect('/form-pendaftaran');
+            } catch (error) {
+                console.log(error);
+                res.status(500).send('Error logging in');
+            }
+        }
+    }
+);
+
+
+// register 
+router.get('/register', (req, res) => {
+    res.render('register', {
+        title: 'register',
+        layout: 'layouts/main-ejs-layouts',
         data: req.body,
     });
 });
 
+// Rute untuk registrasi
+router.post('/register', [
+    check('username', 'username harus berisi huruf!').isAlpha('en-US'),
+    check('password', 'password berisi angka dan huruf').matches(/^[a-zA-Z0-9 ]+$/)
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(req.body)
+        res.render('register', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'register',
+            errors: errors.array(),
+            layout: 'layouts/main-ejs-layouts',
+            data: req.body,
+        })
+    } else {
+        const { username, password } = req.body;
+    
+        try {
+            const user = new User({ username, password });
+            await user.save();
+            req.flash('msg', 'Username Berhasil Ditambah');
+            res.redirect('/login-pendaftaran');
+        } catch (error) {
+            console.log(error);
+            res.status(500).send('Error logging in');
+        }
+    }
+});
 
+
+
+// form pendaftaran
+router.get('/form-pendaftaran', (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-pendaftaran'); // Jika belum login, redirect ke login
+    }
+    if (req.session.userId) {
+        return res.redirect('/data-pendaftar');
+    }
+    res.render('form-pendaftaran', {
+        title: 'halaman pendaftar',
+        layout: 'layouts/main-ejs-layouts',
+        msg: req.flash('msg'),
+        data: req.body,
+    });
+});
 
 // Form pendaftaran
 // Router POST untuk data pendaftar
@@ -58,9 +224,9 @@ router.post('/data-pendaftar', [
                 }
 
                 // Render kembali form dengan pesan error dan data input
-                return res.render('index', {
+                return res.render('form-pendaftaran', {
                     layout: 'layouts/main-ejs-layouts',
-                    title: 'Form',
+                    title: 'halaman pendaftaran',
                     errors: [{ msg: errorMessage }],
                     data: req.body, // Menyimpan input sebelumnya
                 });
@@ -72,7 +238,7 @@ router.post('/data-pendaftar', [
     },
     async (req, res, next) => {
         // Validasi tipe file di sini dengan checkFileType, arahkan ke 'index' jika error
-        await FileValidator.checkFileType(req, res, next, 'index');
+        await FileValidator.checkFileType(req, res, next, 'form-pedaftaran');
     }, 
     // Validasi field NIK dan NISN menggunakan express-validator
     body('nik').custom(async (value) => {
@@ -111,9 +277,9 @@ router.post('/data-pendaftar', [
         }
     
         // Jika ada error dari validasi, render kembali form dengan pesan error
-        return res.render('index', {
+        return res.render('form-pendaftaran', {
             layout: 'layouts/main-ejs-layouts',
-            title: 'Form',
+            title: 'halaman pendaftaran',
             errors: errors.array(),
             data: req.body,
         });
@@ -133,25 +299,24 @@ router.post('/data-pendaftar', [
             }
     
             // Set session
-            req.session.loggedIn = true;
+            req.session.userId = true;
     
             await Pendaftaran.insertMany(finalData); // Menggunakan async/await
             req.flash('msg', 'Data Berhasil Ditambah');
-            res.redirect('/data-pendaftar');
+            res.redirect('/form-pendaftaran');
         } catch (error) {
             console.log(error);
             let errorMessage = 'terjadi kesalahan!';
             // Tampilkan form kembali dengan pesan error dan data input sebelumnya
-            return res.render('index', {
+            return res.render('form-pendaftaran', {
                 layout: 'layouts/main-ejs-layouts',
-                title: 'Form',
+                title: 'halaman pendaftaran',
                 errors: [{ msg: errorMessage }],
                 data: req.body,
             });
         }
     }    
 });
-
 
 
 
@@ -402,6 +567,18 @@ router.put('/ubah-data', (req, res, next) => {
     }
 });
 
+// Logout route
+router.get('/logout', (req, res) => {
+    // Destroy all sessions
+    req.session.destroy((err) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send('Failed to logout');
+        }
+        // Optionally, redirect to login or home page
+        res.redirect('/'); // Redirect to login page after logout
+    });
+});
 
 
 // Hapus data pendaftar

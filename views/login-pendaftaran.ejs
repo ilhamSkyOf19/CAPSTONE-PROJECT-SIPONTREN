@@ -1,0 +1,35 @@
+<div class="container">
+    <div class="row">
+        <h1>Silahkan Login Untuk Mendaftar</h1>
+        <% if (typeof errors != 'undefined') { %>
+          <div class="alert alert-danger" role="alert">
+            <ul>
+              <% errors.forEach(error => { %>
+               <li><%= error.msg %></li>
+              <% }) %>
+            </ul>
+          </div>
+        <% } %>
+        <% if (typeof msg !== 'undefined' && msg.length !== 0) { %>
+          <div class="alert alert-success" role="alert">
+            <h3><%= msg %></h3>
+          </div>
+        <% } %>
+        <div class="col-md-5">
+            <form method="post" action="/login-pendaftaran">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="masukan username" value="<%= data ? data.username : '' %>">
+                  </div>
+                  <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="masukan password" value="<%= data ? data.password : '' %>">
+                  </div>
+                  <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+                <p class="mb-4 mt-4">Belum punya akun?</p>
+                <a href="/register">Register</a>
+        </div>
+    </div>
+</div>
