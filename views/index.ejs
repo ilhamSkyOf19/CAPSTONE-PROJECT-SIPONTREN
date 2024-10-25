@@ -11,10 +11,37 @@
       <div class="col-mbd-5">
         <div class="container">
           <div class="row">
-              <div class="col-md-5">
+              <div class="col-md-5 mb-5">
                   Selamat datang <%= dataUsername ? dataUsername : ' ' %>, di halaman utama
                   <a href="/login-pendaftaran">Pendaftaran</a>
+                
               </div>
+              <h3>Berita Hari ini , <%= today %></h3>
+              </div>
+              <div class="container">
+                <div class="row">
+                  <% if (berita.length > 0) { %>
+                    <% berita.forEach((item) => { %>
+                      <div class="col-md-4 mb-4"> <!-- Atur setiap card dalam grid kolom -->
+                        <div class="card" style="width: 100%;">
+                          <% if (item.thumbnail) { %>
+                            <img src="/public/imageBerita/<%= today %>/<%= item.thumbnail %>" class="card-img-top" alt=" berita ">
+                          <% } %>
+                          <div class="card-body">
+                            <h5 class="card-title"><%= item.title %></h5>
+                            <p class="card-text">
+                              <%= item.content.split(" ").slice(0, 20).join(" ") %>... <!-- Ambil 20 kata pertama -->
+                            </p>
+                            <a href="/detail-berita/<%= item._id %>" class="btn btn-primary">Baca selengkapnya</a>
+                          </div>
+                        </div>
+                      </div>
+                    <% }) %>
+                  <% } else { %>
+                    <p>Tidak ada berita untuk hari ini.</p>
+                  <% } %>
+                </div>
+              </div>              
           </div>
       </div>
       </div>

@@ -1,12 +1,14 @@
 import { check, body, validationResult } from 'express-validator';
-import { Pendaftaran } from '../models/pendaftaran.js';
 import multer from 'multer';
 import { validatorResult, capitalizeWords } from '../utils/validator.js';
 import express from 'express';
 import { Upload, Upload2 } from '../middleware/uploadFile.js';
 import FileValidator from '../middleware/checkFile.js';
+import { UploadBerita } from '../middleware/uploadFile.js';
 import path from 'node:path';
 import fs from 'fs/promises';
+import { Pendaftaran } from '../models/pendaftaran.js';
+import { Berita } from '../models/skemaBerita.js';
 import { User } from '../models/skemaLogin.js';
 import csrf from 'csrf';
 
@@ -29,6 +31,7 @@ router.get(' ',(req, res, next) => {
 
 // Halaman home pendaftaran
 router.get('/', async (req, res) => {
+    const today = new Date().toISOString().split('T')[0]; // format tanggal
     let dataUsername = ''; // Variabel untuk menyimpan nama pengguna, default-nya kosong
 
     if (req.session.loggedIn) {
@@ -41,10 +44,13 @@ router.get('/', async (req, res) => {
             console.error(error);
         }
     }
+    const berita = await Berita.find({ date: { $gte: today } }).sort({ date: -1 });
     return res.render('index', {
         layout:'layouts/main-ejs-layouts',
         title: 'halaman utama',
         dataUsername,
+        berita,
+        today,
     });
 });
 
@@ -165,7 +171,6 @@ router.post('/register', [
             layout: 'layouts/main-ejs-layouts',
             title: 'register',
             errors: errors.array(),
-            layout: 'layouts/main-ejs-layouts',
             data: req.body,
         })
     } else {
@@ -566,6 +571,127 @@ router.put('/ubah-data', (req, res, next) => {
         }
     }
 });
+
+// Route untuk form tambah berita
+router.get('/form-berita', (req, res) => {
+    res.render('form-berita', {
+        layout: 'layouts/main-ejs-layouts',
+        title: 'form berita',
+        data: req.body,
+    });
+  });
+
+
+// Route untuk menambah berita ke database
+router.post('/form-berita', [
+    (req, res, next) => {
+        // Pertama, jalankan Upload middleware untuk menangani file
+        UploadBerita(req, res, function (error) {
+            // Tangani kesalahan dari multer jika ada
+            if (error) {
+                let errorMessage;
+                if (error.code === 'INVALID_FILE_TYPE') {
+                    errorMessage = 'File tidak sesuai dengan yang diharapkan (harus .jpg, .jpeg, atau .png)!';
+                } else if (error instanceof multer.MulterError) {
+                    // Tangani kesalahan dari multer (seperti ukuran file terlalu besar)
+                    if (error.code === 'LIMIT_FILE_SIZE') {
+                        errorMessage = 'Ukuran file terlalu besar! Maksimum 2MB.';
+                    } else {
+                        errorMessage = 'Terjadi kesalahan upload file!';
+                    }
+                } else {
+                    errorMessage = error.message || 'Terjadi kesalahan saat upload file!';
+                }
+
+                // Render kembali form dengan pesan error dan data input
+                return res.render('form-berita', {
+                    layout: 'layouts/main-ejs-layouts',
+                    title: 'form berita',
+                    errors: [{ msg: errorMessage }],
+                    data: req.body, // Menyimpan input sebelumnya
+                });
+            }
+
+            // Jika file upload berhasil, lanjutkan ke middleware validasi berikutnya
+            next();
+        });
+    },
+    async (req, res, next) => {
+        // Validasi tipe file di sini dengan checkFileType, arahkan ke 'index' jika error
+        await FileValidator.checkFileType3(req, res, next, 'form-berita');
+    },
+    check('title', 'Title harus berisi huruf, angka, dan simbol').matches(/^[A-Za-z0-9\s!@#$%^&*(),.?":{}|<>]+$/),
+    check('content', 'content harus berisi huruf, angka, dan simbol').matches(/^[\s\S]+$/)
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        // Memeriksa dan menghapus file jika ada error
+        const uploadedFile = req.file; // Menggunakan req.file, bukan req.files
+    
+        try {
+            if (uploadedFile) {
+                await fs.unlink(uploadedFile.path); // Hapus file
+            }
+        } catch (err) {
+            console.error('Error while deleting file:', err);
+            // Anda dapat memberikan pesan kesalahan yang sesuai kepada pengguna jika diperlukan
+        }
+        console.log('Uploaded File:', req.file); 
+    
+        // Jika ada error dari validasi, render kembali form dengan pesan error
+        return res.render('form-berita', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'form-berita',
+            errors: errors.array(),
+            data: req.body,
+        });
+    } else {        
+        const { title, content } = req.body;
+        const thumbnail = req.file ? req.file.filename : null;
+      
+        const berita = new Berita({
+            title,
+            content,
+            thumbnail
+        });
+      
+        try {
+            await Berita.insertMany([berita]);
+            res.redirect('/');
+        } catch (err) {
+            res.status(500).send(err);
+        }
+    }
+});
+
+
+// router detail berita 
+router.get('/detail-berita/:id', async (req, res) => {
+    try {
+        const today = new Date().toISOString().split('T')[0]; // format tanggal
+        let id = req.params.id;
+        let data = await Berita.findById(id); // Tidak perlu callback di sini
+
+        // Jika data tidak ditemukan, arahkan ke halaman data pendaftar
+        if (!data) {
+            return res.redirect('/');
+        }
+
+
+        // Render halaman ubah-data-pendaftar
+        res.render('detail-berita', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'detal-berita',
+            data,
+            today,
+        });
+    } catch (err) {
+        // Tangani error jika terjadi masalah
+        console.error(err);
+        res.redirect('/data-pendaftar');
+    }
+})
+
 
 // Logout route
 router.get('/logout', (req, res) => {

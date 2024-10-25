@@ -16,7 +16,8 @@ import router from './routes/routes.js';
 
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import cors from 'cors';
 
@@ -55,8 +56,11 @@ connectDB();
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
 
+// Buat __filename dan __dirname manual
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 // public static
-app.use(express.static('public'));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
 // express session

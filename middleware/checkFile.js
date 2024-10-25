@@ -118,6 +118,66 @@ class FileValidator {
             return next(generalError);
         }
     }
+    async checkFileType3(req, res, next, fileLocation) {
+        try {
+            // Ambil file dari request (asumsi hanya satu file)
+            const file = req.file; // Ganti req.files dengan req.file
+            const validMimeTypes = ['image/jpeg', 'image/png', 'image/jpg']; // Tipe MIME yang valid
+            
+            // Logging untuk melihat file yang di-upload
+            console.log('Uploaded file:', file);
+    
+            // Cek apakah file ada
+            if (!file) {
+                const error = new Error('Tidak ada file yang di-upload');
+                error.code = 'NO_FILE_UPLOADED';
+                return res.render(fileLocation, {
+                    layout: 'layouts/main-ejs-layouts',
+                    title: 'Form',
+                    errors: [{ msg: error.message }],
+                    data: req.body,
+                });
+            }
+    
+            // Membaca chunk awal dari file untuk memeriksa tipe file
+            const buffer = await readChunk(file.path, { length: 4100 }).catch(err => {
+                console.error('Error reading chunk:', err);
+                throw new Error('Gagal membaca file untuk memeriksa tipe.');
+            });
+    
+            const fileType = await fileTypeFromBuffer(buffer).catch(err => {
+                console.error('Error getting file type:', err);
+                throw new Error('Gagal mendapatkan tipe file.');
+            });
+    
+            // Validasi tipe file
+            if (!(fileType && validMimeTypes.includes(fileType.mime))) {
+                // Hapus file jika tipe tidak valid
+                const isExistFile = await checkFile(file.path);
+                if (isExistFile) {
+                    await unlink(file.path); // Hapus file yang valid sebelumnya
+                }
+                
+                const error = new Error('File tidak valid, harus berupa .jpg, .jpeg, atau .png');
+                error.code = 'INVALID_FILE_TYPE';
+                return res.render(fileLocation, {
+                    layout: 'layouts/main-ejs-layouts',
+                    title: 'Form',
+                    errors: [{ msg: error.message }],
+                    data: req.body,
+                });
+            }
+    
+            // Jika file valid, lanjutkan ke middleware berikutnya
+            return next();
+        } catch (error) {
+            console.error('Error in checkFileType3:', error);
+            const generalError = new Error('Terjadi kesalahan saat memeriksa file: ' + error.message);
+            generalError.code = 'FILE_CHECK_ERROR';
+            return next(generalError);
+        }
+    }    
+    
 }
 
 export default new FileValidator();

@@ -1,0 +1,42 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-5">
+            <% if (typeof errors != 'undefined') { %>
+                <div class="alert alert-danger" role="alert">
+                  <ul>
+                    <% errors.forEach(error => { %>
+                     <li><%= error.msg %></li>
+                    <% }) %>
+                  </ul>
+                </div>
+              <% } %>
+              <% if (typeof errorsMongoose != 'undefined') { %>
+                <div class="alert alert-danger" role="alert">
+                  <ul>
+                    <% errorsMongoose.forEach(error => { %>
+                     <li><%= error.message %></li>
+                    <% }) %>
+                  </ul>
+                </div>
+              <% } %>
+            <h1>Tambah Berita</h1>
+            <form action="/form-berita" method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" class="form-control" id="title" name="title" placeholder="masukan judul" value="<%= data ? data.title : '' %>" required >
+                  </div>
+                
+                <div class="mb-3">
+                    <label for="content" class="form-label">content</label>
+                    <textarea class="form-control" id="content" name="content" rows="3" required><%= data ? data.content : '' %></textarea>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="thumbnail" class="form-label">Upload Thumnail</label>
+                    <input class="form-control" type="file" id="thumbnail" name="thumbnail" required>
+                  </div>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>

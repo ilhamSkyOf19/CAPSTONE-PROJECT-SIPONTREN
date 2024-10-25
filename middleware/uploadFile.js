@@ -1,6 +1,7 @@
 import multer from 'multer';
 // import path from 'path';
 import fs from 'fs/promises'; // Pastikan Anda mengimpor fs/promises
+import { existsSync } from 'fs';
 
 const TYPE_IMAGE = {
     "image/jpg": 'jpg',
@@ -111,4 +112,51 @@ export const Upload = multer({
     { name: 'fc_ktp', maxCount: 1 },  // Field untuk image kedua
     { name: 'kip_kis', maxCount: 1 },  // Field untuk image kedua
 ]);
+
+
+
+
+const storageBerita = multer.diskStorage({
+    destination: async function (req, file, cb) {
+        const today = new Date().toISOString().split('T')[0];
+        const dir = `public/imageBerita/${today}`;
+
+        // Cek apakah folder sudah ada
+        if (!existsSync(dir)) {
+            try {
+                // Jika folder belum ada, buat folder
+                await fs.mkdir(dir, { recursive: true });
+            } catch (error) {
+                return cb(error, null); // Tangani kesalahan saat membuat direktori
+            }
+        }
+        cb(null, dir); // Set direktori penyimpanan file
+    },
+    filename: function (req, file, cb) {
+        const ext = TYPE_IMAGE[file.mimetype]; // Ekstensi file berdasarkan MIME type
+        const filename = `${file.fieldname}_${Date.now()}.${ext}`.toLowerCase(); // Penamaan file menjadi lowercase
+        cb(null, filename); // Mengirimkan nama file yang sudah diubah menjadi lowercase
+    }
+});
+
+// File filter untuk memvalidasi tipe file yang di-upload
+const fileFilterBerita = (req, file, cb) => {
+    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg') {
+        cb(null, true);
+    } else {
+        const error = new Error('File tidak valid');
+        error.code = 'INVALID_FILE_TYPE';
+        cb(error, false); // Lempar error dengan tipe khusus
+    }
+};
+
+// Ukuran file maksimal (2MB)
+const maxSizeBerita = 2 * 1024 * 1024; // 2MB
+
+// Konfigurasi multer
+export const UploadBerita = multer({
+    storage: storageBerita,
+    fileFilter: fileFilterBerita,
+    limits: { fileSize: maxSizeBerita },
+}).single('thumbnail');
 
