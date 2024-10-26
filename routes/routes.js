@@ -1,6 +1,6 @@
 import { check, body, validationResult } from 'express-validator';
 import multer from 'multer';
-import { validatorResult, capitalizeWords } from '../utils/validator.js';
+import { validatorResult, capitalizeWords, deleteBeritaById, deletePendaftarById } from '../utils/validator.js';
 import express from 'express';
 import { Upload, Upload2 } from '../middleware/uploadFile.js';
 import FileValidator from '../middleware/checkFile.js';
@@ -275,7 +275,7 @@ router.post('/data-pendaftar', [
                     await fs.unlink(file.path); // Hapus file
                 }
             }
-            fs.rmdir(`images/${req.body.nik}`);
+            fs.rmdir(`public/imagesPendaftar/${req.body.nik}`);
         } catch (err) {
             console.error('Error while deleting files or directory:', err);
             // Anda dapat memberikan pesan kesalahan yang sesuai kepada pengguna jika diperlukan
@@ -447,7 +447,7 @@ router.put('/ubah-data', (req, res, next) => {
                 }
             }
     
-            const folder = `images/${oldNik}`;
+            const folder = `public/imagesPendaftar/${oldNik}`;
             if (folder) {
                 await fs.rmdir(folder);
             }
@@ -467,8 +467,8 @@ router.put('/ubah-data', (req, res, next) => {
         try {
             // Cek jika NIK berubah, rename folder dari oldNik ke nik
             if (nik !== oldNik) {
-                const oldDir = path.join('images', oldNik);
-                const newDir = path.join('images', nik);
+                const oldDir = path.join('public/imagesPendaftar', oldNik);
+                const newDir = path.join('public/imagesPendaftar', nik);
 
                 // Rename folder old_nik ke nik baru
                 await fs.rename(oldDir, newDir);
@@ -493,7 +493,7 @@ router.put('/ubah-data', (req, res, next) => {
                         if (req.files[field]) {
                             const newFileName = path.basename(req.files[field][0].path);
                             if (oldFileField) {
-                                const oldFilePath = path.join('images', nik, oldFileField);
+                                const oldFilePath = path.join('public/imagesPendaftar', nik, oldFileField);
                                 await fs.unlink(oldFilePath);
                                 console.log(`Old ${field} file removed`);
                             }
@@ -693,6 +693,45 @@ router.get('/detail-berita/:id', async (req, res) => {
 })
 
 
+// daftar berita 
+router.get('/daftar-berita', async (req, res) => {
+    const today = new Date().toISOString().split('T')[0]; // format tanggal
+    const berita = await Berita.find({ date: { $gte: today } }).sort({ date: -1 });
+    return res.render('daftar-berita', {
+        layout:'layouts/main-ejs-layouts',
+        title: 'daftar-berita',
+        msg: req.flash('msg'),
+        berita,
+        today,
+    });
+});
+
+// Hapus data pendaftar
+router.delete('/daftar-berita/:id', async (req, res) => {
+    const result = await deleteBeritaById(req.params.id);
+    
+    // Menggunakan flash untuk mengirim pesan ke pengguna
+    req.flash('msg', result.message);
+
+    // Redirect ke halaman daftar berita
+    res.redirect('/daftar-berita');
+});
+
+
+
+// Hapus data pendaftar
+router.delete('/data-pendaftar/:id', async (req, res) => {
+    const result = await deletePendaftarById(req.params.id);
+
+     // Menggunakan flash untuk mengirim pesan ke pengguna
+     req.flash('msg', result.message);
+
+     // Redirect ke halaman daftar berita
+     res.redirect('/data-pendaftar');
+});
+
+
+
 // Logout route
 router.get('/logout', (req, res) => {
     // Destroy all sessions
@@ -707,11 +746,8 @@ router.get('/logout', (req, res) => {
 });
 
 
-// Hapus data pendaftar
-router.delete('/data-pendaftar/:id', async (req, res) => {
-    await Pendaftaran.deleteOne({ _id: req.params.id });
-    req.flash('msg', 'Data berhasil dihapus!');
-    res.redirect('/data-pendaftar');
-});
+
+
+
 
 export default router;

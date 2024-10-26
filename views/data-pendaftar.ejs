@@ -18,6 +18,7 @@
                   <th scope="col">Jenis Kelamin</th>
                   <th scope="col">Usia</th>
                   <th scope="col">Ubah</th>
+                  <th scope="col">Delete</th>
                 </tr>
               </thead>
               <tbody>
@@ -38,7 +39,13 @@
                       <td> <%= data.nik %> </td>
                       <td> <%= data.jenis_kelamin %> </td>
                       <td> <%= data.usia %> </td>
-                      <td> <a href="/ubah-data-pendaftar/<%= data._id %>">Ubah</a></td>
+                      <td> <a class="btn btn-warning" href="/ubah-data-pendaftar/<%= data._id %>">Ubah</a></td>
+                      <td>
+                        <form id="delete" method="POST" action="/data-pendaftar/<%= data._id %>?_method=DELETE" class="d-inline">
+                          <input type="hidden" name="id" value="<%= data._id %>">
+                          <button type="submit" class="btn btn-danger" id="submitBtn">Delete</button>
+                      </form>
+                      </td>
                     </tr>
                   <% }) %>
                 <% } %>
@@ -47,3 +54,5 @@
       </div>
     </div>
 </div>
+
+<script src="/public/js/script.js"></script>

@@ -23,7 +23,7 @@
                   <% if (berita.length > 0) { %>
                     <% berita.forEach((item) => { %>
                       <div class="col-md-4 mb-4"> <!-- Atur setiap card dalam grid kolom -->
-                        <div class="card" style="width: 100%;">
+                        <div class="card" style="width: 100%; min-height: 500px;">
                           <% if (item.thumbnail) { %>
                             <img src="/public/imageBerita/<%= today %>/<%= item.thumbnail %>" class="card-img-top" alt=" berita ">
                           <% } %>

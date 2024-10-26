@@ -1,4 +1,14 @@
 import { check } from "express-validator";
+import { fileURLToPath } from 'node:url';
+import fs from 'fs';
+import path from 'path';
+import { Berita } from '../models/skemaBerita.js';
+import { Pendaftaran } from "../models/pendaftaran.js";
+
+
+// path untuk dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 
 // validator input
@@ -117,3 +127,78 @@ export const validatorResult = [
 export function capitalizeWords(str) {
     return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 };
+
+
+// delete berita 
+export async function deleteBeritaById(id) {
+    try {
+        // Temukan data berita berdasarkan ID
+        const berita = await Berita.findById(id);
+
+        // Jika berita ditemukan
+        if (!berita) {
+            return { success: false, message: 'Data tidak ditemukan!' };
+        }
+
+        // Path direktori image (today adalah tanggal dari dokumen berita)
+        const today = berita.date.toISOString().split('T')[0]; // Mengambil tanggal dari date dan menghilangkan 'T'
+        const filePath = path.join(process.cwd(), 'public', 'imageBerita', today, berita.thumbnail); // Menyusun path gambar
+
+        // Cek apakah file gambar ada dan hapus
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath); // Menggunakan unlinkSync untuk menunggu proses penghapusan selesai
+            console.log('Gambar berhasil dihapus:', filePath);
+        } else {
+            console.log('File gambar tidak ditemukan:', filePath);
+        }
+
+        // Hapus data berita dari MongoDB
+        await Berita.deleteOne({ _id: id });
+        return { success: true, message: 'Data dan gambar berhasil dihapus!' };
+        
+    } catch (error) {
+        console.error('Error saat menghapus berita:', error);
+        return { success: false, message: 'Gagal menghapus data!' };
+    }
+}
+
+
+
+// delete data pendaftar
+export async function deletePendaftarById(id) {
+    try {
+        // Temukan data pendaftar berdasarkan ID
+        const pendaftar = await Pendaftaran.findById(id);
+
+        // Jika pendaftar tidak ditemukan
+        if (!pendaftar) {
+            return { success: false, message: 'Data pendaftar tidak ditemukan!' };
+        }
+
+        // Path direktori folder berdasarkan NIK
+        const nikFolder = path.join(process.cwd(), 'public', 'imagesPendaftar', pendaftar.nik);
+
+        // Menghapus setiap file gambar di dalam folder NIK
+        if (fs.existsSync(nikFolder)) {
+            fs.readdirSync(nikFolder).forEach((file) => {
+                const filePath = path.join(nikFolder, file);
+                fs.unlinkSync(filePath);
+                console.log('Gambar berhasil dihapus:', filePath);
+            });
+
+            // Hapus folder setelah semua file di dalamnya terhapus
+            fs.rmdirSync(nikFolder);
+            console.log('Folder berhasil dihapus:', nikFolder);
+        } else {
+            console.log('Folder tidak ditemukan:', nikFolder);
+        }
+
+        // Hapus data pendaftar dari MongoDB
+        await Pendaftaran.deleteOne({ _id: id });
+        return { success: true, message: 'Data pendaftar, gambar, dan folder berhasil dihapus!' };
+
+    } catch (error) {
+        console.error('Error saat menghapus data pendaftar:', error);
+        return { success: false, message: 'Gagal menghapus data!' };
+    }
+}

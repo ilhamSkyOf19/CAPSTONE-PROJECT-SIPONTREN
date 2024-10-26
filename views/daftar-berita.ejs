@@ -1,0 +1,36 @@
+<div class="container">
+    <div class="row">
+        <% if (typeof msg !== 'undefined' && msg.length !== 0) { %>
+            <div class="alert alert-success" role="alert">
+              <h3><%= msg %></h3>
+            </div>
+          <% } %>
+      <% if (berita.length > 0) { %>
+        <% berita.forEach((item) => { %>
+          <div class="col-md-4 mb-4"> <!-- Atur setiap card dalam grid kolom -->
+            <div class="card" style="width: 100%; min-height: 500px;">
+              <% if (item.thumbnail) { %>
+                <img src="/public/imageBerita/<%= today %>/<%= item.thumbnail %>" class="card-img-top" alt=" berita ">
+              <% } %>
+              <div class="card-body">
+                <h5 class="card-title"><%= item.title %></h5>
+                <p class="card-text">
+                  <%= item.content.split(" ").slice(0, 20).join(" ") %>... <!-- Ambil 20 kata pertama -->
+                </p>
+                <a href="/detail-berita/<%= item._id %>" class="btn btn-primary">Baca selengkapnya</a>
+                <form id="delete" method="POST" action="/daftar-berita/<%= item._id %>?_method=DELETE" class="d-inline">
+                    <input type="hidden" name="id" value="<%= item._id %>">
+                    <button type="submit" class="btn btn-danger" id="submitBtn">Delete</button>
+                </form>
+                  <a class="btn btn-warning" href="/ubah-data-pendaftar/<%= item._id %>">Ubah</a>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <p>Tidak ada berita untuk hari ini.</p>
+      <% } %>
+    </div>
+</div> 
+
+<script src="/public/js/script.js"></script>

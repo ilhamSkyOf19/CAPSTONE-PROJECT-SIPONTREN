@@ -15,9 +15,9 @@ const storage2 = multer.diskStorage({
 
         // Jika NIK berbeda, gunakan folder dari old_nik, jika sama gunakan folder dari NIK baru
         if (req.body.nik !== req.body.old_nik) {
-            dir = `images/${req.body.old_nik}`;
+            dir = `public/imagesPendaftar/${req.body.old_nik}`;
         } else {
-            dir = `images/${req.body.nik}`;
+            dir = `public/imagesPendaftar/${req.body.nik}`;
         }
 
         try {
@@ -69,7 +69,7 @@ export const Upload2 = multer({
 const storage = multer.diskStorage({
     destination: async function (req, file, cb) {
         const nik = req.body.nik;
-        const dir = `images/${nik}`;
+        const dir = `public/imagesPendaftar/${nik}`;
 
         try {
             // Buat direktori jika tidak ada
