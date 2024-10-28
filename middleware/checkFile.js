@@ -47,12 +47,12 @@ class FileValidator {
                     }));
     
                     // Buat error custom dengan kode
-                    await fs.rmdir(`images/${req.body.nik}`); // Hapus folder berdasarkan nik
+                    await fs.rmdir(`public/imagesPendaftar/${req.body.nik}`); // Hapus folder berdasarkan nik
                     const error = new Error('File tidak valid, harus berupa .jpg, .jpeg, atau .png');
                     error.code = 'INVALID_FILE_TYPE';
                     return res.render(fileLocation, {
                         layout: 'layouts/main-ejs-layouts',
-                        title: 'Form',
+                        title: 'halaman pendaftar',
                         errors: [{ msg: error.message }],
                         data: req.body, // Menyimpan input sebelumnya
                     });

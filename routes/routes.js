@@ -55,15 +55,9 @@ router.get('/', async (req, res) => {
 });
 
 // login pendaftaran
-router.get('/login-pendaftaran', (req, res) => {
-    if (req.session.loggedIn) {
-        return res.redirect('/form-pendaftaran');
-    };
-    if (req.session.userId) {
-        return res.redirect('/data-pendaftar');
-    }
+router.get('/login-admin', (req, res) => {
     const token = csrfProtection.create(secret);
-    return res.render('login-pendaftaran', {
+    return res.render('login-admin', {
         layout: 'layouts/main-ejs-layouts',
         title: 'form pendaftaran',
         data: req.body,
@@ -73,7 +67,7 @@ router.get('/login-pendaftaran', (req, res) => {
 });
 
 // form login pendaftaran
-router.post('/login-pendaftaran', 
+router.post('/login-admin', 
     body('username').custom(async (value) => {
         const username = await User.findOne({ username: value });
         if (!username) {
@@ -89,7 +83,7 @@ router.post('/login-pendaftaran',
     async (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.render('login-pendaftaran', {
+            return res.render('login-admin', {
                 layout: 'layouts/main-ejs-layouts',
                 title: 'halaman login',
                 errors: errors.array(),
@@ -108,7 +102,7 @@ router.post('/login-pendaftaran',
 
                 if (!user) {
                     errorMsg = 'Username tidak terdaftar!';
-                    return res.render('login-pendaftaran', {
+                    return res.render('login-admin', {
                         title: 'halaman login',
                         layout: 'layouts/main-ejs-layouts',
                         errors: [{ msg: errorMsg }],
@@ -120,7 +114,7 @@ router.post('/login-pendaftaran',
                 const isPasswordValid = await user.comparePassword(password); // Gunakan instance user untuk membandingkan password
                 if (!isPasswordValid) {
                     errorMsg = 'Terjadi kesalahan password!';
-                    return res.render('login-pendaftaran', {
+                    return res.render('login-admin', {
                         layout: 'layouts/main-ejs-layouts',
                         title: 'halaman login',
                         errors: [{ msg: errorMsg }],
@@ -140,7 +134,7 @@ router.post('/login-pendaftaran',
 
                 req.session.loggedIn = user._id;
                 req.flash('msg', 'Berhasil masuk');
-                res.redirect('/form-pendaftaran');
+                res.redirect('/');
             } catch (error) {
                 console.log(error);
                 res.status(500).send('Error logging in');
@@ -192,12 +186,6 @@ router.post('/register', [
 
 // form pendaftaran
 router.get('/form-pendaftaran', (req, res) => {
-    if (!req.session.loggedIn) {
-        return res.redirect('/login-pendaftaran'); // Jika belum login, redirect ke login
-    }
-    if (req.session.userId) {
-        return res.redirect('/data-pendaftar');
-    }
     res.render('form-pendaftaran', {
         title: 'halaman pendaftar',
         layout: 'layouts/main-ejs-layouts',
@@ -243,7 +231,7 @@ router.post('/data-pendaftar', [
     },
     async (req, res, next) => {
         // Validasi tipe file di sini dengan checkFileType, arahkan ke 'index' jika error
-        await FileValidator.checkFileType(req, res, next, 'form-pedaftaran');
+        await FileValidator.checkFileType(req, res, next, 'form-pendaftaran');
     }, 
     // Validasi field NIK dan NISN menggunakan express-validator
     body('nik').custom(async (value) => {
@@ -304,11 +292,11 @@ router.post('/data-pendaftar', [
             }
     
             // Set session
-            req.session.userId = true;
+            // req.session.userId = true;
     
             await Pendaftaran.insertMany(finalData); // Menggunakan async/await
             req.flash('msg', 'Data Berhasil Ditambah');
-            res.redirect('/form-pendaftaran');
+            res.redirect('/');
         } catch (error) {
             console.log(error);
             let errorMessage = 'terjadi kesalahan!';
@@ -328,6 +316,10 @@ router.post('/data-pendaftar', [
 
 // Halaman data-pendaftar
 router.get('/data-pendaftar', async (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');
+       
+    }
     let dataPendaftar = await Pendaftaran.find();
     dataPendaftar = dataPendaftar.map(dataPendaftar => {
         if (dataPendaftar._doc && typeof dataPendaftar._doc === 'object') {
@@ -349,6 +341,9 @@ router.get('/data-pendaftar', async (req, res) => {
 
 // Halaman ubah
 router.get('/ubah-data-pendaftar/:id', async (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');
+    }
     try {
         let id = req.params.id;
         let data = await Pendaftaran.findById(id); // Tidak perlu callback di sini
@@ -574,6 +569,9 @@ router.put('/ubah-data', (req, res, next) => {
 
 // Route untuk form tambah berita
 router.get('/form-berita', (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');
+    }
     res.render('form-berita', {
         layout: 'layouts/main-ejs-layouts',
         title: 'form berita',
@@ -695,6 +693,9 @@ router.get('/detail-berita/:id', async (req, res) => {
 
 // daftar berita 
 router.get('/daftar-berita', async (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');
+    }
     const today = new Date().toISOString().split('T')[0]; // format tanggal
     const berita = await Berita.find({ date: { $gte: today } }).sort({ date: -1 });
     return res.render('daftar-berita', {
@@ -708,6 +709,9 @@ router.get('/daftar-berita', async (req, res) => {
 
 // Hapus data pendaftar
 router.delete('/daftar-berita/:id', async (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');
+    }
     const result = await deleteBeritaById(req.params.id);
     
     // Menggunakan flash untuk mengirim pesan ke pengguna
@@ -721,6 +725,9 @@ router.delete('/daftar-berita/:id', async (req, res) => {
 
 // Hapus data pendaftar
 router.delete('/data-pendaftar/:id', async (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');  
+    }
     const result = await deletePendaftarById(req.params.id);
 
      // Menggunakan flash untuk mengirim pesan ke pengguna
