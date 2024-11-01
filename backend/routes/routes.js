@@ -50,7 +50,7 @@ router.get('/', async (req, res) => {
 // login pendaftaran
 router.get('/login-admin', (req, res) => {
     const token = csrfProtection.create(secret);
-    return res.render('pages/home/login-admin', {
+    return res.render('pages/admin/login/login-admin', {
         layout: 'layouts/main-ejs-layouts',
         title: 'form pendaftaran',
         data: req.body,
@@ -76,7 +76,7 @@ router.post('/login-admin',
     async (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.render('pages/home/login-admin', {
+            return res.render('pages/admin/login/login-admin', {
                 layout: 'layouts/main-ejs-layouts',
                 title: 'halaman login',
                 errors: errors.array(),
@@ -95,7 +95,7 @@ router.post('/login-admin',
 
                 if (!user) {
                     errorMsg = 'Username tidak terdaftar!';
-                    return res.render('pages/home/login-admin', {
+                    return res.render('pages/admin/login/login-admin', {
                         title: 'halaman login',
                         layout: 'layouts/main-ejs-layouts',
                         errors: [{ msg: errorMsg }],
@@ -107,7 +107,7 @@ router.post('/login-admin',
                 const isPasswordValid = await user.comparePassword(password); // Gunakan instance user untuk membandingkan password
                 if (!isPasswordValid) {
                     errorMsg = 'Terjadi kesalahan password!';
-                    return res.render('pages/home/login-admin', {
+                    return res.render('pages/admin/login/login-admin', {
                         layout: 'layouts/main-ejs-layouts',
                         title: 'halaman login',
                         errors: [{ msg: errorMsg }],
@@ -324,7 +324,7 @@ router.get('/data-pendaftar', async (req, res) => {
         }
         return dataPendaftar._doc;
     });
-    res.render('pages/daftar/data-pendaftar', {
+    res.render('pages/admin/daftar/data-pendaftar', {
         layout: 'layouts/main-ejs-layouts',
         title: 'data pendaftar',
         dataPendaftar,
@@ -360,7 +360,7 @@ router.get('/ubah-data-pendaftar/:id', async (req, res) => {
         }
 
         // Render halaman ubah-data-pendaftar
-        res.render('pages/daftar/ubah-data-pendaftar', {
+        res.render('pages/admin/daftar/ubah-data-pendaftar', {
             layout: 'layouts/main-ejs-layouts',
             title: 'Ubah Data Pendaftar',
             data,
@@ -396,7 +396,7 @@ router.put('/ubah-data', (req, res, next) => {
                 errorMessage = error.message || 'Terjadi kesalahan saat upload file!';
             }
 
-            return res.render('pages/daftar/ubah-data-pendaftar', {
+            return res.render('pages/admin/daftar/ubah-data-pendaftar', {
                 layout: 'layouts/main-ejs-layouts',
                 title: 'Form',
                 errors: [{ msg: errorMessage }],
@@ -443,7 +443,7 @@ router.put('/ubah-data', (req, res, next) => {
             console.error('Error while deleting files or directory:', err);
         }
     
-        return res.render('pages/daftar/ubah-data-pendaftar', {
+        return res.render('pages/admin/daftar/ubah-data-pendaftar', {
             layout: 'layouts/main-ejs-layouts',
             title: 'ubah data pendaftar',
             errors: errors.array(),
@@ -548,7 +548,7 @@ router.put('/ubah-data', (req, res, next) => {
                 errorMessage = 'Terjadi kesalahan saat menyimpan data ke database!';
             }
 
-            return res.render('pages/daftar/ubah-data-pendaftar', {
+            return res.render('pages/admin/daftar/ubah-data-pendaftar', {
                 layout: 'layouts/main-ejs-layouts',
                 title: 'Form',
                 errors: [{ msg: errorMessage }],
@@ -565,7 +565,7 @@ router.get('/form-berita', (req, res) => {
     if (!req.session.loggedIn) {
         return res.redirect('/login-admin');
     }
-    res.render('pages/home/form-berita', {
+    res.render('pages/admin/home/form-berita', {
         layout: 'layouts/main-ejs-layouts',
         title: 'form berita',
         data: req.body,
@@ -595,7 +595,7 @@ router.post('/form-berita', [
                 }
 
                 // Render kembali form dengan pesan error dan data input
-                return res.render('pages/berita/form-berita', {
+                return res.render('pages/admin/berita/form-berita', {
                     layout: 'layouts/main-ejs-layouts',
                     title: 'form berita',
                     errors: [{ msg: errorMessage }],
@@ -630,7 +630,7 @@ router.post('/form-berita', [
         console.log('Uploaded File:', req.file); 
     
         // Jika ada error dari validasi, render kpages/home/embali form dengan pesan error
-        return res.render('pages/berita/form-berita', {
+        return res.render('pages/admin/berita/form-berita', {
             layout: 'layouts/main-ejs-layouts',
             title: 'form-berita',
             errors: errors.array(),
@@ -670,7 +670,7 @@ router.get('/detail-berita/:id', async (req, res) => {
 
 
         // Render halaman ubah-data-pendaftar
-        res.render('pages/berita/detail-berita', {
+        res.render('pages/admin/berita/detail-berita', {
             layout: 'layouts/main-ejs-layouts',
             title: 'detal-berita',
             data,
@@ -691,7 +691,7 @@ router.get('/daftar-berita', async (req, res) => {
     }
     const today = new Date().toISOString().split('T')[0]; // format tanggal
     const berita = await Berita.find({ date: { $gte: today } }).sort({ date: -1 });
-    return res.render('pages/berita/daftar-berita', {
+    return res.render('pages/admin/berita/daftar-berita', {
         layout:'layouts/main-ejs-layouts',
         title: 'daftar-berita',
         msg: req.flash('msg'),

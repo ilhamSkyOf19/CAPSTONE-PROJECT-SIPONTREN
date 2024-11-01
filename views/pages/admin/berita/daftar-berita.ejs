@@ -20,7 +20,7 @@
                 <a href="/detail-berita/<%= item._id %>" class="btn btn-primary">Baca selengkapnya</a>
                 <form id="delete" method="POST" action="/daftar-berita/<%= item._id %>?_method=DELETE" class="d-inline">
                     <input type="hidden" name="id" value="<%= item._id %>">
-                    <button type="submit" class="btn btn-danger" id="submitBtn">Delete</button>
+                    <button type="submit" class="btn btn-danger" id="submitBtn" onclick="confirm('apakah anda yakin')">Delete</button>
                 </form>
                   <a class="btn btn-warning" href="/ubah-data-pendaftar/<%= item._id %>">Ubah</a>
               </div>
