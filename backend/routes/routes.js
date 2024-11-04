@@ -4,7 +4,7 @@ import { validatorResult, capitalizeWords, deleteBeritaById, deletePendaftarById
 import express from 'express';
 import { Upload, Upload2 } from '../middleware/uploadFile.js';
 import FileValidator from '../middleware/checkFile.js';
-import { UploadBerita } from '../middleware/uploadFile.js';
+import { FileSingleUploader } from '../middleware/uploadFile.js';
 import path from 'node:path';
 import fs from 'fs/promises';
 import { Pendaftaran } from '../models/pendaftaran.js';
@@ -224,7 +224,7 @@ router.post('/data-pendaftar', [
     },
     async (req, res, next) => {
         // Validasi tipe file di sini dengan checkFileType, arahkan ke 'index' jika error
-        await FileValidator.checkFileType(req, res, next, 'form-pendaftaran');
+        await FileValidator.checkFileType(req, res, next, 'pages/user/form-pendaftaran');
     }, 
     // Validasi field NIK dan NISN menggunakan express-validator
     body('nik').custom(async (value) => {
@@ -284,9 +284,6 @@ router.post('/data-pendaftar', [
                 }
             }
     
-            // Set session
-            // req.session.userId = true;
-    
             await Pendaftaran.insertMany(finalData); // Menggunakan async/await
             req.flash('msg', 'Data Berhasil Ditambah');
             res.redirect('/');
@@ -311,8 +308,9 @@ router.post('/data-pendaftar', [
 router.get('/data-pendaftar', async (req, res) => {
     if (!req.session.loggedIn) {
         return res.redirect('/login-admin');
-       
     }
+    const user = await User.findOne({ _id: req.session.loggedIn });
+    const dataUsername = user.username;
     let dataPendaftar = await Pendaftaran.find();
     dataPendaftar = dataPendaftar.map(dataPendaftar => {
         if (dataPendaftar._doc && typeof dataPendaftar._doc === 'object') {
@@ -328,19 +326,19 @@ router.get('/data-pendaftar', async (req, res) => {
         layout: 'layouts/main-ejs-layouts',
         title: 'data pendaftar',
         dataPendaftar,
+        dataUsername,
         msg: req.flash('msg'),
     });
 });
 
-// Halaman ubah
+// Halaman ubah data pendaftar
 router.get('/ubah-data-pendaftar/:id', async (req, res) => {
     if (!req.session.loggedIn) {
         return res.redirect('/login-admin');
     }
     try {
         let id = req.params.id;
-        let data = await Pendaftaran.findById(id); // Tidak perlu callback di sini
-
+        let data = await Pendaftaran.findById(id); 
         // Jika data tidak ditemukan, arahkan ke halaman data pendaftar
         if (!data) {
             return res.redirect('/data-pendaftar');
@@ -358,12 +356,14 @@ router.get('/ubah-data-pendaftar/:id', async (req, res) => {
                 }
             }
         }
-
+        const user = await User.findOne({ _id: req.session.loggedIn });
+        const dataUsername = user.username;
         // Render halaman ubah-data-pendaftar
         res.render('pages/admin/daftar/ubah-data-pendaftar', {
             layout: 'layouts/main-ejs-layouts',
             title: 'Ubah Data Pendaftar',
             data,
+            dataUsername,
             dataFile: '',
         });
     } catch (err) {
@@ -374,7 +374,7 @@ router.get('/ubah-data-pendaftar/:id', async (req, res) => {
 });
 
 
-// PUT
+// PUT ubah data pendaftar
 router.put('/ubah-data', (req, res, next) => {
     console.log('Request body:', req.body); // Menampilkan semua data yang dikirim
     console.log('Files:', req.files); // Menampilkan file yang dikirim
@@ -411,7 +411,7 @@ router.put('/ubah-data', (req, res, next) => {
     });
 }, async (req, res, next) => {
     if(req.files) {
-        FileValidator.checkFileType2(req, res, next, 'ubah-data-pendaftar');
+        FileValidator.checkFileType2(req, res, next, 'pages/admin/daftar/ubah-data-pendaftar');
     } else {
         next();
     }
@@ -561,23 +561,28 @@ router.put('/ubah-data', (req, res, next) => {
 });
 
 // Route untuk form tambah berita
-router.get('/form-berita', (req, res) => {
+router.get('/form-berita', async (req, res) => {
     if (!req.session.loggedIn) {
         return res.redirect('/login-admin');
     }
-    res.render('pages/admin/home/form-berita', {
+    const user = await User.findOne({ _id: req.session.loggedIn });
+    const dataUsername = user.username;
+    res.render('pages/admin/berita/form-berita', {
         layout: 'layouts/main-ejs-layouts',
         title: 'form berita',
+        dataUsername,
         data: req.body,
     });
   });
 
 
 // Route untuk menambah berita ke database
+const maxSize = 2 * 1024 * 1024; // 2MB limit
+const uploaderberita = new FileSingleUploader('public/imageBerita', maxSize, 'thumbnail');
 router.post('/form-berita', [
     (req, res, next) => {
         // Pertama, jalankan Upload middleware untuk menangani file
-        UploadBerita(req, res, function (error) {
+        uploaderberita.upload(req, res, function (error) {
             // Tangani kesalahan dari multer jika ada
             if (error) {
                 let errorMessage;
@@ -609,7 +614,7 @@ router.post('/form-berita', [
     },
     async (req, res, next) => {
         // Validasi tipe file di sini dengan checkFileType, arahkan ke 'index' jika error
-        await FileValidator.checkFileType3(req, res, next, 'pages/berita/form-berita');
+        await FileValidator.checkFileType3(req, res, next, 'pages/admin/berita/form-berita');
     },
     check('title', 'Title harus berisi huruf, angka, dan simbol').matches(/^[A-Za-z0-9\s!@#$%^&*(),.?":{}|<>]+$/),
     check('content', 'content harus berisi huruf, angka, dan simbol').matches(/^[\s\S]+$/)
@@ -627,7 +632,6 @@ router.post('/form-berita', [
             console.error('Error while deleting file:', err);
             // Anda dapat memberikan pesan kesalahan yang sesuai kepada pengguna jika diperlukan
         }
-        console.log('Uploaded File:', req.file); 
     
         // Jika ada error dari validasi, render kpages/home/embali form dengan pesan error
         return res.render('pages/admin/berita/form-berita', {
@@ -655,6 +659,144 @@ router.post('/form-berita', [
     }
 });
 
+// Route untuk form ubah berita
+router.get('/ubah-berita/:id', async (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');
+    }
+    const user = await User.findOne({ _id: req.session.loggedIn });
+    const dataUsername = user.username;
+    try {
+        let id = req.params.id;
+        let data = await Berita.findById(id);
+        // Jika data tidak ditemukan, arahkan ke halaman data pendaftar
+        if (!data) {
+            return res.redirect('/data-pendaftar');
+        }
+        res.render('pages/admin/berita/ubah-berita', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'form ubah berita',
+            dataUsername,
+            data,
+            dataFile: '',
+        });
+    } catch {
+         // Tangani error jika terjadi masalah
+         console.error(err);
+         res.redirect('/data-pendaftar');
+    }
+   
+});
+
+
+
+// Ubah data berita
+const uploaderUbahBerita = new FileSingleUploader('public/imageBerita', maxSize, 'thumbnail');
+router.put('/form-berita', (req, res, next) => {
+    console.log('Request body:', req.body); // Menampilkan semua data yang dikirim
+    console.log('Files:', req.files); // Menampilkan file yang dikirim
+
+    // Jalankan Upload middleware untuk menangani file
+    uploaderUbahBerita(req, res, async (error) => {
+        let dataBerita = await Berita.findById(req.body._id);
+        if (error) {
+            let errorMessage;
+
+            if (error.code === 'INVALID_FILE_TYPE') {
+                errorMessage = 'File tidak sesuai dengan yang diharapkan (harus .jpg, .jpeg, atau .png)!';
+            } else if (error instanceof multer.MulterError) {
+                if (error.code === 'LIMIT_FILE_SIZE') {
+                    errorMessage = 'Ukuran file terlalu besar! Maksimum 2MB.';
+                } else {
+                    errorMessage = 'Terjadi kesalahan upload file!';
+                }
+            } else {
+                errorMessage = error.message || 'Terjadi kesalahan saat upload file!';
+            }
+
+            return res.render('pages/admin/berita/ubah-berita', {
+                layout: 'layouts/main-ejs-layouts',
+                title: 'Form',
+                errors: [{ msg: errorMessage }],
+                data: req.body,
+                msg: req.flash('msg'),
+                dataFile: dataBerita,
+            });
+        }
+
+        // Jika file upload berhasil, lanjutkan ke middleware validasi berikutnya
+        next();
+    });
+}, async (req, res) => {
+    const errors = validationResult(req);
+    const dataBerita = await Berita.findById(req.body._id);
+
+    if (!errors.isEmpty()) {
+        return res.render('pages/admin/berita/ubah-berita', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'ubah data pendaftar',
+            errors: errors.array(),
+            data: req.body,
+            msg: req.flash('msg'),
+            dataFile: dataBerita,
+        });
+    }
+
+    try {
+        let thumbnailOld = req.body.thumbnailOld || '';
+        let thumbnail = req.body.thumbnail || '';
+    
+        if (req.files) {
+            try {
+                const processFile = async (field, oldFile) => {
+                    if (req.files[field]) {
+                        const newFileName = path.basename(req.files[field][0].path);
+                        if (oldFile) {
+                            const oldFilePath = path.join('public/imageBerita/', oldFile);
+                            await fs.promises.unlink(oldFilePath);
+                            console.log(`Old ${field} file removed: ${oldFilePath}`);
+                        }
+                        return newFileName;
+                    }
+                    return oldFile; // Mengembalikan file lama jika tidak ada file baru
+                };
+                thumbnail = await processFile('thumbnail', thumbnailOld);
+            } catch (err) {
+                console.error("Error processing files:", err);
+                return res.status(500).send("Error processing files");
+            }
+        }
+    
+        await Pendaftaran.updateOne(
+            { _id: req.body._id },
+            {
+                $set: {
+                    title: req.body.title,
+                    content: req.body.content,
+                    thumbnail: thumbnail, // Gunakan thumbnail yang diproses
+                }
+            }
+        );
+    
+        req.flash('msg', 'Data berhasil diubah!');
+        res.redirect('/daftar-berita');
+    } catch (error) {
+        let errorMessage = error.name === 'ValidationError' ? 
+            Object.values(error.errors).map(err => err.message).join(', ') : 
+            'Terjadi kesalahan saat menyimpan data ke database!';
+    
+        return res.render('pages/admin/berita/ubah-berita', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'Form Ubah Berita',
+            errors: [{ msg: errorMessage }],
+            data: req.body,
+            msg: req.flash('msg'),
+            dataFile: dataBerita,
+        });
+    }    
+});
+
+
 
 // router detail berita 
 router.get('/detail-berita/:id', async (req, res) => {
@@ -667,19 +809,31 @@ router.get('/detail-berita/:id', async (req, res) => {
         if (!data) {
             return res.redirect('/');
         }
-
-
-        // Render halaman ubah-data-pendaftar
-        res.render('pages/admin/berita/detail-berita', {
-            layout: 'layouts/main-ejs-layouts',
-            title: 'detal-berita',
-            data,
-            today,
-        });
+        const user = await User.findOne({ _id: req.session.loggedIn });
+        if (user) {
+            const dataUsername = user.username;
+              // Render halaman ubah-data-pendaftar
+            res.render('pages/admin/berita/detail-berita', {
+                layout: 'layouts/main-ejs-layouts',
+                title: 'detail-berita',
+                data,
+                dataUsername,
+                today,
+            });
+        } else {
+              // Render halaman ubah-data-pendaftar
+            res.render('pages/admin/berita/detail-berita', {
+                layout: 'layouts/main-ejs-layouts',
+                title: 'detail-berita',
+                data,
+                today,
+            });
+        }
+      
     } catch (err) {
         // Tangani error jika terjadi masalah
         console.error(err);
-        res.redirect('/data-pendaftar');
+        res.redirect('/');
     }
 })
 
@@ -691,11 +845,14 @@ router.get('/daftar-berita', async (req, res) => {
     }
     const today = new Date().toISOString().split('T')[0]; // format tanggal
     const berita = await Berita.find({ date: { $gte: today } }).sort({ date: -1 });
+    const user = await User.findOne({ _id: req.session.loggedIn });
+    const dataUsername = user.username;
     return res.render('pages/admin/berita/daftar-berita', {
         layout:'layouts/main-ejs-layouts',
         title: 'daftar-berita',
         msg: req.flash('msg'),
         berita,
+        dataUsername,
         today,
     });
 });

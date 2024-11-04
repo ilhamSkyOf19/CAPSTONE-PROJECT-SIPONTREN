@@ -72,7 +72,6 @@ class FileValidator {
         let dataPendaftar = await Pendaftaran.findById(req.body._id);
         try {
             // Cek apakah file ada dalam request
-            // Cek apakah file ada dalam request
             const fotoFormal = req.files['foto_formal'] ? req.files['foto_formal'][0] : null;
             const aktaKelahiran = req.files['akta_kelahiran'] ? req.files['akta_kelahiran'][0] : null;
             const kartuKeluarga = req.files['kartu_keluarga'] ? req.files['kartu_keluarga'][0] : null;
@@ -129,14 +128,8 @@ class FileValidator {
     
             // Cek apakah file ada
             if (!file) {
-                const error = new Error('Tidak ada file yang di-upload');
-                error.code = 'NO_FILE_UPLOADED';
-                return res.render(fileLocation, {
-                    layout: 'layouts/main-ejs-layouts',
-                    title: 'Form',
-                    errors: [{ msg: error.message }],
-                    data: req.body,
-                });
+            // Jika tidak ada file, lanjutkan ke middleware berikutnya tanpa melakukan proses lebih lanjut
+            return next();
             }
     
             // Membaca chunk awal dari file untuk memeriksa tipe file

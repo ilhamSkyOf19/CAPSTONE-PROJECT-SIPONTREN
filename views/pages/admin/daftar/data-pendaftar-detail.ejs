@@ -39,7 +39,7 @@
                   <p class="card-text">Nama Lengkap Wali :<%= idPendaftar.nama_lengkap_wali %></p>
                   <form id="delete_data" method="POST" action="/data?_method=DELETE" class="d-inline">
                     <input type="hidden" name="id" value="<%= idPendaftar.id %>">
-                    <button type="submit" class="btn btn-danger" id="submitBtn">Delete</button>
+                    <button type="submit" class="btn btn-danger" id="submitBtn" onclick="confirm('apakah anda yakin')">Delete</button>
                   </form>
                   <a class="btn btn-danger" href="/ubah-data-pendaftar/<%= idPendaftar._id %>">Ubah</a>
                   <a href="/data-pendaftar" class="card-link d-block mt-4">Kembali ke halaman</a>
