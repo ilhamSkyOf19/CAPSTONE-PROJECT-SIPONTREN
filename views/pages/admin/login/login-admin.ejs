@@ -17,7 +17,6 @@
         <% } %>
         <div class="col-md-5">
             <form method="post" action="/login-admin">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                   <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
                     <input type="text" class="form-control" id="username" name="username" placeholder="masukan username" value="<%= data ? data.username : '' %>">

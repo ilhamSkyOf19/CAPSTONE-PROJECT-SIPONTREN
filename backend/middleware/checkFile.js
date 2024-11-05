@@ -2,7 +2,7 @@ import { fileTypeFromBuffer } from 'file-type';
 import { readChunk } from 'read-chunk';
 import { unlink, access } from 'node:fs/promises';
 import fs from 'fs/promises';
-import { Pendaftaran } from '../models/pendaftaran.js';
+import Pendaftaran from '../models/pendaftaran.js';
 
 async function checkFile(path) {
     try {

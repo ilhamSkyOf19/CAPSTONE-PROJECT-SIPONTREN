@@ -1,41 +1,39 @@
-import mongoose from 'mongoose';
-import argon2 from 'argon2'
+import { Sequelize, DataTypes } from 'sequelize';
+import db from '../config/database.js'; // Pastikan path database yang benar
+import argon2 from 'argon2';  // Library untuk hashing password
 
-const userSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        required: true,
-        unique: true
+const User = db.define('user', {
+  username: {
+    type: DataTypes.STRING(255),
+    allowNull: false,
+    unique: true,  // Menjamin username unik
+    validate: {
+      notEmpty: true, // Username tidak boleh kosong
     },
-    password: {
-        type: String,
-        required: true
-    }
+  },
+  password: {
+    type: DataTypes.STRING(255),
+    allowNull: false,
+    validate: {
+      notEmpty: true, // Password tidak boleh kosong
+    },
+  },
+}, {
+  freezeTableName: true,
+  timestamps: true,  // Menggunakan createdAt dan updatedAt
+  // Jika ingin menggunakan custom primary key
+  // primaryKey: true,
 });
 
-// Middleware untuk mengenkripsi password sebelum disimpan
-userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) {
-        return next();
-    }
-    try {
-        this.password = await argon2.hash(this.password); // Hash password dengan Argon2
-        next();
-    } catch (err) {
-        next(err);
-    }
+// Sebelum membuat atau mengupdate user, hash password terlebih dahulu
+User.beforeCreate(async (user, options) => {
+  user.password = await argon2.hash(user.password);
 });
 
-// Metode untuk membandingkan password yang dimasukkan dengan password yang tersimpan
-userSchema.methods.comparePassword = async function (candidatePassword) {
-    try {
-        return await argon2.verify(this.password, candidatePassword); // Verifikasi password dengan Argon2
-    } catch (err) {
-        throw new Error(err);
-    }
-};
+User.beforeUpdate(async (user, options) => {
+  if (user.password) {
+    user.password = await argon2.hash(user.password);
+  }
+});
 
-export const User = mongoose.model('User', userSchema);
-
-
-
+export default User;

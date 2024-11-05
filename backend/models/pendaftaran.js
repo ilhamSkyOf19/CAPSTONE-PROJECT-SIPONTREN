@@ -1,164 +1,144 @@
-// module mongoose
-import mongoose from "mongoose";
+import { Sequelize, DataTypes } from 'sequelize';
+import db from '../config/database.js'; // Pastikan path database yang benar
 
-
-// scema pendaftaran
-export const Pendaftaran = mongoose.model('SISWA', {
-    nisn: {
-        type: String,
-        required: true,
-        trim: true,
+const Pendaftaran = db.define('pendaftar', {
+  nisn: {
+    type: DataTypes.STRING(20),
+    allowNull: false,
+    unique: true,
+    trim: true,
+  },
+  nik: {
+    type: DataTypes.STRING(20),
+    allowNull: false,
+    trim: true,
+  },
+  nama_lengkap: {
+    type: DataTypes.STRING(30),
+    allowNull: false,
+    trim: true,
+    set(value) {
+      this.setDataValue('nama_lengkap', value.toLowerCase()); // Menyimpan dengan huruf kecil
     },
-    nik: {
-        type: String,
-        required: true,
-        trim: true,
+  },
+  jenis_kelamin: {
+    type: DataTypes.STRING(10),
+    allowNull: false,
+    trim: true,
+    set(value) {
+      this.setDataValue('jenis_kelamin', value.toLowerCase());
     },
-    nama_lengkap: {
-        type: String,
-        required: true,
-        trim: true,
-        lowercase: true,
-        maxlength: 30,
+  },
+  usia: {
+    type: DataTypes.STRING(2),
+    allowNull: false,
+    trim: true,
+  },
+  tempat_lahir: {
+    type: DataTypes.STRING(30),
+    allowNull: false,
+    trim: true,
+    set(value) {
+      this.setDataValue('tempat_lahir', value.toLowerCase());
     },
-    jenis_kelamin: {
-        type: String,
-        required: true,
-        trim: true,
-        lowercase: true,
+  },
+  tanggal_lahir: {
+    type: DataTypes.DATEONLY,
+    allowNull: false,
+    trim: true,
+  },
+  alamat: {
+    type: DataTypes.TEXT, // Menggunakan TEXT untuk menampung alamat panjang
+    allowNull: false,
+    trim: true,
+  },
+  anak_ke: {
+    type: DataTypes.STRING(2),
+    allowNull: false,
+    trim: true,
+  },
+  jumlah_saudara: {
+    type: DataTypes.STRING(2),
+    allowNull: false,
+    trim: true,
+  },
+  nomor_telephone: {
+    type: DataTypes.STRING(13),
+    allowNull: false,
+    trim: true,
+  },
+  alumni_sd: {
+    type: DataTypes.STRING(50),
+    allowNull: false,
+    trim: true,
+  },
+  alamat_sekolah_asal: {
+    type: DataTypes.STRING(100),
+    allowNull: false,
+    trim: true,
+  },
+  nama_lengkap_ayah: {
+    type: DataTypes.STRING(50),
+    allowNull: false,
+    trim: true,
+    set(value) {
+      this.setDataValue('nama_lengkap_ayah', value.toLowerCase());
     },
-    usia: {
-        type: String,
-        required: true,
-        trim: true,
-        minlength: 2,
-        maxlength: 2,
+  },
+  nama_lengkap_ibu: {
+    type: DataTypes.STRING(50),
+    allowNull: false,
+    trim: true,
+    set(value) {
+      this.setDataValue('nama_lengkap_ibu', value.toLowerCase());
     },
-    tempat_tanggal_lahir: {
-        tempat_lahir: {
-            type: String,
-            required: true,
-            trim: true,
-            lowercase: true,
-            maxlength: 30,
-        },
-        tanggal_lahir: {
-            type: String,
-            required: true,
-            trim: true,
-        },
+  },
+  nama_lengkap_wali: {
+    type: DataTypes.STRING(50),
+    allowNull: false,
+    trim: true,
+    set(value) {
+      this.setDataValue('nama_lengkap_wali', value.toLowerCase());
     },
-    alamat: {
-        desa: {
-            type: String,
-            required: true,
-            trim: true,
-            lowercase: true,
-        },
-        rw: {
-            type: String,
-            required: true,
-            trim: true,
-            maxlength: 2,
-        },
-        rt: {
-            type: String,
-            required: true,
-            trim: true,
-            maxlength: 2,
-        },
-        kecamatan: {
-            type: String,
-            required: true,
-            trim: true,
-            lowercase: true,
-        },
-        kabupaten: {
-            type: String,
-            required: true,
-            trim: true,
-            lowercase: true,
-        },
-        provinsi: {
-            type: String,
-            required: true,
-            trim: true,
-            lowercase: true,
-        },
-    },
-    anak_ke: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    jumlah_saudara: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    nomor_telephone: {
-        type: String,
-        required: true,
-        trim: true,
-        maxlength: 13,
-    },
-    alumni_sd: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    alamat_sekolah_asal: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    nama_lengkap_ayah: {
-        type: String,
-        required: true,
-        trim: true,
-        lowercase: true,
-    },
-    nama_lengkap_ibu: {
-        type: String,
-        required: true,
-        trim: true,
-        lowercase: true,
-    },
-    nama_lengkap_wali: {
-        type: String,
-        required: true,
-        trim: true,
-        lowercase: true,
-    },
-    kode_pos: {
-        type: String,
-        required: true,
-        trim: true,
-        maxlength: 5,
-    },
-    foto_formal: {
-        type: String,
-        required: false,
-        lowercase: true,
-    },
-    akta_kelahiran: {
-        type: String,
-        required: false,
-        lowercase: true,
-    },
-    kartu_keluarga: {
-        type: String,
-        required: false,
-        lowercase: true,
-    },
-    fc_ktp: {
-        type: String,
-        required: false,
-        lowercase: true,
-    },
-    kip_kis: {
-        type: String,
-        required: false,
-        lowercase: true,
-    },
+  },
+  kode_pos: {
+    type: DataTypes.STRING(5),
+    allowNull: false,
+    trim: true,
+  },
+  foto_formal: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+    trim: true,
+  },
+  akta_kelahiran: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+    trim: true,
+  },
+  kartu_keluarga: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+    trim: true,
+  },
+  fc_ktp: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+    trim: true,
+  },
+  kip_kis: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+    trim: true,
+  },
+}, {
+  freezeTableName: true,
+  timestamps: false,
 });
+
+export default Pendaftaran;
+
+
+(async () => {
+    await db.sync();
+})();

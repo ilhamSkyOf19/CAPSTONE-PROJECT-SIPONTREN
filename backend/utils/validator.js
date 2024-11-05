@@ -2,8 +2,8 @@ import { check } from "express-validator";
 import { fileURLToPath } from 'node:url';
 import fs from 'fs';
 import path from 'path';
-import { Berita } from '../models/skemaBerita.js';
-import { Pendaftaran } from "../models/pendaftaran.js";
+import Berita from '../models/skemaBerita.js';
+import Pendaftaran from "../models/pendaftaran.js";
 
 
 // path untuk dirname
@@ -27,38 +27,8 @@ export const validatorResult = [
             }
             return true; // Validasi berhasil
         }),
-    check('tempat_tanggal_lahir.tempat_lahir', 'tempat harus berisi huruf!').isAlpha('en-US', { ignore: ' ' }), // cek tempat lahir
-    check('tempat_tanggal_lahir.tanggal_lahir', 'tanggal lahir tidak valid').isDate(),  // cek tanggal lahir
-    check('alamat.desa', 'desa harus berisi huruf!').isAlpha('en-US', { ignore: ' ' }), // cek alamat desa
-    check('alamat.rw')  // cek alamat rw
-        .notEmpty().withMessage('rw harus diisi!')
-        .bail()
-        .isInt().withMessage('rw harus berupa angka dan maksimal 100!')
-        .bail()
-        .isLength({max: 3}).withMessage('rw tidak boleh lebih dari 3 digit!')
-        .bail()
-        .custom(value => {
-            if (value < 1) {
-                throw new Error('rw harus lebih dari 0!');
-            }
-            return true; // Validasi berhasil
-        }),
-    check('alamat.rt')  // cek alamat rt
-        .notEmpty().withMessage('rt harus diisi!')
-        .bail()
-        .isInt({ max: 100 }).withMessage('rt harus berupa angka ')
-        .bail()
-        .isLength({max: 3}).withMessage('rt tidak boleh lebih dari 3 digit!')
-        .bail()
-        .custom(value => {
-            if (value < 1) {
-                throw new Error('rt harus lebih dari 0!');
-            }
-            return true; // Validasi berhasil
-        }),
-    check('alamat.kecamatan', 'kecamatan harus berisi huruf!').isAlpha('en-US', { ignore: ' ' }),   // cek alamat kecamatan
-    check('alamat.kabupaten', 'kabupaten harus berisi huruf!').isAlpha('en-US', { ignore: ' ' }),   // cek alamat kabupaten
-    check('alamat.provinsi', 'provinsi harus berisi huruf!').isAlpha('en-US', { ignore: ' ' }),     // cek alamat provinsi  
+    check('tempat_lahir', 'tempat harus berisi huruf!').isAlpha('en-US', { ignore: ' ' }), // cek tempat lahir
+    check('tanggal_lahir', 'tanggal lahir tidak valid').isDate(),  // cek tanggal lahir
     check('anak_ke')    // cek berat badan
     .notEmpty().withMessage('anak ke harus diisi!')
     .bail()

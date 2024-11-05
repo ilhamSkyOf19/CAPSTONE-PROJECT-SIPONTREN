@@ -15,7 +15,6 @@ import methodOverride from 'method-override';
 import router from './backend/routes/routes.js';
 
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
 import path from 'path';
 import { fileURLToPath } from 'url'; // Import fileURLToPath dari url
 import cors from 'cors';
@@ -28,21 +27,6 @@ dotenv.config();
 
 // set port 
 const port = process.env.PORT || 3001;
-
-const connectDB = async () => {
-    try {
-        // Menghubungkan ke MongoDB menggunakan MONGODB_URI dari .env
-        await mongoose.connect(process.env.MONGODB_URI, {
-            serverSelectionTimeoutMS: 30000 // Optional: menambah timeout
-        });
-        console.log('Connected to MongoDB');
-    } catch (err) {
-        console.error('Failed to connect to MongoDB:', err);
-    }
-};
-
-// Memanggil fungsi koneksi
-connectDB();
 
 // set view engine ejs
 app.use(expressLayouts);

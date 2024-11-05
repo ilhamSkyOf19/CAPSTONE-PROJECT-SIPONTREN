@@ -88,9 +88,6 @@ const storage2 = multer.diskStorage({
 });
 
 
-
-
-
 // Konfigurasi multer
 export const Upload2 = multer({
     storage: storage2,

@@ -27,10 +27,11 @@
     "jsonwebtoken": "^9.0.2",
     "method-override": "^3.0.0",
     "mongodb": "^6.9.0",
-    "mongoose": "^8.7.0",
     "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.11.3",
     "path": "^0.12.7",
     "read-chunk": "^5.0.0",
+    "sequelize": "^6.37.5",
     "validator": "^13.12.0"
   }
 }
