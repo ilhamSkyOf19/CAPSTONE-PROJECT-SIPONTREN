@@ -69,7 +69,7 @@ class FileValidator {
         }
     }    
     async checkFileType2(req, res, next, fileLocation) {
-        let dataPendaftar = await Pendaftaran.findById(req.body._id);
+        let dataPendaftar = await Pendaftaran.findByPk(req.body._id);
         try {
             // Cek apakah file ada dalam request
             const fotoFormal = req.files['foto_formal'] ? req.files['foto_formal'][0] : null;

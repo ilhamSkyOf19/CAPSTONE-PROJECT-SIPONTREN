@@ -309,7 +309,7 @@ router.post('/form-pendaftaran', [
 });
 
 
-// UBAHH KE MYSQL!!!
+
 
 
 // Halaman data-pendaftar
@@ -317,26 +317,41 @@ router.get('/data-pendaftar', async (req, res) => {
     if (!req.session.loggedIn) {
         return res.redirect('/login-admin');
     }
-    const user = await User.findOne({ _id: req.session.loggedIn });
-    const dataUsername = user.username;
-    let dataPendaftar = await Pendaftaran.find();
-    dataPendaftar = dataPendaftar.map(dataPendaftar => {
-        if (dataPendaftar._doc && typeof dataPendaftar._doc === 'object') {
-            for (let key in dataPendaftar._doc) {
-                if (typeof dataPendaftar._doc[key] === 'string' && key !== 'email' && key !== 'asal_sekolah' && key !== 'ijazah' && key !== 'kk') {
-                    dataPendaftar._doc[key] = capitalizeWords(dataPendaftar._doc[key]);
+    
+    try {
+        // Cari user yang sedang login
+        const user = await User.findOne({ where: { id: req.session.loggedIn } });
+        const dataUsername = user.username;
+
+        // Ambil semua data pendaftar dari MySQL
+        let dataPendaftar = await Pendaftaran.findAll();
+
+        // Proses data pendaftar untuk kapitalisasi kecuali beberapa field
+        dataPendaftar = dataPendaftar.map(data => {
+            let pendaftar = data.dataValues; // Ambil data yang telah dimuat
+
+            // Kapitalisasi setiap kata untuk semua field string kecuali beberapa field tertentu
+            for (let key in pendaftar) {
+                if (typeof pendaftar[key] === 'string' && key !== 'email' && key !== 'asal_sekolah' && key !== 'ijazah' && key !== 'kk') {
+                    pendaftar[key] = capitalizeWords(pendaftar[key]);
                 }
             }
-        }
-        return dataPendaftar._doc;
-    });
-    res.render('pages/admin/daftar/data-pendaftar', {
-        layout: 'layouts/main-ejs-layouts',
-        title: 'data pendaftar',
-        dataPendaftar,
-        dataUsername,
-        msg: req.flash('msg'),
-    });
+            return pendaftar;
+        });
+
+        // Render halaman dengan data yang sudah diproses
+        res.render('pages/admin/daftar/data-pendaftar', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'Data Pendaftar',
+            dataPendaftar,
+            dataUsername,
+            msg: req.flash('msg'),
+        });
+    } catch (err) {
+        console.error(err);
+        req.flash('msg', 'Terjadi kesalahan saat mengambil data pendaftar.');
+        res.redirect('/');
+    }
 });
 
 // Halaman ubah data pendaftar
@@ -344,42 +359,47 @@ router.get('/ubah-data-pendaftar/:id', async (req, res) => {
     if (!req.session.loggedIn) {
         return res.redirect('/login-admin');
     }
+
     try {
-        let id = req.params.id;
-        let data = await Pendaftaran.findById(id); 
+        const id = req.params.id;  // Mendapatkan ID dari parameter URL
+
+        // Mengambil data pendaftar berdasarkan ID dengan Sequelize
+        let data = await Pendaftaran.findOne({ where: { id } });
+
         // Jika data tidak ditemukan, arahkan ke halaman data pendaftar
         if (!data) {
             return res.redirect('/data-pendaftar');
         }
 
-        // Lakukan kapitalisasi untuk semua string kecuali 'email' dan 'asal_sekolah'
-        for (let key in data._doc) {
-            if (typeof data._doc[key] === 'string' && key !== 'email' && key !== 'asal_sekolah' && key !== 'foto_formal' && key !== 'akta_kelahiran' && key !== 'kartu_keluarga' && key !== 'fc_ktp' && key !== 'kip_kis') {
-                data._doc[key] = capitalizeWords(data._doc[key]);
-            } else if (typeof data._doc[key] === 'object') {
-                for (let subKey in data._doc[key]) {
-                    if (typeof data._doc[key][subKey] === 'string') {
-                        data._doc[key][subKey] = capitalizeWords(data._doc[key][subKey]);
-                    }
-                }
+        // Mengakses data dengan dataValues (mengambil data sesungguhnya dari Sequelize)
+        let pendaftar = data.dataValues;
+
+        // Lakukan kapitalisasi untuk semua string kecuali beberapa field tertentu
+        for (let key in pendaftar) {
+            if (typeof pendaftar[key] === 'string' && key !== 'foto_formal' && key !== 'akta_kelahiran' && key !== 'kartu_keluarga' && key !== 'fc_ktp' && key !== 'kip_kis') {
+                pendaftar[key] = capitalizeWords(pendaftar[key]);
             }
         }
-        const user = await User.findOne({ _id: req.session.loggedIn });
+
+        // Ambil data user yang sedang login
+        const user = await User.findOne({ where: { id: req.session.loggedIn } });
         const dataUsername = user.username;
-        // Render halaman ubah-data-pendaftar
+
+        // Render halaman ubah data pendaftar dengan data yang sudah diproses
         res.render('pages/admin/daftar/ubah-data-pendaftar', {
             layout: 'layouts/main-ejs-layouts',
             title: 'Ubah Data Pendaftar',
-            data,
+            data: pendaftar,
             dataUsername,
-            dataFile: '',
+            dataFile: '', // Tempat untuk mengirimkan file jika ada
         });
     } catch (err) {
-        // Tangani error jika terjadi masalah
         console.error(err);
+        // Jika ada error, arahkan kembali ke halaman data pendaftar
         res.redirect('/data-pendaftar');
     }
 });
+
 
 
 // PUT ubah data pendaftar
@@ -387,9 +407,8 @@ router.put('/ubah-data', (req, res, next) => {
     console.log('Request body:', req.body); // Menampilkan semua data yang dikirim
     console.log('Files:', req.files); // Menampilkan file yang dikirim
 
-    // Pertama, jalankan Upload middleware untuk menangani file
+    // Pertama, jalankan middleware Upload2 untuk menangani file upload
     Upload2(req, res, async function (error) {
-        let dataPendaftar = await Pendaftaran.findById(req.body._id);
         if (error) {
             let errorMessage;
             if (error.code === 'INVALID_FILE_TYPE') {
@@ -404,9 +423,10 @@ router.put('/ubah-data', (req, res, next) => {
                 errorMessage = error.message || 'Terjadi kesalahan saat upload file!';
             }
 
+            let dataPendaftar = await Pendaftaran.findByPk(req.body._id); // Temukan pendaftar berdasarkan ID
             return res.render('pages/admin/daftar/ubah-data-pendaftar', {
                 layout: 'layouts/main-ejs-layouts',
-                title: 'Form',
+                title: 'Form Ubah Data Pendaftar',
                 errors: [{ msg: errorMessage }],
                 data: req.body,
                 dataFile: dataPendaftar,
@@ -414,159 +434,128 @@ router.put('/ubah-data', (req, res, next) => {
             });
         }
 
-        // Jika file upload berhasil, lanjutkan ke middleware validasi berikutnya
         next();
     });
 }, async (req, res, next) => {
-    if(req.files) {
+    if (req.files) {
         FileValidator.checkFileType2(req, res, next, 'pages/admin/daftar/ubah-data-pendaftar');
     } else {
         next();
     }
-}, validatorResult, async (req, res) => {
+}, async (req, res) => {
     const errors = validationResult(req);
-    let dataPendaftar = await Pendaftaran.findById(req.body._id);
+    let dataPendaftar = await Pendaftaran.findByPk(req.body._id); // Temukan pendaftar berdasarkan ID
 
-    // Ambil NIK lama dan NIK baru
-    const oldNik = req.body.old_nik || ''; // Ambil NIK lama dari form
-    const nik = req.body.nik || ''; // Ambil NIK baru dari form
-    
     if (!errors.isEmpty()) {
-        const fileFields = ['foto_formal', 'akta_kelahiran', 'kartu_keluarga', 'fc_ktp', 'kip_kis'];
-        const uploadedFiles = req.files || {};
-    
-        try {
-            for (const field of fileFields) {
-                const file = uploadedFiles?.[field]?.[0] || null;
-                if (file) {
-                    await fs.unlink(file.path);
-                }
-            }
-    
-            const folder = `public/imagesPendaftar/${oldNik}`;
-            if (folder) {
-                await fs.rmdir(folder);
-            }
-        } catch (err) {
-            console.error('Error while deleting files or directory:', err);
-        }
-    
+        // Jika ada error validasi, tampilkan kembali form dengan error
         return res.render('pages/admin/daftar/ubah-data-pendaftar', {
             layout: 'layouts/main-ejs-layouts',
-            title: 'ubah data pendaftar',
+            title: 'Form Ubah Data Pendaftar',
             errors: errors.array(),
             data: req.body,
             dataFile: dataPendaftar,
             msg: req.flash('msg'),
         });
-    } else {
-        try {
-            // Cek jika NIK berubah, rename folder dari oldNik ke nik
-            if (nik !== oldNik) {
-                const oldDir = path.join('public/imagesPendaftar', oldNik);
-                const newDir = path.join('public/imagesPendaftar', nik);
+    }
 
-                // Rename folder old_nik ke nik baru
-                await fs.rename(oldDir, newDir);
-                console.log(`Folder renamed from ${oldNik} to ${nik}`);
-            }
+    // Jika tidak ada error, lanjutkan dengan update data
+    try {
+        const oldNik = req.body.old_nik || '';
+        const nik = req.body.nik || '';
 
-            // Proses file yang diupload
-            let fotoFormal = req.body.foto_formal || '';
-            let fotoFormalOld = req.body.old_foto_formal || '';
-            let aktaKelahiran = req.body.akta_kelahiran || '';
-            let aktaKelahiranOld = req.body.old_akta_kelahiran || '';
-            let kartuKeluarga = req.body.kartu_keluarga || '';
-            let kartuKeluargaOld = req.body.old_kartu_keluarga || '';
-            let fcKtp = req.body.fc_ktp || '';
-            let fcKtpOld = req.body.old_fc_ktp || '';
-            let kipKis = req.body.kip_kis || '';
-            let kipKisOld = req.body.old_kip_kis || '';
-
-            if (req.files) {
-                try {
-                    const processFile = async (field, oldFileField) => {
-                        if (req.files[field]) {
-                            const newFileName = path.basename(req.files[field][0].path);
-                            if (oldFileField) {
-                                const oldFilePath = path.join('public/imagesPendaftar', nik, oldFileField);
-                                await fs.unlink(oldFilePath);
-                                console.log(`Old ${field} file removed`);
-                            }
-                            return newFileName;
-                        }
-                        return oldFileField;
-                    };
-
-                    fotoFormal = await processFile('foto_formal', fotoFormalOld);
-                    aktaKelahiran = await processFile('akta_kelahiran', aktaKelahiranOld);
-                    kartuKeluarga = await processFile('kartu_keluarga', kartuKeluargaOld);
-                    fcKtp = await processFile('fc_ktp', fcKtpOld);
-                    kipKis = await processFile('kip_kis', kipKisOld);
-
-                } catch (err) {
-                    console.error("Error processing files:", err);
-                    return res.status(500).send("Error processing files");
-                }
-            }
-
-            await Pendaftaran.updateOne(
-                { _id: req.body._id },
-                {
-                    $set: {
-                        nisn: req.body.nisn,
-                        nik: req.body.nik,
-                        nama_lengkap: req.body.nama_lengkap,
-                        jenis_kelamin: req.body.jenis_kelamin,
-                        usia: req.body.usia,
-                        "tempat_tanggal_lahir.tempat_lahir": req.body.tempat_tanggal_lahir.tempat_lahir,
-                        "tempat_tanggal_lahir.tanggal_lahir": req.body.tempat_tanggal_lahir.tanggal_lahir,
-                        "alamat.desa": req.body.alamat.desa,
-                        "alamat.rw": req.body.alamat.rw,
-                        "alamat.rt": req.body.alamat.rt,
-                        "alamat.kecamatan": req.body.alamat.kecamatan,
-                        "alamat.kabupaten": req.body.alamat.kabupaten,
-                        "alamat.provinsi": req.body.alamat.provinsi,
-                        asal_sekolah: req.body.asal_sekolah,
-                        nomor_telephone: req.body.nomor_telephone,
-                        nomor_whatsapp: req.body.nomor_whatsapp,
-                        email: req.body.email,
-                        kode_pos: req.body.kode_pos,
-                        status_anak: req.body.status_anak,
-                        berat_badan: req.body.berat_badan,
-                        tinggi_badan: req.body.tinggi_badan,
-                        foto_formal: fotoFormal,
-                        akta_kelahiran: aktaKelahiran,
-                        kartu_keluarga: kartuKeluarga,
-                        fc_ktp: fcKtp,
-                        kip_kis: kipKis,
-                    }
-                }
-            );
-
-            req.flash('msg', 'Data berhasil diubah!');
-            res.redirect('/data-pendaftar');
-        } catch (error) {
-            let errorMessage;
-            if (error.name === 'ValidationError') {
-                errorMessage = Object.values(error.errors)
-                    .map(err => err.message)
-                    .join(', ');
-            } else {
-                errorMessage = 'Terjadi kesalahan saat menyimpan data ke database!';
-            }
-
-            return res.render('pages/admin/daftar/ubah-data-pendaftar', {
-                layout: 'layouts/main-ejs-layouts',
-                title: 'Form',
-                errors: [{ msg: errorMessage }],
-                data: req.body,
-                dataFile: dataPendaftar,
-                msg: req.flash('msg'),
-            });
+        // Jika NIK berubah, kita perlu mengganti nama folder
+        if (nik !== oldNik) {
+            const oldDir = path.join('public/imagesPendaftar', oldNik);
+            const newDir = path.join('public/imagesPendaftar', nik);
+            await fs.rename(oldDir, newDir); // Rename folder dengan NIK yang baru
+            console.log(`Folder renamed from ${oldNik} to ${nik}`);
         }
+
+        // Proses upload file
+        let fotoFormal = req.body.foto_formal || '';
+        let fotoFormalOld = req.body.old_foto_formal || '';
+        let aktaKelahiran = req.body.akta_kelahiran || '';
+        let aktaKelahiranOld = req.body.old_akta_kelahiran || '';
+        let kartuKeluarga = req.body.kartu_keluarga || '';
+        let kartuKeluargaOld = req.body.old_kartu_keluarga || '';
+        let fcKtp = req.body.fc_ktp || '';
+        let fcKtpOld = req.body.old_fc_ktp || '';
+        let kipKis = req.body.kip_kis || '';
+        let kipKisOld = req.body.old_kip_kis || '';
+
+        // Fungsi untuk menangani proses penggantian file yang diupload
+        const processFile = async (field, oldFileField) => {
+            if (req.files[field]) {
+                const newFileName = path.basename(req.files[field][0].path);
+                if (oldFileField) {
+                    const oldFilePath = path.join('public/imagesPendaftar', nik, oldFileField);
+                    await fs.unlink(oldFilePath);
+                    console.log(`Old ${field} file removed`);
+                }
+                return newFileName;
+            }
+            return oldFileField;
+        };
+
+        // Proses file upload
+        fotoFormal = await processFile('foto_formal', fotoFormalOld);
+        aktaKelahiran = await processFile('akta_kelahiran', aktaKelahiranOld);
+        kartuKeluarga = await processFile('kartu_keluarga', kartuKeluargaOld);
+        fcKtp = await processFile('fc_ktp', fcKtpOld);
+        kipKis = await processFile('kip_kis', kipKisOld);
+
+        // Update data di database menggunakan Sequelize
+        await Pendaftaran.update(
+            {
+                nisn: req.body.nisn,
+                nik: req.body.nik,
+                nama_lengkap: req.body.nama_lengkap,
+                jenis_kelamin: req.body.jenis_kelamin,
+                usia: req.body.usia,
+                tempat_lahir: req.body.tempat_lahir,
+                tanggal_lahir: req.body.tanggal_lahir,
+                alamat: req.body.alamat,
+                anak_ke: req.body.anak_ke,
+                jumlah_saudara: req.body.jumlah_saudara,
+                nomor_telephone: req.body.nomor_telephone,
+                alumni_sd: req.body.alumni_sd,
+                alamat_sekolah_asal: req.body.alamat_sekolah_asal,
+                nama_lengkap_ayah: req.body.nama_lengkap_ayah,
+                nama_lengkap_ibu: req.body.nama_lengkap_ibu,
+                nama_lengkap_wali: req.body.nama_lengkap_wali,
+                kode_pos: req.body.kode_pos,
+                foto_formal: fotoFormal,
+                akta_kelahiran: aktaKelahiran,
+                kartu_keluarga: kartuKeluarga,
+                fc_ktp: fcKtp,
+                kip_kis: kipKis,
+            },
+            { where: { id: req.body._id } }
+        );
+
+        req.flash('msg', 'Data berhasil diubah!');
+        res.redirect('/data-pendaftar'); // Redirect ke halaman data pendaftar
+    } catch (error) {
+        console.error(error);
+        let errorMessage = 'Terjadi kesalahan saat menyimpan data ke database!';
+        if (error.name === 'SequelizeValidationError') {
+            errorMessage = error.errors.map(err => err.message).join(', ');
+        }
+
+        return res.render('pages/admin/daftar/ubah-data-pendaftar', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'Form Ubah Data Pendaftar',
+            errors: [{ msg: errorMessage }],
+            data: req.body,
+            dataFile: dataPendaftar,
+            msg: req.flash('msg'),
+        });
     }
 });
+
+
+
+// UBAHH KE MYSQL!!!
 
 // Route untuk form tambah berita
 router.get('/form-berita', async (req, res) => {

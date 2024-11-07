@@ -29,7 +29,7 @@
 
             <form id="MyForm" method="post" action="/ubah-data?_method=PUT" enctype="multipart/form-data">
                 <!-- id -->
-                <input type="hidden" name="_id" value="<%= data._id %>">
+                <input type="hidden" name="_id" value="<%= data.id %>">
                 <!-- nisn -->
                 <div class="mb-3">
                     <label for="nisn" class="form-label">NISN</label>
@@ -64,57 +64,13 @@
                 <div class="mb-3">
                     <label for="tempatTanggalLahir" class="form-label">Tempat / Tanggal Lahir </label>
                     <!-- tempat lahir -->
-                    <input type="text" class="form-control" id="tempatLahir" name="tempat_tanggal_lahir[tempat_lahir]" value="<%= data.tempat_tanggal_lahir && data.tempat_tanggal_lahir.tempat_lahir ? data.tempat_tanggal_lahir.tempat_lahir : '' %>" placeholder="masukan Tempat Lahir" required autocomplete="off">
+                    <input type="text" class="form-control" id="tempatLahir" name="tempat_lahir" value="<%= data.tempat_lahir || '' %>" placeholder="masukan Tempat Lahir" required autocomplete="off">
                     <!-- Tanggal Lahir -->
-                    <input type="date" class="form-control mt-2" id="tanggalLahir" name="tempat_tanggal_lahir[tanggal_lahir]" value="<%= data.tempat_tanggal_lahir && data.tempat_tanggal_lahir.tanggal_lahir ? data.tempat_tanggal_lahir.tanggal_lahir : '' %>" required autocomplete="off">
+                    <input type="date" class="form-control mt-2" id="tanggalLahir" name="tanggal_lahir" value="<%= data.tanggal_lahir || '' %>" required autocomplete="off">
                 </div>
-                <div class="mb-4">
-                    <!-- alamat -->
-                    <p>Alamat : </p>
-                    <div style="margin-left: 30px;">
-                        <!-- desa -->
-                        <div class="mb-3">
-                            <label for="desa" class="form-label">Desa </label>
-                            <input type="text" class="form-control" id="desa" name="alamat[desa]" 
-                                value="<%= data.alamat.desa %>" 
-                                placeholder="masukan Desa" required autocomplete="off">
-                        </div>
-                        <!-- rw -->
-                        <div class="mb-3">
-                            <label for="rw" class="form-label">Rw </label>
-                            <input type="text" class="form-control" id="rw" name="alamat[rw]" 
-                                value="<%= data.alamat && data.alamat.rw ? data.alamat.rw : '' %>" 
-                                placeholder="masukan Rw" required autocomplete="off">
-                        </div>
-                        <!-- rt -->
-                        <div class="mb-3">
-                            <label for="rt" class="form-label">Rt </label>
-                            <input type="text" class="form-control" id="rt" name="alamat[rt]" 
-                                value="<%= data.alamat && data.alamat.rt ? data.alamat.rt : '' %>" 
-                                placeholder="masukan Rt" required autocomplete="off">
-                        </div>
-                        <!-- kecamatan -->
-                        <div class="mb-3">
-                            <label for="kecamatan" class="form-label">Kecamatan </label>
-                            <input type="text" class="form-control" id="kecamatan" name="alamat[kecamatan]" 
-                                value="<%= data.alamat && data.alamat.kecamatan ? data.alamat.kecamatan : '' %>" 
-                                placeholder="masukan kecamatan" required autocomplete="off">
-                        </div>
-                        <!-- kabupaten -->
-                        <div class="mb-3">
-                            <label for="kabupaten" class="form-label">Kabupaten </label>
-                            <input type="text" class="form-control" id="kabupaten" name="alamat[kabupaten]" 
-                                value="<%= data.alamat && data.alamat.kabupaten ? data.alamat.kabupaten : '' %>" 
-                                placeholder="masukan kabupaten" required autocomplete="off">
-                        </div>
-                        <!-- provinsi -->
-                        <div class="mb-3">
-                            <label for="provinsi" class="form-label">Provinsi </label>
-                            <input type="text" class="form-control" id="provinsi" name="alamat[provinsi]" 
-                                value="<%= data.alamat && data.alamat.provinsi ? data.alamat.provinsi : '' %>" 
-                                placeholder="masukan provinsi" required autocomplete="off">
-                        </div>
-                    </div>
+                <div class="mb-3">
+                    <label for="alamat" class="form-label">Alamat </label>
+                    <textarea class="form-control" placeholder="Leave a comment here" id="alamat" name="alamat" style="height: 100px" required><%= data.alamat || ' ' %></textarea>
                 </div>
                 <div class="mb-3">
                     <label for="anakKe" class="form-label">Anak ke </label>
