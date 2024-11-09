@@ -1,6 +1,6 @@
 import { check, body, validationResult } from 'express-validator';
 import multer from 'multer';
-import { validatorResult, capitalizeWords, deleteBeritaById, deletePendaftarById } from '../utils/validator.js';
+import { validatorResult, capitalizeWords } from '../utils/validator.js';
 import express from 'express';
 import { Upload, Upload2 } from '../middleware/uploadFile.js';
 import FileValidator from '../middleware/checkFile.js';
@@ -630,31 +630,33 @@ router.post('/form-berita', [
             // Anda dapat memberikan pesan kesalahan yang sesuai kepada pengguna jika diperlukan
         }
     
-        // Jika ada error dari validasi, render kpages/home/embali form dengan pesan error
+        // Jika ada error dari validasi, render kembali form dengan pesan error
         return res.render('pages/admin/berita/form-berita', {
             layout: 'layouts/main-ejs-layouts',
             title: 'form-berita',
             errors: errors.array(),
             data: req.body,
         });
-    } else {        
+    } else {
         const { title, content } = req.body;
         const thumbnail = req.file ? req.file.filename : null;
       
-        const berita = new Berita({
-            title,
-            content,
-            thumbnail
-        });
-      
         try {
-            await Berita.insertMany([berita]);
-            res.redirect('/');
+            // Simpan berita ke dalam MySQL menggunakan Sequelize
+            const berita = await Berita.create({
+                title,
+                content,
+                thumbnail
+            });
+
+            res.redirect('/'); // Setelah sukses, redirect ke halaman utama
         } catch (err) {
-            res.status(500).send(err);
+            console.error('Error saving berita:', err);
+            res.status(500).send('Terjadi kesalahan saat menyimpan berita');
         }
     }
 });
+
 
 // Route untuk form ubah berita
 router.get('/ubah-berita/:id', async (req, res) => {
@@ -665,10 +667,10 @@ router.get('/ubah-berita/:id', async (req, res) => {
     const dataUsername = user.username;
     try {
         let id = req.params.id;
-        let data = await Berita.findById(id);
+        let data = await Berita.findByPk(id);
         // Jika data tidak ditemukan, arahkan ke halaman data pendaftar
         if (!data) {
-            return res.redirect('/data-pendaftar');
+            return res.redirect('/');
         }
         res.render('pages/admin/berita/ubah-berita', {
             layout: 'layouts/main-ejs-layouts',
@@ -677,10 +679,10 @@ router.get('/ubah-berita/:id', async (req, res) => {
             data,
             dataFile: '',
         });
-    } catch {
+    } catch (err) {
          // Tangani error jika terjadi masalah
          console.error(err);
-         res.redirect('/data-pendaftar');
+         res.redirect('/');
     }
    
 });
@@ -689,13 +691,15 @@ router.get('/ubah-berita/:id', async (req, res) => {
 
 // Ubah data berita
 const uploaderUbahBerita = new FileSingleUploader('public/imageBerita', maxSize, 'thumbnail');
-router.put('/form-berita', (req, res, next) => {
+router.put('/ubah-berita',
+    
+        (req, res, next) => {
     console.log('Request body:', req.body); // Menampilkan semua data yang dikirim
     console.log('Files:', req.files); // Menampilkan file yang dikirim
-
     // Jalankan Upload middleware untuk menangani file
-    uploaderUbahBerita(req, res, async (error) => {
-        let dataBerita = await Berita.findById(req.body._id);
+    uploaderUbahBerita.upload(req, res, async (error) => {
+        let dataBerita = await Berita.findByPk(req.body.id); // Ganti findById dengan findByPk untuk Sequelize
+
         if (error) {
             let errorMessage;
 
@@ -724,14 +728,23 @@ router.put('/form-berita', (req, res, next) => {
         // Jika file upload berhasil, lanjutkan ke middleware validasi berikutnya
         next();
     });
-}, async (req, res) => {
+}, async (req, res, next) => {
+    if(req.files) {
+        FileValidator.checkFileType3(req, res, next, 'pages/admin/daftar/ubah-berita');
+    } else {
+        next();
+    }
+},
+    check('title', 'Title harus berisi huruf, angka, dan simbol').matches(/^[A-Za-z0-9\s!@#$%^&*(),.?":{}|<>]+$/),
+    check('content', 'content harus berisi huruf, angka, dan simbol').matches(/^[\s\S]+$/),
+async (req, res) => {
     const errors = validationResult(req);
-    const dataBerita = await Berita.findById(req.body._id);
+    const dataBerita = await Berita.findByPk(req.body.id); // Ganti findById dengan findByPk untuk Sequelize
 
     if (!errors.isEmpty()) {
         return res.render('pages/admin/berita/ubah-berita', {
             layout: 'layouts/main-ejs-layouts',
-            title: 'ubah data pendaftar',
+            title: 'ubah data berita',
             errors: errors.array(),
             data: req.body,
             msg: req.flash('msg'),
@@ -740,38 +753,40 @@ router.put('/form-berita', (req, res, next) => {
     }
 
     try {
-        let thumbnailOld = req.body.thumbnailOld || '';
-        let thumbnail = req.body.thumbnail || '';
+        let thumbnailOld = req.body.thumbnailOld || ''; // Ambil thumbnail lama dari form
+        let thumbnail = req.body.thumbnail || thumbnailOld; // Jika tidak ada thumbnail baru, gunakan thumbnail lama
     
-        if (req.files) {
+        // Proses file jika ada yang di-upload
+        if (req.files && req.files.thumbnail) {
             try {
                 const processFile = async (field, oldFile) => {
                     if (req.files[field]) {
-                        const newFileName = path.basename(req.files[field][0].path);
+                        const newFileName = path.basename(req.files[field][0].path); // Dapatkan nama file baru
                         if (oldFile) {
-                            const oldFilePath = path.join('public/imageBerita/', oldFile);
-                            await fs.promises.unlink(oldFilePath);
+                            const oldFilePath = path.join('public/imageBerita', oldFile);
+                            await fs.promises.unlink(oldFilePath); // Hapus file lama
                             console.log(`Old ${field} file removed: ${oldFilePath}`);
                         }
-                        return newFileName;
+                        return newFileName; // Kembalikan nama file baru jika ada
                     }
-                    return oldFile; // Mengembalikan file lama jika tidak ada file baru
+                    return oldFile; // Kembalikan file lama jika tidak ada file baru
                 };
-                thumbnail = await processFile('thumbnail', thumbnailOld);
+                thumbnail = await processFile('thumbnail', thumbnailOld); // Proses file thumbnail
             } catch (err) {
                 console.error("Error processing files:", err);
                 return res.status(500).send("Error processing files");
             }
         }
     
-        await Pendaftaran.updateOne(
-            { _id: req.body._id },
+        // Update data berita menggunakan Sequelize
+        await Berita.update(
             {
-                $set: {
-                    title: req.body.title,
-                    content: req.body.content,
-                    thumbnail: thumbnail, // Gunakan thumbnail yang diproses
-                }
+                title: req.body.title,
+                content: req.body.content,
+                thumbnail: thumbnail, // Gunakan thumbnail yang baru diproses
+            },
+            {
+                where: { id: req.body.id } // Gantilah _id dengan id jika sesuai dengan skema Anda
             }
         );
     
@@ -779,7 +794,7 @@ router.put('/form-berita', (req, res, next) => {
         res.redirect('/daftar-berita');
     } catch (error) {
         let errorMessage = error.name === 'ValidationError' ? 
-            Object.values(error.errors).map(err => err.message).join(', ') : 
+            Object.values(error.errors).map(err => err.message).join(', ') :
             'Terjadi kesalahan saat menyimpan data ke database!';
     
         return res.render('pages/admin/berita/ubah-berita', {
@@ -790,38 +805,44 @@ router.put('/form-berita', (req, res, next) => {
             msg: req.flash('msg'),
             dataFile: dataBerita,
         });
-    }    
+    }
 });
-
 
 
 // router detail berita 
 router.get('/detail-berita/:id', async (req, res) => {
     try {
         const today = new Date().toISOString().split('T')[0]; // format tanggal
-        let id = req.params.id;
-        let data = await Berita.findById(id); // Tidak perlu callback di sini
+        const id = req.params.id;
 
-        // Jika data tidak ditemukan, arahkan ke halaman data pendaftar
+        // Menggunakan Sequelize untuk mencari data berdasarkan primary key
+        let data = await Berita.findByPk(id); // Gantilah findById dengan findByPk
+
+        // Jika data tidak ditemukan, arahkan ke halaman beranda
         if (!data) {
-            return res.redirect('/');
+            return res.redirect('/'); // Atau bisa ganti dengan res.status(404).send('Berita tidak ditemukan')
         }
-        const user = await User.findOne({ _id: req.session.loggedIn });
-        if (user) {
-            const dataUsername = user.username;
-              // Render halaman ubah-data-pendaftar
+
+        // Cek apakah session loggedIn ada (admin)
+        if (req.session.loggedIn) {
+            // Jika ada session, berarti admin, cari data pengguna
+            const user = await User.findOne({ where: { id: req.session.loggedIn } });
+            const dataUsername = user ? user.username : 'Admin';  // Ambil username atau set default 'Admin'
+            
+            // Render halaman detail berita untuk admin
             res.render('pages/admin/berita/detail-berita', {
                 layout: 'layouts/main-ejs-layouts',
-                title: 'detail-berita',
+                title: 'Detail Berita',
                 data,
-                dataUsername,
+                dataUsername,  // Tampilkan data pengguna
                 today,
             });
         } else {
-              // Render halaman ubah-data-pendaftar
+            // Jika session tidak ada, berarti user biasa
+            // Render halaman detail berita tanpa data pengguna (user biasa)
             res.render('pages/admin/berita/detail-berita', {
                 layout: 'layouts/main-ejs-layouts',
-                title: 'detail-berita',
+                title: 'Detail Berita',
                 data,
                 today,
             });
@@ -829,10 +850,10 @@ router.get('/detail-berita/:id', async (req, res) => {
       
     } catch (err) {
         // Tangani error jika terjadi masalah
-        console.error(err);
-        res.redirect('/');
+        console.error('Error fetching data:', err);
+        res.redirect('/');  // Bisa juga kirim status 500 dan error message ke user
     }
-})
+});
 
 
 // daftar berita 
@@ -840,32 +861,67 @@ router.get('/daftar-berita', async (req, res) => {
     if (!req.session.loggedIn) {
         return res.redirect('/login-admin');
     }
-    const today = new Date().toISOString().split('T')[0]; // format tanggal
-    const berita = await Berita.find({ date: { $gte: today } }).sort({ date: -1 });
-    const user = await User.findOne({ _id: req.session.loggedIn });
-    const dataUsername = user.username;
-    return res.render('pages/admin/berita/daftar-berita', {
-        layout:'layouts/main-ejs-layouts',
-        title: 'daftar-berita',
-        msg: req.flash('msg'),
-        berita,
-        dataUsername,
-        today,
-    });
+
+    const today = new Date().toISOString().split('T')[0]; // Format tanggal
+
+    try {
+        // Mengambil berita dengan kondisi `date >= today` dan mengurutkan berdasarkan tanggal (desc)
+        const berita = await Berita.findAll({
+            where: {
+                date: {
+                    [Sequelize.Op.gte]: today,  // Filter berita yang tanggalnya >= hari ini
+                }
+            },
+            order: [['date', 'DESC']]  // Urutkan berdasarkan tanggal terbaru
+        });
+
+        // Mengambil data pengguna berdasarkan ID session
+        const user = await User.findOne({ where: { id: req.session.loggedIn } });
+
+        // Menyediakan username untuk ditampilkan di halaman
+        const dataUsername = user ? user.username : '';
+
+        return res.render('pages/admin/berita/daftar-berita', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'Daftar Berita',
+            msg: req.flash('msg'),
+            berita,
+            dataUsername,
+            today,
+        });
+    } catch (err) {
+        console.error('Error fetching berita:', err);
+        res.status(500).send('Terjadi kesalahan saat mengambil daftar berita.');
+    }
 });
+
 
 // Hapus data pendaftar
 router.delete('/daftar-berita/:id', async (req, res) => {
     if (!req.session.loggedIn) {
         return res.redirect('/login-admin');
     }
-    const result = await deleteBeritaById(req.params.id);
-    
-    // Menggunakan flash untuk mengirim pesan ke pengguna
-    req.flash('msg', result.message);
 
-    // Redirect ke halaman daftar berita
-    res.redirect('/daftar-berita');
+    try {
+        // Menghapus berita berdasarkan ID menggunakan Sequelize destroy
+        const result = await Berita.destroy({
+            where: { id: req.params.id }  // Kondisi berdasarkan ID yang diterima dari URL
+        });
+
+        // Cek apakah berita berhasil dihapus
+        if (result) {
+            req.flash('msg', 'Berita berhasil dihapus!');
+        } else {
+            req.flash('msg', 'Berita tidak ditemukan atau sudah dihapus!');
+        }
+
+        // Redirect ke halaman daftar berita
+        res.redirect('/daftar-berita');
+    } catch (err) {
+        console.error('Error deleting berita:', err);
+        req.flash('msg', 'Terjadi kesalahan saat menghapus berita!');
+        res.status(500).send('Terjadi kesalahan saat menghapus berita.');
+    }
 });
 
 
@@ -873,15 +929,29 @@ router.delete('/daftar-berita/:id', async (req, res) => {
 // Hapus data pendaftar
 router.delete('/data-pendaftar/:id', async (req, res) => {
     if (!req.session.loggedIn) {
-        return res.redirect('/login-admin');  
+        return res.redirect('/login-admin');  // Pastikan admin sudah login
     }
-    const result = await deletePendaftarById(req.params.id);
 
-     // Menggunakan flash untuk mengirim pesan ke pengguna
-     req.flash('msg', result.message);
+    try {
+        // Menghapus pendaftar berdasarkan ID menggunakan Sequelize destroy
+        const result = await Pendaftar.destroy({
+            where: { id: req.params.id }  // Kondisi pencarian berdasarkan ID yang diterima dari URL
+        });
 
-     // Redirect ke halaman daftar berita
-     res.redirect('/data-pendaftar');
+        // Cek apakah data berhasil dihapus
+        if (result) {
+            req.flash('msg', 'Data pendaftar berhasil dihapus!');
+        } else {
+            req.flash('msg', 'Data pendaftar tidak ditemukan atau sudah dihapus!');
+        }
+
+        // Redirect ke halaman daftar pendaftar
+        res.redirect('/data-pendaftar');
+    } catch (err) {
+        console.error('Error deleting pendaftar:', err);
+        req.flash('msg', 'Terjadi kesalahan saat menghapus data pendaftar!');
+        res.status(500).send('Terjadi kesalahan saat menghapus data pendaftar.');
+    }
 });
 
 
@@ -891,11 +961,15 @@ router.get('/logout', (req, res) => {
     // Destroy all sessions
     req.session.destroy((err) => {
         if (err) {
-            console.log(err);
-            return res.status(500).send('Failed to logout');
+            console.error('Error while destroying session:', err);
+            return res.status(500).send('Failed to log out');
         }
-        // Optionally, redirect to login or home page
-        res.redirect('/'); // Redirect to login page after logout
+        
+        // Optionally, clear the session cookie if your session store is using cookies
+        res.clearCookie('connect.sid'); // Ensure the session cookie is cleared
+        
+        // Redirect to the home page or login page after logging out
+        res.redirect('/login-admin'); // Redirect to the login page or home page
     });
 });
 

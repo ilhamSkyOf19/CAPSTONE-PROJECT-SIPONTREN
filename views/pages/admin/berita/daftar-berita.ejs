@@ -17,12 +17,12 @@
                 <p class="card-text">
                   <%= item.content.split(" ").slice(0, 20).join(" ") %>... <!-- Ambil 20 kata pertama -->
                 </p>
-                <a href="/detail-berita/<%= item._id %>" class="btn btn-primary">Baca selengkapnya</a>
-                <form id="delete" method="POST" action="/daftar-berita/<%= item._id %>?_method=DELETE" class="d-inline">
-                    <input type="hidden" name="id" value="<%= item._id %>">
+                <a href="/detail-berita/<%= item.id %>" class="btn btn-primary">Baca selengkapnya</a>
+                <form id="delete" method="POST" action="/daftar-berita/<%= item.id %>?_method=DELETE" class="d-inline">
+                    <input type="hidden" name="id" value="<%= item.id %>">
                     <button type="submit" class="btn btn-danger" id="submitBtn" onclick="confirm('apakah anda yakin')">Delete</button>
                 </form>
-                  <a class="btn btn-warning" href="/ubah-berita/<%= item._id %>">Ubah</a>
+                  <a class="btn btn-warning" href="/ubah-berita/<%= item.id %>">Ubah</a>
               </div>
             </div>
           </div>
@@ -33,4 +33,4 @@
     </div>
 </div> 
 
-<script src="/public/js/script.js"></script>
+<!-- <script src="/public/js/script.js"></script> -->

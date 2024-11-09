@@ -20,8 +20,8 @@
                 </div>
               <% } %>
             <h1>Tambah Berita</h1>
-            <form action="/form-berita" action="/ubah-data?_method=PUT" enctype="multipart/form-data">
-                <input type="hidden" name="_id" value="<%= data._id %>">
+            <form action="/ubah-berita?_method=PUT" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="id" value="<%= data.id %>">
                 <div class="mb-3">
                     <label for="title" class="form-label">Title</label>
                     <input type="text" class="form-control" id="title" name="title" placeholder="masukan judul" value="<%= data ? data.title : '' %>" required >
