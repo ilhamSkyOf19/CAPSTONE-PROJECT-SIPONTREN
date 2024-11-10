@@ -3,6 +3,7 @@ import { readChunk } from 'read-chunk';
 import { unlink, access } from 'node:fs/promises';
 import fs from 'fs/promises';
 import Pendaftaran from '../models/pendaftaran.js';
+import Berita from '../models/skemaBerita.js';
 
 async function checkFile(path) {
     try {
@@ -118,6 +119,7 @@ class FileValidator {
         }
     }
     async checkFileType3(req, res, next, fileLocation) {
+        let dataBerita = await Berita.findByPk(req.body.id);
         try {
             // Ambil file dari request (asumsi hanya satu file)
             const file = req.file; // Ganti req.files dengan req.file
@@ -158,6 +160,7 @@ class FileValidator {
                     title: 'Form',
                     errors: [{ msg: error.message }],
                     data: req.body,
+                    dataFile: dataBerita,
                 });
             }
     

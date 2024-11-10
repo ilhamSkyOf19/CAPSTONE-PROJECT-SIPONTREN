@@ -1,6 +1,6 @@
 import { check, body, validationResult } from 'express-validator';
 import multer from 'multer';
-import { validatorResult, capitalizeWords } from '../utils/validator.js';
+import { validatorResult, capitalizeWords, deleteBeritaById } from '../utils/validator.js';
 import express from 'express';
 import { Upload, Upload2 } from '../middleware/uploadFile.js';
 import FileValidator from '../middleware/checkFile.js';
@@ -21,11 +21,13 @@ const secret = csrfProtection.secretSync();
 // router
 const router = express.Router();
 
+const today = new Date().toISOString().split('T')[0]; // Format tanggal
+
 
 
 
 router.get('/', async (req, res) => {
-    const today = new Date().toISOString().split('T')[0]; // format tanggal
+    // const today = new Date().toISOString().split('T')[0]; // format tanggal
 
     let dataUsername = ''; // Variabel untuk menyimpan nama pengguna, default-nya kosong
 
@@ -557,6 +559,47 @@ router.put('/ubah-data', (req, res, next) => {
 
 // UBAHH KE MYSQL!!!
 
+
+// daftar berita 
+router.get('/daftar-berita', async (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');
+    }
+
+    // const today = new Date().toISOString().split('T')[0]; // Format tanggal
+
+    try {
+        // Mengambil berita dengan kondisi `date >= today` dan mengurutkan berdasarkan tanggal (desc)
+        const berita = await Berita.findAll({
+            where: {
+                date: {
+                    [Sequelize.Op.gte]: today,  // Filter berita yang tanggalnya >= hari ini
+                }
+            },
+            order: [['date', 'DESC']]  // Urutkan berdasarkan tanggal terbaru
+        });
+
+        // Mengambil data pengguna berdasarkan ID session
+        const user = await User.findOne({ where: { id: req.session.loggedIn } });
+
+        // Menyediakan username untuk ditampilkan di halaman
+        const dataUsername = user ? user.username : '';
+
+        return res.render('pages/admin/berita/daftar-berita', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'Daftar Berita',
+            msg: req.flash('msg'),
+            berita,
+            dataUsername,
+            today,
+        });
+    } catch (err) {
+        console.error('Error fetching berita:', err);
+        res.status(500).send('Terjadi kesalahan saat mengambil daftar berita.');
+    }
+});
+
+
 // Route untuk form tambah berita
 router.get('/form-berita', async (req, res) => {
     if (!req.session.loggedIn) {
@@ -648,7 +691,8 @@ router.post('/form-berita', [
                 content,
                 thumbnail
             });
-
+            // tampilkan pesan berhasil
+            req.flash('msg', 'Data berhasil diubah!');
             res.redirect('/'); // Setelah sukses, redirect ke halaman utama
         } catch (err) {
             console.error('Error saving berita:', err);
@@ -690,9 +734,8 @@ router.get('/ubah-berita/:id', async (req, res) => {
 
 
 // Ubah data berita
-const uploaderUbahBerita = new FileSingleUploader('public/imageBerita', maxSize, 'thumbnail');
+const uploaderUbahBerita = new FileSingleUploader(`public/imageBerita`, maxSize, 'thumbnail');
 router.put('/ubah-berita',
-    
         (req, res, next) => {
     console.log('Request body:', req.body); // Menampilkan semua data yang dikirim
     console.log('Files:', req.files); // Menampilkan file yang dikirim
@@ -729,8 +772,8 @@ router.put('/ubah-berita',
         next();
     });
 }, async (req, res, next) => {
-    if(req.files) {
-        FileValidator.checkFileType3(req, res, next, 'pages/admin/daftar/ubah-berita');
+    if(req.file) {
+        FileValidator.checkFileType3(req, res, next, 'pages/admin/berita/ubah-berita');
     } else {
         next();
     }
@@ -750,62 +793,75 @@ async (req, res) => {
             msg: req.flash('msg'),
             dataFile: dataBerita,
         });
+    } else {
+        try {
+            let thumbnailOld = req.body.thumbnailOld || ''; // Ambil nama file lama
+            let thumbnail = req.body.thumbnail || thumbnailOld; // Jika tidak ada file baru, gunakan file lama
+            console.log('Thumbnail Old:', thumbnailOld);
+            console.log('Thumbnail:', thumbnail);
+            console.log('File Data:', req.file);
+        
+           // Jika ada file yang diupload
+        if (req.file) {
+            try {
+             const newFileName = path.basename(req.file.path);  // Ambil nama file baru
+
+                    // Hapus file lama jika ada
+                    if (thumbnailOld) {
+                        const oldFilePath = path.join('public/imageBerita', today, thumbnailOld);
+
+                        // Cek apakah file lama ada, jika ada hapus
+                        try {
+                            await fs.access(oldFilePath, fs.constants.F_OK);  // Cek keberadaan file lama
+                            await fs.unlink(oldFilePath);  // Hapus file lama
+                            console.log(`Old file removed: ${oldFilePath}`);
+                        } catch (err) {
+                            // Jika file tidak ditemukan, tidak perlu melakukan apa-apa
+                            console.log(`No old file to remove: ${oldFilePath}`);
+                        }
+                    }
+
+                    // Set thumbnail ke file baru
+                    thumbnail = newFileName;
+                } catch (err) {
+                    console.error("Error processing files:", err);
+                    return res.status(500).send("Error processing files");
+                }
+            } else {
+                console.log('No file uploaded');
+            }
+
+            // Update data berita menggunakan Sequelize
+            await Berita.update(
+                {
+                    title: req.body.title,
+                    content: req.body.content,
+                    thumbnail: thumbnail, // Gunakan thumbnail yang baru diproses
+                },
+                {
+                    where: { id: req.body.id } // Gantilah _id dengan id jika sesuai dengan skema Anda
+                }
+            );
+        
+            req.flash('msg', 'Data berhasil diubah!');
+            res.redirect('/daftar-berita');
+        } catch (error) {
+            let errorMessage = error.name === 'ValidationError' ? 
+                Object.values(error.errors).map(err => err.message).join(', ') :
+                'Terjadi kesalahan saat menyimpan data ke database!';
+        
+            return res.render('pages/admin/berita/ubah-berita', {
+                layout: 'layouts/main-ejs-layouts',
+                title: 'Form Ubah Berita',
+                errors: [{ msg: errorMessage }],
+                data: req.body,
+                msg: req.flash('msg'),
+                dataFile: dataBerita,
+            });
+        }
     }
 
-    try {
-        let thumbnailOld = req.body.thumbnailOld || ''; // Ambil thumbnail lama dari form
-        let thumbnail = req.body.thumbnail || thumbnailOld; // Jika tidak ada thumbnail baru, gunakan thumbnail lama
     
-        // Proses file jika ada yang di-upload
-        if (req.files && req.files.thumbnail) {
-            try {
-                const processFile = async (field, oldFile) => {
-                    if (req.files[field]) {
-                        const newFileName = path.basename(req.files[field][0].path); // Dapatkan nama file baru
-                        if (oldFile) {
-                            const oldFilePath = path.join('public/imageBerita', oldFile);
-                            await fs.promises.unlink(oldFilePath); // Hapus file lama
-                            console.log(`Old ${field} file removed: ${oldFilePath}`);
-                        }
-                        return newFileName; // Kembalikan nama file baru jika ada
-                    }
-                    return oldFile; // Kembalikan file lama jika tidak ada file baru
-                };
-                thumbnail = await processFile('thumbnail', thumbnailOld); // Proses file thumbnail
-            } catch (err) {
-                console.error("Error processing files:", err);
-                return res.status(500).send("Error processing files");
-            }
-        }
-    
-        // Update data berita menggunakan Sequelize
-        await Berita.update(
-            {
-                title: req.body.title,
-                content: req.body.content,
-                thumbnail: thumbnail, // Gunakan thumbnail yang baru diproses
-            },
-            {
-                where: { id: req.body.id } // Gantilah _id dengan id jika sesuai dengan skema Anda
-            }
-        );
-    
-        req.flash('msg', 'Data berhasil diubah!');
-        res.redirect('/daftar-berita');
-    } catch (error) {
-        let errorMessage = error.name === 'ValidationError' ? 
-            Object.values(error.errors).map(err => err.message).join(', ') :
-            'Terjadi kesalahan saat menyimpan data ke database!';
-    
-        return res.render('pages/admin/berita/ubah-berita', {
-            layout: 'layouts/main-ejs-layouts',
-            title: 'Form Ubah Berita',
-            errors: [{ msg: errorMessage }],
-            data: req.body,
-            msg: req.flash('msg'),
-            dataFile: dataBerita,
-        });
-    }
 });
 
 
@@ -856,103 +912,25 @@ router.get('/detail-berita/:id', async (req, res) => {
 });
 
 
-// daftar berita 
-router.get('/daftar-berita', async (req, res) => {
-    if (!req.session.loggedIn) {
-        return res.redirect('/login-admin');
-    }
-
-    const today = new Date().toISOString().split('T')[0]; // Format tanggal
-
-    try {
-        // Mengambil berita dengan kondisi `date >= today` dan mengurutkan berdasarkan tanggal (desc)
-        const berita = await Berita.findAll({
-            where: {
-                date: {
-                    [Sequelize.Op.gte]: today,  // Filter berita yang tanggalnya >= hari ini
-                }
-            },
-            order: [['date', 'DESC']]  // Urutkan berdasarkan tanggal terbaru
-        });
-
-        // Mengambil data pengguna berdasarkan ID session
-        const user = await User.findOne({ where: { id: req.session.loggedIn } });
-
-        // Menyediakan username untuk ditampilkan di halaman
-        const dataUsername = user ? user.username : '';
-
-        return res.render('pages/admin/berita/daftar-berita', {
-            layout: 'layouts/main-ejs-layouts',
-            title: 'Daftar Berita',
-            msg: req.flash('msg'),
-            berita,
-            dataUsername,
-            today,
-        });
-    } catch (err) {
-        console.error('Error fetching berita:', err);
-        res.status(500).send('Terjadi kesalahan saat mengambil daftar berita.');
-    }
-});
-
 
 // Hapus data pendaftar
 router.delete('/daftar-berita/:id', async (req, res) => {
     if (!req.session.loggedIn) {
         return res.redirect('/login-admin');
     }
+    const result = await deleteBeritaById(req.params.id);
+    
+    // Menggunakan flash untuk mengirim pesan ke pengguna
+    req.flash('msg', result.message);
 
-    try {
-        // Menghapus berita berdasarkan ID menggunakan Sequelize destroy
-        const result = await Berita.destroy({
-            where: { id: req.params.id }  // Kondisi berdasarkan ID yang diterima dari URL
-        });
-
-        // Cek apakah berita berhasil dihapus
-        if (result) {
-            req.flash('msg', 'Berita berhasil dihapus!');
-        } else {
-            req.flash('msg', 'Berita tidak ditemukan atau sudah dihapus!');
-        }
-
-        // Redirect ke halaman daftar berita
-        res.redirect('/daftar-berita');
-    } catch (err) {
-        console.error('Error deleting berita:', err);
-        req.flash('msg', 'Terjadi kesalahan saat menghapus berita!');
-        res.status(500).send('Terjadi kesalahan saat menghapus berita.');
-    }
+    // Redirect ke halaman daftar berita
+    res.redirect('/daftar-berita');
 });
 
 
 
-// Hapus data pendaftar
-router.delete('/data-pendaftar/:id', async (req, res) => {
-    if (!req.session.loggedIn) {
-        return res.redirect('/login-admin');  // Pastikan admin sudah login
-    }
+// hapus data pendaftar
 
-    try {
-        // Menghapus pendaftar berdasarkan ID menggunakan Sequelize destroy
-        const result = await Pendaftar.destroy({
-            where: { id: req.params.id }  // Kondisi pencarian berdasarkan ID yang diterima dari URL
-        });
-
-        // Cek apakah data berhasil dihapus
-        if (result) {
-            req.flash('msg', 'Data pendaftar berhasil dihapus!');
-        } else {
-            req.flash('msg', 'Data pendaftar tidak ditemukan atau sudah dihapus!');
-        }
-
-        // Redirect ke halaman daftar pendaftar
-        res.redirect('/data-pendaftar');
-    } catch (err) {
-        console.error('Error deleting pendaftar:', err);
-        req.flash('msg', 'Terjadi kesalahan saat menghapus data pendaftar!');
-        res.status(500).send('Terjadi kesalahan saat menghapus data pendaftar.');
-    }
-});
 
 
 

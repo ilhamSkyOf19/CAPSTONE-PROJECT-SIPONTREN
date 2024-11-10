@@ -102,28 +102,28 @@ export function capitalizeWords(str) {
 // delete berita 
 export async function deleteBeritaById(id) {
     try {
-        // Temukan data berita berdasarkan ID
-        const berita = await Berita.findById(id);
+        // Query untuk mendapatkan data berita berdasarkan ID
+        const berita = await Berita.findByPk(id);  // Menggunakan Sequelize untuk mencari berdasarkan PK (id)
 
-        // Jika berita ditemukan
         if (!berita) {
             return { success: false, message: 'Data tidak ditemukan!' };
         }
 
-        // Path direktori image (today adalah tanggal dari dokumen berita)
-        const today = berita.date.toISOString().split('T')[0]; // Mengambil tanggal dari date dan menghilangkan 'T'
-        const filePath = path.join(process.cwd(), 'public', 'imageBerita', today, berita.thumbnail); // Menyusun path gambar
+        // Path direktori image (tanggal hari ini dari berita)
+        const today = new Date(berita.date).toISOString().split('T')[0]; // Ambil tanggal dan hilangkan 'T'
+        const filePath = path.join(process.cwd(), 'public', 'imageBerita', today, berita.thumbnail); // Susun path gambar
 
         // Cek apakah file gambar ada dan hapus
         if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath); // Menggunakan unlinkSync untuk menunggu proses penghapusan selesai
+            fs.unlinkSync(filePath); // Hapus gambar
             console.log('Gambar berhasil dihapus:', filePath);
         } else {
             console.log('File gambar tidak ditemukan:', filePath);
         }
 
-        // Hapus data berita dari MongoDB
-        await Berita.deleteOne({ _id: id });
+        // Hapus data berita dari MySQL menggunakan Sequelize
+        await berita.destroy(); // Menggunakan method destroy() dari Sequelize untuk menghapus data
+
         return { success: true, message: 'Data dan gambar berhasil dihapus!' };
         
     } catch (error) {
