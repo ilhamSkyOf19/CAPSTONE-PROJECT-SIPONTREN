@@ -1,6 +1,6 @@
 import { check, body, validationResult } from 'express-validator';
 import multer from 'multer';
-import { validatorResult, capitalizeWords, deleteBeritaById } from '../utils/validator.js';
+import { validatorResult, capitalizeWords, deleteBeritaById, deletePendaftarById } from '../utils/validator.js';
 import express from 'express';
 import { Upload, Upload2 } from '../middleware/uploadFile.js';
 import FileValidator from '../middleware/checkFile.js';
@@ -745,7 +745,6 @@ router.put('/ubah-berita',
 
         if (error) {
             let errorMessage;
-
             if (error.code === 'INVALID_FILE_TYPE') {
                 errorMessage = 'File tidak sesuai dengan yang diharapkan (harus .jpg, .jpeg, atau .png)!';
             } else if (error instanceof multer.MulterError) {
@@ -913,7 +912,7 @@ router.get('/detail-berita/:id', async (req, res) => {
 
 
 
-// Hapus data pendaftar
+// Hapus data berita
 router.delete('/daftar-berita/:id', async (req, res) => {
     if (!req.session.loggedIn) {
         return res.redirect('/login-admin');
@@ -930,6 +929,18 @@ router.delete('/daftar-berita/:id', async (req, res) => {
 
 
 // hapus data pendaftar
+router.delete('/data-pendaftar/:id', async (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');
+    }
+    const result = await deletePendaftarById(req.params.id);
+    
+    // Menggunakan flash untuk mengirim pesan ke pengguna
+    req.flash('msg', result.message);
+
+    // Redirect ke halaman daftar berita
+    res.redirect('/data-pendaftar');
+});
 
 
 

@@ -135,10 +135,11 @@ export async function deleteBeritaById(id) {
 
 
 // delete data pendaftar
+// Fungsi untuk menghapus pendaftar berdasarkan ID
 export async function deletePendaftarById(id) {
     try {
-        // Temukan data pendaftar berdasarkan ID
-        const pendaftar = await Pendaftaran.findById(id);
+        // Cari data pendaftar berdasarkan ID menggunakan Sequelize
+        const pendaftar = await Pendaftaran.findOne({ where: { id } });
 
         // Jika pendaftar tidak ditemukan
         if (!pendaftar) {
@@ -163,8 +164,9 @@ export async function deletePendaftarById(id) {
             console.log('Folder tidak ditemukan:', nikFolder);
         }
 
-        // Hapus data pendaftar dari MongoDB
-        await Pendaftaran.deleteOne({ _id: id });
+        // Hapus data pendaftar dari MySQL
+        await Pendaftaran.destroy({ where: { id } });
+
         return { success: true, message: 'Data pendaftar, gambar, dan folder berhasil dihapus!' };
 
     } catch (error) {

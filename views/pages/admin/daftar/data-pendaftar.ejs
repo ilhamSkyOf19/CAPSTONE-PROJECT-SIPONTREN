@@ -42,7 +42,7 @@
                       <td> <a class="btn btn-warning" href="/ubah-data-pendaftar/<%= data.id %>">Ubah</a></td>
                       <td>
                         <form id="delete" method="POST" action="/data-pendaftar/<%= data.id %>?_method=DELETE" class="d-inline">
-                          <input type="hidden" name="id" value="<%= data._id %>">
+                          <input type="hidden" name="id" value="<%= data.id %>">
                           <button type="submit" class="btn btn-danger" id="submitBtn">Delete</button>
                       </form>
                       </td>
