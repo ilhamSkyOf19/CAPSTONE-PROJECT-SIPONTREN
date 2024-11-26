@@ -92,6 +92,12 @@ export const validatorResult = [
     
 ];
 
+export const validatorUbahUsername = [
+    check('usernameLama', 'username lama tidak valid').isAlpha('en-US'),
+    check('password', 'password tidak valid').matches(/^[a-zA-Z0-9 ]+$/),
+    check('usernameBaru', 'username baru tidak valid').isAlpha('en-US'),
+];
+
 
 // capitalize teks
 export function capitalizeWords(str) {

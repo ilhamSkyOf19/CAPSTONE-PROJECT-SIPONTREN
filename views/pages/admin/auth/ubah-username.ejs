@@ -1,0 +1,37 @@
+<div class="container">
+    <div class="row">
+        <h1>Ubah Username</h1>
+        <% if (typeof errors != 'undefined') { %>
+          <div class="alert alert-danger" role="alert">
+            <ul>
+              <% errors.forEach(error => { %>
+               <li><%= error.msg %></li>
+              <% }) %>
+            </ul>
+          </div>
+        <% } %>
+        <% if (typeof msg !== 'undefined' && msg.length !== 0) { %>
+          <div class="alert alert-success" role="alert">
+            <h3><%= msg %></h3>
+          </div>
+        <% } %>
+        <div class="col-md-5">
+            <form method="post" action="/ubah-username?_method=PUT">
+              <input type="text" class="form-control" name="_id" placeholder="masukan username lama" value="<%= user ? user.id : '' %>">
+                  <div class="mb-3">
+                    <label for="usernameLama" class="form-label">Username Lama</label>
+                    <input type="text" class="form-control" id="usernameLama" name="usernameLama" placeholder="masukan username lama">
+                  </div>
+                  <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="masukan password" >
+                  </div>
+                  <div class="mb-3">
+                    <label for="usernameBaru" class="form-label">Username Baru</label>
+                    <input type="text" class="form-control" id="usernameBaru" name="usernameBaru" placeholder="masukan username baru" >
+                  </div>
+                  <button type="submit" class="btn btn-primary">Kirim</button>
+                </form>
+        </div>
+    </div>
+</div>

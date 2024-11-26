@@ -1,6 +1,6 @@
 import { check, body, validationResult } from 'express-validator';
 import multer from 'multer';
-import { validatorResult, capitalizeWords, deleteBeritaById, deletePendaftarById } from '../utils/validator.js';
+import { validatorResult, capitalizeWords, deleteBeritaById, deletePendaftarById, validatorUbahUsername } from '../utils/validator.js';
 import express from 'express';
 import { Upload, Upload2 } from '../middleware/uploadFile.js';
 import FileValidator from '../middleware/checkFile.js';
@@ -13,6 +13,7 @@ import User from '../models/skemaLogin.js';
 import csrf from 'csrf';
 import { Sequelize } from 'sequelize';
 import argon2 from 'argon2';
+import { verifyPassword } from '../utils/auth.js';
 
 // konfigurasi crsf
 const csrfProtection = new csrf();
@@ -692,7 +693,7 @@ router.post('/form-berita', [
                 thumbnail
             });
             // tampilkan pesan berhasil
-            req.flash('msg', 'Data berhasil diubah!');
+            req.flash('msg', 'Data berhasil ditambah!');
             res.redirect('/'); // Setelah sukses, redirect ke halaman utama
         } catch (err) {
             console.error('Error saving berita:', err);
@@ -941,6 +942,76 @@ router.delete('/data-pendaftar/:id', async (req, res) => {
     // Redirect ke halaman daftar berita
     res.redirect('/data-pendaftar');
 });
+
+
+// ubah username 
+router.get('/ubah-username', async (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');  
+    }
+    const user = await User.findOne({ where: { id: req.session.loggedIn } });
+    const dataUsername = user.username;
+    res.render('pages/admin/auth/ubah-username', {
+        layout: 'layouts/main-ejs-layouts',
+        title: 'Form Ubah Username',
+        msg: req.flash('msg'),
+        user,
+        dataUsername,
+    });
+});
+
+// ubah username
+router.put('/ubah-username',
+    validatorUbahUsername, // Middleware untuk validasi input
+    async (req, res) => {
+        const { _id, usernameLama, password, usernameBaru } = req.body;
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            const user = await User.findOne({ where: { id: _id } }); // Ambil user berdasarkan ID
+            return res.render('pages/admin/auth/ubah-username', {
+                layout: 'layouts/main-ejs-layouts',
+                title: 'Form Ubah Username',
+                errors: errors.array(),
+                user,
+            });
+        } else {
+            try {
+                // Mencari user berdasarkan ID yang dikirimkan dari form
+                const user = await User.findByPk(_id); // Metode Sequelize untuk mencari primary key
+                if (!user) {
+                    req.flash('msg', 'User tidak ditemukan');
+                    return res.redirect('/ubah-username');
+                }
+
+                // Verifikasi username lama
+                if (user.username !== usernameLama) {
+                    req.flash('msg', 'Username lama tidak cocok');
+                    return res.redirect('/ubah-username');
+                }
+
+                // Verifikasi password lama
+                const isPasswordValid = await verifyPassword(user.password, password);
+                if (!isPasswordValid) {
+                    req.flash('msg', 'Password salah');
+                    return res.redirect('/ubah-username');
+                }
+                console.log('Password valid. Melanjutkan ke proses pengubahan username.');
+                // Update username
+                user.username = usernameBaru;
+                await user.save(); // Menyimpan perubahan ke database
+
+                req.flash('msg', 'Username berhasil diubah');
+                return res.redirect('/ubah-username');
+            } catch (error) {
+                console.error(error);
+                req.flash('msg', 'Terjadi kesalahan saat memproses permintaan');
+                return res.redirect('/ubah-username');
+            }
+        }
+    }
+);
+
 
 
 

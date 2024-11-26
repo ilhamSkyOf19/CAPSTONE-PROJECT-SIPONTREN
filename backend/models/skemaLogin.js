@@ -21,17 +21,16 @@ const User = db.define('user', {
 }, {
   freezeTableName: true,
   timestamps: true,  // Menggunakan createdAt dan updatedAt
-  // Jika ingin menggunakan custom primary key
-  // primaryKey: true,
 });
 
-// Sebelum membuat atau mengupdate user, hash password terlebih dahulu
+// Sebelum membuat user, hash password terlebih dahulu
 User.beforeCreate(async (user, options) => {
   user.password = await argon2.hash(user.password);
 });
 
+// Sebelum mengupdate user, hanya hash password jika berubah
 User.beforeUpdate(async (user, options) => {
-  if (user.password) {
+  if (user.changed('password')) {
     user.password = await argon2.hash(user.password);
   }
 });
