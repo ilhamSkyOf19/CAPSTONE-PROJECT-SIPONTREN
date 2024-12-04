@@ -1,0 +1,89 @@
+<div class="flex items-center justify-center min-h-screen min-w-full max-w-full  bg-gradient-to-br p-6">
+    <div class="w-full max-w-xl bg-white shadow-lg rounded-lg p-8">
+      <!-- Header -->
+      <div class="text-center">
+        <h2 class="text-2xl font-extrabold text-gray-800">Ubah Data Alumni</h2>
+        <p class="text-sm text-gray-600 mt-1">Silakan perbarui data alumni di bawah ini</p>
+      </div>
+  
+      <!-- Pesan Error -->
+      <% if (!data) { %>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-6" role="alert">
+        <strong class="font-bold">Data Tidak Ada!</strong>
+        <span class="block sm:inline">Silakan kembali ke halaman sebelumnya.</span>
+        <a href="/data-pendaftar" class="underline text-blue-600 hover:text-blue-800 ml-2">Kembali</a>
+      </div>
+      <% } %>
+  
+      <% if (typeof errors != 'undefined' && errors.length > 0) { %>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-6" role="alert">
+        <strong class="font-bold">Ada kesalahan!</strong>
+        <ul class="mt-2 list-disc pl-6">
+          <% errors.forEach(error => { %>
+          <li><%= error.msg %></li>
+          <% }) %>
+        </ul>
+      </div>
+      <% } %>
+  
+      <% if (typeof errorsMongoose != 'undefined' && errorsMongoose.length > 0) { %>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-6" role="alert">
+        <strong class="font-bold">Error Database:</strong>
+        <ul class="mt-2 list-disc pl-6">
+          <% errorsMongoose.forEach(error => { %>
+          <li><%= error.message %></li>
+          <% }) %>
+        </ul>
+      </div>
+      <% } %>
+  
+      <!-- Form -->
+      <form action="/ubah-data-alumni?_method=PUT" method="POST" class="mt-8 space-y-6">
+        <!-- Nama -->
+        <div>
+            <input type="hidden" value="<%= data.id %>" name="_id">
+          <label for="nama" class="block text-sm font-medium text-gray-600">Nama</label>
+          <input type="text" id="nama" name="nama_alumni" value="<%= data.nama_alumni%>" 
+            class="w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required>
+        </div>
+  
+        <!-- Tanggal Lahir -->
+        <div>
+          <label for="tanggal_lahir" class="block text-sm font-medium text-gray-600">Tanggal Lahir</label>
+          <input type="date" id="tanggal_lahir" name="tanggal_lahir" value="<%= data.tanggal_lahir %>" 
+            class="w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required>
+        </div>
+  
+        <!-- Angkatan -->
+        <div>
+          <label for="angkatan" class="block text-sm font-medium text-gray-600">Angkatan</label>
+          <input type="number" id="angkatan" name="angkatan" value="<%= data.angkatan %>" 
+            class="w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required>
+        </div>
+  
+        <!-- Pesan -->
+        <div>
+          <label for="pesan" class="block text-sm font-medium text-gray-600">Pesan</label>
+          <textarea id="pesan" name="pesan" rows="4" 
+            class="w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required><%= data.pesan %></textarea>
+        </div>
+  
+        <!-- Tombol -->
+        <div class="flex justify-between items-center">
+          <a href="/data-alumni" 
+            class="text-gray-600 hover:text-white bg-gray-200 hover:bg-gray-700 px-6 py-2 rounded-lg shadow transition duration-200">
+            Kembali
+          </a>
+          <button type="submit" 
+            class="bg-indigo-600 text-white px-6 py-2 rounded-lg shadow hover:bg-indigo-700 transition duration-200">
+            Simpan Perubahan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  

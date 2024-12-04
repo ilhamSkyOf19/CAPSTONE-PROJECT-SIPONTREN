@@ -1,23 +1,28 @@
-import { check, body, validationResult } from 'express-validator';
+import { body, validationResult } from 'express-validator';
 import multer from 'multer';
-import { validatorResult, capitalizeWords, deleteBeritaById, deletePendaftarById, validatorUbahUsername } from '../utils/validator.js';
+import {validatorUbahUsername, validatorLogin, validatorUploadBerita, validatorUbahBerita, validatorUbahPassword, validatorUbahDataAlumni, validatorResultPendaftar } from '../utils/validator.js';
+import { capitalizeWords, deleteBeritaById, deletePendaftarById } from '../utils/controller.js';
 import express from 'express';
 import { Upload, Upload2 } from '../middleware/uploadFile.js';
 import FileValidator from '../middleware/checkFile.js';
 import { FileSingleUploader } from '../middleware/uploadFile.js';
 import path from 'node:path';
 import fs from 'fs/promises';
+import fsSync from 'fs'
 import  Pendaftaran  from '../models/pendaftaran.js';
 import  Berita  from '../models/skemaBerita.js';
 import User from '../models/skemaLogin.js';
-import csrf from 'csrf';
+import Alumni from '../models/skemaAlumni.js';
 import { Sequelize } from 'sequelize';
 import argon2 from 'argon2';
 import { verifyPassword } from '../utils/auth.js';
+import PdfPrinter from 'pdfmake';
+import { Op } from 'sequelize';
+import archiver from 'archiver';
+import { fileURLToPath } from 'url';
 
-// konfigurasi crsf
-const csrfProtection = new csrf();
-const secret = csrfProtection.secretSync();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // router
 const router = express.Router();
@@ -81,11 +86,7 @@ router.post('/login-admin',
         }
         return true;
     }),
-    [
-        // Validasi username dan password
-        check('username', 'Username harus berisi huruf!').isAlpha('en-US'),
-        check('password', 'Password harus berisi angka dan huruf!').matches(/^[a-zA-Z0-9 ]+$/),
-    ],
+    validatorLogin,
     async (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -133,61 +134,6 @@ router.post('/login-admin',
         }
     }
 );
-
-
-// register 
-router.get('/register', (req, res) => {
-    res.render('register', {
-        title: 'register',
-        layout: 'layouts/main-ejs-layouts',
-        data: req.body,
-    });
-});
-
-// Rute untuk registrasi
-router.post('/register', [
-    check('username', 'username harus berisi huruf!').isAlpha('en-US'),
-    check('password', 'password berisi angka dan huruf').matches(/^[a-zA-Z0-9 ]+$/)
-], async (req, res) => {
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-        return res.render('register', {
-            layout: 'layouts/main-ejs-layouts',
-            title: 'Register',
-            errors: errors.array(),
-            data: req.body,
-        });
-    }
-
-    const { username, password } = req.body;
-
-    try {
-        // Cek apakah username sudah terdaftar
-        const existingUser = await User.findOne({ where: { username } });
-        if (existingUser) {
-            return res.render('register', {
-                layout: 'layouts/main-ejs-layouts',
-                title: 'Register',
-                errors: [{ msg: 'Username sudah terdaftar!' }],
-                data: req.body,
-            });
-        }
-
-        // Membuat pengguna baru
-        const newUser = await User.create({ 
-            username, 
-            password, // Password otomatis di-hash oleh Sequelize hook
-        });
-
-        req.flash('msg', 'Username berhasil ditambahkan');
-        res.redirect('/login'); // Redirect ke halaman login setelah registrasi berhasil
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Terjadi kesalahan saat registrasi.');
-    }
-});
-
 
 
 // form pendaftaran
@@ -253,7 +199,7 @@ router.post('/form-pendaftaran', [
     }),
 
     // Validasi dan pengecekan form
-    validatorResult
+    validatorResultPendaftar
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -312,9 +258,6 @@ router.post('/form-pendaftaran', [
 });
 
 
-
-
-
 // Halaman data-pendaftar
 router.get('/data-pendaftar', async (req, res) => {
     if (!req.session.loggedIn) {
@@ -326,8 +269,24 @@ router.get('/data-pendaftar', async (req, res) => {
         const user = await User.findOne({ where: { id: req.session.loggedIn } });
         const dataUsername = user.username;
 
-        // Ambil semua data pendaftar dari MySQL
-        let dataPendaftar = await Pendaftaran.findAll();
+        // Ambil query untuk pencarian
+        const query = req.query.query || '';
+
+        // Ambil data pendaftar dari MySQL berdasarkan query
+        let dataPendaftar = [];
+        if (query) {
+            dataPendaftar = await Pendaftaran.findAll({
+                where: {
+                    [Op.or]: [
+                        { nama_lengkap: { [Op.like]: `%${query}%` } },
+                        { nisn: { [Op.like]: `%${query}%` } },
+                        { nik: { [Op.like]: `%${query}%` } },
+                    ],
+                },
+            });
+        } else {
+            dataPendaftar = await Pendaftaran.findAll();
+        }
 
         // Proses data pendaftar untuk kapitalisasi kecuali beberapa field
         dataPendaftar = dataPendaftar.map(data => {
@@ -349,6 +308,7 @@ router.get('/data-pendaftar', async (req, res) => {
             dataPendaftar,
             dataUsername,
             msg: req.flash('msg'),
+            query, // Kirim query ke frontend untuk menampilkan ulang nilai pencarian
         });
     } catch (err) {
         console.error(err);
@@ -356,6 +316,39 @@ router.get('/data-pendaftar', async (req, res) => {
         res.redirect('/');
     }
 });
+
+// data pendaftar detail
+router.get('/data-pendaftar-detail/:id', async (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');
+    }
+    try {
+        // Cari user yang sedang login
+        const user = await User.findOne({ where: { id: req.session.loggedIn } });
+        const dataUsername = user.username;
+      const { id } = req.params;
+      const pendaftar = await Pendaftaran.findByPk(id);
+  
+      if (!pendaftar) {
+        return res.status(404).render('error', { message: 'Data pendaftar tidak ditemukan!' });
+        }
+        
+         // Render halaman dengan data yang sudah diproses
+         res.render('pages/admin/daftar/data-pendaftar-detail', {
+            layout: 'layouts/main-ejs-layouts',
+             title: 'Data Pendaftar Detail',
+            pendaftar,
+            dataUsername,
+            msg: req.flash('msg'),
+        });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Terjadi kesalahan pada server.');
+    }
+  });
+
+
+// Halaman data-pendaftar
 
 // Halaman ubah data pendaftar
 router.get('/ubah-data-pendaftar/:id', async (req, res) => {
@@ -406,11 +399,8 @@ router.get('/ubah-data-pendaftar/:id', async (req, res) => {
 
 
 // PUT ubah data pendaftar
-router.put('/ubah-data', (req, res, next) => {
-    console.log('Request body:', req.body); // Menampilkan semua data yang dikirim
-    console.log('Files:', req.files); // Menampilkan file yang dikirim
-
-    // Pertama, jalankan middleware Upload2 untuk menangani file upload
+router.put('/ubah-data', [
+    (req, res, next) => {
     Upload2(req, res, async function (error) {
         if (error) {
             let errorMessage;
@@ -425,7 +415,8 @@ router.put('/ubah-data', (req, res, next) => {
             } else {
                 errorMessage = error.message || 'Terjadi kesalahan saat upload file!';
             }
-
+            const user = await User.findOne({ where: { id: req.session.loggedIn } });
+            const dataUsername = user.username;
             let dataPendaftar = await Pendaftaran.findByPk(req.body._id); // Temukan pendaftar berdasarkan ID
             return res.render('pages/admin/daftar/ubah-data-pendaftar', {
                 layout: 'layouts/main-ejs-layouts',
@@ -434,12 +425,16 @@ router.put('/ubah-data', (req, res, next) => {
                 data: req.body,
                 dataFile: dataPendaftar,
                 msg: req.flash('msg'),
+                dataUsername,
             });
         }
 
         next();
     });
-}, async (req, res, next) => {
+},
+    validatorResultPendaftar
+]
+,async (req, res, next) => {
     if (req.files) {
         FileValidator.checkFileType2(req, res, next, 'pages/admin/daftar/ubah-data-pendaftar');
     } else {
@@ -448,6 +443,11 @@ router.put('/ubah-data', (req, res, next) => {
 }, async (req, res) => {
     const errors = validationResult(req);
     let dataPendaftar = await Pendaftaran.findByPk(req.body._id); // Temukan pendaftar berdasarkan ID
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');  
+    }
+    const user = await User.findOne({ where: { id: req.session.loggedIn } });
+    const dataUsername = user.username;
 
     if (!errors.isEmpty()) {
         // Jika ada error validasi, tampilkan kembali form dengan error
@@ -458,6 +458,7 @@ router.put('/ubah-data', (req, res, next) => {
             data: req.body,
             dataFile: dataPendaftar,
             msg: req.flash('msg'),
+            dataUsername,
         });
     }
 
@@ -552,6 +553,7 @@ router.put('/ubah-data', (req, res, next) => {
             data: req.body,
             dataFile: dataPendaftar,
             msg: req.flash('msg'),
+            dataUsername,
         });
     }
 });
@@ -559,6 +561,187 @@ router.put('/ubah-data', (req, res, next) => {
 
 
 // UBAHH KE MYSQL!!!
+router.get('/data-alumni', async (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');
+    }
+    
+    try {
+        // Cari user yang sedang login
+        const user = await User.findOne({ where: { id: req.session.loggedIn } });
+        const dataUsername = user.username;
+
+        // Ambil query untuk pencarian
+        const query = req.query.query || '';
+        
+        // Ambil data pendaftar dari MySQL berdasarkan query
+        let dataAlumni = [];
+        if (query) {
+            dataAlumni = await Alumni.findAll({
+                where: {
+                    [Op.or]: [
+                        { nama_alumni: { [Op.like]: `%${query}%` } },
+                        { angkatan: { [Op.like]: `%${query}%` } },
+                    ],
+                },
+            });
+        } else {
+            dataAlumni = await Alumni.findAll();
+        }
+
+        // Proses data pendaftar untuk kapitalisasi kecuali beberapa field
+        dataAlumni = dataAlumni.map(data => {
+            let alumni = data.dataValues; // Ambil data yang telah dimuat
+
+            // Kapitalisasi setiap kata untuk semua field string kecuali beberapa field tertentu
+            for (let key in alumni) {
+                if (typeof alumni[key] === 'string') {
+                    alumni[key] = capitalizeWords(alumni[key]);
+                }
+            }
+            return alumni;
+        });
+
+        // Render halaman dengan data yang sudah diproses
+        res.render('pages/admin/daftar/data-alumni', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'Data Alumni',
+            dataAlumni,
+            dataUsername,
+            msg: req.flash('msg'),
+            query, // Kirim query ke frontend untuk menampilkan ulang nilai pencarian
+        });
+    } catch (err) {
+        console.error(err);
+        req.flash('msg', 'Terjadi kesalahan saat mengambil data pendaftar.');
+        res.redirect('/');
+    }
+});
+
+// data alumni detail
+router.get('/data-detail-alumni/:id', async (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');
+    }
+    try {
+        // Cari user yang sedang login
+        const user = await User.findOne({ where: { id: req.session.loggedIn } });
+        const dataUsername = user.username;
+      const { id } = req.params;
+      const alumni = await Alumni.findByPk(id);
+  
+      if (!alumni) {
+        return res.status(404).render('error', { message: 'Data pendaftar tidak ditemukan!' });
+        }
+        
+         // Render halaman dengan data yang sudah diproses
+         res.render('pages/admin/daftar/data-detail-alumni', {
+            layout: 'layouts/main-ejs-layouts',
+             title: 'Data Alumi Detail',
+            dataAlumni: alumni,
+            dataUsername,
+            msg: req.flash('msg'),
+        });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Terjadi kesalahan pada server.');
+    }
+});
+  
+// Halaman ubah data alumni
+router.get('/ubah-data-alumni/:id', async (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');
+    }
+
+    try {
+        const id = req.params.id;  // Mendapatkan ID dari parameter URL
+
+        // Mengambil data pendaftar berdasarkan ID dengan Sequelize
+        let data = await Alumni.findOne({ where: { id } });
+
+        // Jika data tidak ditemukan, arahkan ke halaman data pendaftar
+        if (!data) {
+            return res.redirect('/data-alumni');
+        }
+
+        // Mengakses data dengan dataValues (mengambil data sesungguhnya dari Sequelize)
+        let alumni = data.dataValues;
+
+        // Lakukan kapitalisasi untuk semua string kecuali beberapa field tertentu
+        for (let key in data) {
+            if (typeof alumni[key] === 'string')  {
+                alumni[key] = capitalizeWords(alumni[key]);
+            }
+        }
+
+        // Ambil data user yang sedang login
+        const user = await User.findOne({ where: { id: req.session.loggedIn } });
+        const dataUsername = user.username;
+
+        // Render halaman ubah data pendaftar dengan data yang sudah diproses
+        res.render('pages/admin/daftar/ubah-data-alumni', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'Ubah Data Pendaftar',
+            data: alumni,
+            dataUsername
+        });
+    } catch (err) {
+        console.error(err);
+        // Jika ada error, arahkan kembali ke halaman data pendaftar
+        res.redirect('/data-pendaftar');
+    }
+});
+
+// PUT ubah data pendaftar
+router.put('/ubah-data-alumni', [validatorUbahDataAlumni]
+, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        // Jika ada error validasi, tampilkan kembali form dengan error
+        return res.render('pages/admin/daftar/ubah-data-alumni', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'Form Ubah Data Alumni',
+            errors: errors.array(),
+            data: req.body,
+            msg: req.flash('msg'),
+        });
+    }
+
+    // Jika tidak ada error, lanjutkan dengan update data
+    try {
+    // Update data di database menggunakan Sequelize
+        await Alumni.update(
+            {
+                nama_alumni: req.body.nama_alumni,
+                tanggal_lahir: req.body.tanggal_lahir,
+                angkatan: req.body.angkatan,
+                pesan: req.body.pesan,
+            },
+            { where: { id: req.body._id } }
+        );
+
+        req.flash('msg', 'Data berhasil diubah!');
+        res.redirect('/data-alumni'); // Redirect ke halaman data pendaftar
+    } catch (error) {
+        console.error(error);
+        let errorMessage = 'Terjadi kesalahan saat menyimpan data ke database!';
+        if (error.name === 'SequelizeValidationError') {
+            errorMessage = error.errors.map(err => err.message).join(', ');
+        }
+        return res.render('pages/admin/daftar/ubah-data-alumni', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'Form Ubah Data Alumni',
+            errors: [{ msg: errorMessage }],
+            data: req.body,
+            msg: req.flash('msg'),
+        });
+    }
+});
+
+
+
+
 
 
 // daftar berita 
@@ -657,8 +840,8 @@ router.post('/form-berita', [
         // Validasi tipe file di sini dengan checkFileType, arahkan ke 'index' jika error
         await FileValidator.checkFileType3(req, res, next, 'pages/admin/berita/form-berita');
     },
-    check('title', 'Title harus berisi huruf, angka, dan simbol').matches(/^[A-Za-z0-9\s!@#$%^&*(),.?":{}|<>]+$/),
-    check('content', 'content harus berisi huruf, angka, dan simbol').matches(/^[\s\S]+$/)
+    
+    validatorUploadBerita
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -687,7 +870,7 @@ router.post('/form-berita', [
       
         try {
             // Simpan berita ke dalam MySQL menggunakan Sequelize
-            const berita = await Berita.create({
+            await Berita.create({
                 title,
                 content,
                 thumbnail
@@ -717,11 +900,13 @@ router.get('/ubah-berita/:id', async (req, res) => {
         if (!data) {
             return res.redirect('/');
         }
+        console.log(today);
         res.render('pages/admin/berita/ubah-berita', {
             layout: 'layouts/main-ejs-layouts',
             title: 'form ubah berita',
             dataUsername,
             data,
+            today,
             dataFile: '',
         });
     } catch (err) {
@@ -765,6 +950,7 @@ router.put('/ubah-berita',
                 data: req.body,
                 msg: req.flash('msg'),
                 dataFile: dataBerita,
+                today,
             });
         }
 
@@ -778,9 +964,9 @@ router.put('/ubah-berita',
         next();
     }
 },
-    check('title', 'Title harus berisi huruf, angka, dan simbol').matches(/^[A-Za-z0-9\s!@#$%^&*(),.?":{}|<>]+$/),
-    check('content', 'content harus berisi huruf, angka, dan simbol').matches(/^[\s\S]+$/),
-async (req, res) => {
+    // validator ubah berita
+   validatorUbahBerita
+,async (req, res) => {
     const errors = validationResult(req);
     const dataBerita = await Berita.findByPk(req.body.id); // Ganti findById dengan findByPk untuk Sequelize
 
@@ -792,6 +978,7 @@ async (req, res) => {
             data: req.body,
             msg: req.flash('msg'),
             dataFile: dataBerita,
+            today,
         });
     } else {
         try {
@@ -857,6 +1044,7 @@ async (req, res) => {
                 data: req.body,
                 msg: req.flash('msg'),
                 dataFile: dataBerita,
+                today,
             });
         }
     }
@@ -964,6 +1152,12 @@ router.get('/ubah-username', async (req, res) => {
 router.put('/ubah-username',
     validatorUbahUsername, // Middleware untuk validasi input
     async (req, res) => {
+        if (!req.session.loggedIn) {
+            return res.redirect('/login-admin');  
+        }
+        const user = await User.findOne({ where: { id: req.session.loggedIn } });
+        const dataUsername = user.username;
+
         const { _id, usernameLama, password, usernameBaru } = req.body;
         const errors = validationResult(req);
 
@@ -974,6 +1168,7 @@ router.put('/ubah-username',
                 title: 'Form Ubah Username',
                 errors: errors.array(),
                 user,
+                dataUsername,
             });
         } else {
             try {
@@ -1012,8 +1207,235 @@ router.put('/ubah-username',
     }
 );
 
+ 
+// ubah password
+router.get('/ubah-password', async (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');  
+    }
+    const user = await User.findOne({ where: { id: req.session.loggedIn } });
+    const dataUsername = user.username;
+    res.render('pages/admin/auth/ubah-password', {
+        layout: 'layouts/main-ejs-layouts',
+        title: 'Form Ubah Password',
+        msg: req.flash('msg'),
+        user,
+        dataUsername,
+    });
+});
+
+// BERIKAN VALIDASI ERROR TERHADAP VALIDATOR   
+// ubah password
+router.put('/ubah-password', validatorUbahPassword, async (req, res) => {
+    const { _id, username, passwordLama, passwordBaru, konfirmasiPassword } = req.body;
+
+    try {
+        // Cari user berdasarkan ID
+        const user = await User.findByPk(_id);
+
+        // 1. Validasi apakah user ditemukan
+        if (!user || user.username !== username) {
+            req.flash('msg', 'Username tidak ditemukan');
+            return res.redirect('/ubah-password');
+        }
+
+        // 2. Verifikasi password lama menggunakan fungsi verifyPassword
+        const isPasswordLamaValid = await verifyPassword(user.password, passwordLama.trim());
+        if (!isPasswordLamaValid) {
+            req.flash('msg', 'Password lama salah');
+            return res.redirect('/ubah-password');
+        }
+
+        // 3. Validasi password baru dan konfirmasi password
+        if (passwordBaru.trim() !== konfirmasiPassword.trim()) {
+            req.flash('msg', 'Password baru dan konfirmasi password tidak cocok');
+            return res.redirect('/ubah-password');
+        }
+
+        // 4. Update password baru (hashing dilakukan di Sequelize hooks)
+        user.password = passwordBaru.trim(); // Assign password baru
+        await user.save(); // Sequelize akan otomatis menghash di hook `beforeUpdate`
+
+        // Kirim pesan sukses
+        req.flash('msg', 'Password berhasil diubah');
+        return res.redirect('/ubah-password'); // Ganti dengan halaman sesuai keinginan Anda
+
+    } catch (error) {
+        console.error(error);
+        req.flash('msg', 'Terjadi kesalahan di server');
+        return res.redirect('/ubah-password');
+    }
+});
 
 
+
+  
+// download file pdf
+router.get('/download-pdf', async (req, res) => {
+    try {
+        // Ambil data dari database
+        const dataPendaftar = await Pendaftaran.findAll({
+            attributes: [
+                'nisn',
+                'nik',
+                'nama_lengkap',
+                'jenis_kelamin',
+                'usia',
+                'tempat_lahir',
+                'tanggal_lahir',
+                'alamat',
+                'anak_ke',
+                'jumlah_saudara',
+                'nomor_telephone',
+                'alumni_sd',
+                'alamat_sekolah_asal',
+                'nama_lengkap_ayah',
+                'nama_lengkap_ibu',
+                'nama_lengkap_wali',
+                'kode_pos',
+            ],
+        });
+
+        // Ubah data menjadi array untuk PDF
+        const tableBody = [
+            [
+                { text: 'NISN', bold: true },
+                { text: 'NIK', bold: true },
+                { text: 'Nama Lengkap', bold: true },
+                { text: 'Jenis Kelamin', bold: true },
+                { text: 'Usia', bold: true },
+                { text: 'Tanggal Lahir', bold: true },
+            ],
+        ];
+
+        dataPendaftar.forEach((pendaftar) => {
+            tableBody.push([
+                pendaftar.nisn,
+                pendaftar.nik,
+                pendaftar.nama_lengkap,
+                pendaftar.jenis_kelamin,
+                pendaftar.usia,
+                pendaftar.tanggal_lahir,
+            ]);
+        });
+
+        const docDefinition = {
+            content: [
+                { text: 'Data Pendaftar', style: 'header' },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ['10%', '15%', '20%', '15%', '10%', '15%'],
+                        body: tableBody,
+                    },
+                },
+            ],
+            styles: {
+                header: {
+                    fontSize: 18,
+                    bold: true,
+                    marginBottom: 10,
+                },
+            },
+        };
+
+        // Pastikan path font sudah benar dan file font tersedia
+        const fonts = {
+            Roboto: {
+                bold: './public/fonts/Roboto-Bold.ttf',
+                normal: './public/fonts/Roboto-Regular.ttf',
+                italics: './public/fonts/Roboto-Italic.ttf',
+                bolditalics: './public/fonts/Roboto-BoldItalic.ttf',
+            },
+        };
+
+        const printer = new PdfPrinter(fonts);
+        const pdfDoc = printer.createPdfKitDocument(docDefinition);
+
+        // Tentukan folder dan path untuk menyimpan PDF
+        const outputDir = path.join(process.cwd(), 'public', 'output');
+        const filePath = path.join(outputDir, 'pendaftar.pdf');
+
+        // Pastikan folder output ada, jika belum buat
+        if (!fsSync.existsSync(outputDir)) {
+            fsSync.mkdirSync(outputDir, { recursive: true });
+        }
+
+        const writeStream = fsSync.createWriteStream(filePath);
+
+        // Pipe PDF ke file
+        pdfDoc.pipe(writeStream);
+        pdfDoc.end();
+
+        // Pastikan proses file selesai
+        writeStream.on('finish', () => {
+            // Kirim file PDF setelah selesai
+            res.download(filePath, 'pendaftar.pdf', (err) => {
+                if (err) {
+                    console.error('Error during download:', err);
+                    return res.status(500).json({ error: 'Gagal mengunduh file PDF' });
+                }
+
+                // Hapus file setelah diunduh
+                fsSync.unlinkSync(filePath);
+            });
+        });
+
+        // Tangani error pada writeStream
+        writeStream.on('error', (error) => {
+            console.error('Error writing PDF file:', error);
+            res.status(500).json({ error: 'Terjadi kesalahan saat membuat PDF' });
+        });
+
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        res.status(500).json({ error: 'Terjadi kesalahan saat membuat PDF' });
+    }
+});
+
+// download zip gambar 
+router.get('/download-zip/:nik', (req, res) => {
+    const { nik } = req.params; // Ambil NIK dari parameter URL
+    const outputPath = path.join(__dirname, `${nik}.zip`); // Nama file ZIP berdasarkan NIK
+    const output = fsSync.createWriteStream(outputPath);
+    const archive = archiver('zip', { zlib: { level: 9 } });
+
+    // Tangani event ketika arsip selesai dibuat
+    output.on('close', () => {
+        console.log(`ZIP file created: ${archive.pointer()} total bytes`);
+
+        // Kirim file ZIP ke pengguna
+        res.download(outputPath, `${nik}.zip`, (err) => {
+            if (err) {
+                console.error('Error during download:', err);
+            } else {
+                // Hapus file ZIP setelah selesai diunduh
+                fsSync.unlinkSync(outputPath);
+                console.log(`File ZIP ${nik}.zip telah dihapus setelah diunduh`);
+            }
+        });
+    });
+
+    // Tangani error
+    archive.on('error', (err) => {
+        throw err;
+    });
+
+    // Hubungkan stream dengan file output
+    archive.pipe(output);
+
+    // Tambahkan folder berdasarkan NIK ke arsip
+    const folderPath = path.join(__dirname, '../../public/imagesPendaftar', nik); // Path folder berdasarkan NIK
+    console.log(folderPath)
+    if (fsSync.existsSync(folderPath)) {
+        archive.directory(folderPath, nik); // Tambahkan folder ke ZIP
+    } else {
+        return res.status(404).send('Folder tidak ditemukan.');
+    }
+
+    // Panggil finalize untuk menyelesaikan pembuatan ZIP
+    archive.finalize();
+});
 
 
 // Logout route

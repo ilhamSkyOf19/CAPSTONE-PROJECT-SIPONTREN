@@ -1,33 +1,51 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Navbar</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/data-pendaftar">data pendaftar</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/form-berita">Tambah Berita</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/daftar-berita">Daftar Berita</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/ubah-username">Ubah Username</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/ubah-password">Ubah Password</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/logout">Logout</a>
-          </li>
-        </ul>
-      </div>
+<!-- Navbar -->
+<nav
+  id="navbar"
+  class="bg-indigo-600 text-white shadow-lg fixed top-0 left-0 h-full w-48 flex flex-col py-4"
+>
+  <div class="space-y-6">
+    <!-- Header Navbar -->
+    <div class="px-4 text-xl font-bold hover:text-gray-200 transition duration-200">
+      <a href="#">Navbar</a>
     </div>
-  </nav>
+    <div class="space-y-4 px-4">
+      <!-- Menu Links -->
+      <a href="/" class="flex items-center space-x-2 text-gray-200 hover:text-white transition duration-200">
+        <span>🏡</span>
+        <span>Home</span>
+      </a>
+      <a href="/data-pendaftar" class="flex items-center space-x-2 text-gray-200 hover:text-white transition duration-200">
+        <span>📜</span>
+        <span>Data Pendaftar</span>
+      </a>
+      <a href="/data-alumni" class="flex items-center space-x-2 text-gray-200 hover:text-white transition duration-200">
+        <span>🎓</span>
+        <span>Data Alumni</span>
+      </a>
+      <a href="/data-guru" class="flex items-center space-x-2 text-gray-200 hover:text-white transition duration-200">
+        <span>👩‍🏫</span>
+        <span>Data Guru</span>
+      </a>
+      <a href="/form-berita" class="flex items-center space-x-2 text-gray-200 hover:text-white transition duration-200">
+        <span>🖋</span>
+        <span>Tambah Berita</span>
+      </a>
+      <a href="/daftar-berita" class="flex items-center space-x-2 text-gray-200 hover:text-white transition duration-200">
+        <span>📰</span>
+        <span>Daftar Berita</span>
+      </a>
+      <a href="/ubah-username" class="flex items-center space-x-2 text-gray-200 hover:text-white transition duration-200">
+        <span>👤</span>
+        <span>Ubah Username</span>
+      </a>
+      <a href="/ubah-password" class="flex items-center space-x-2 text-gray-200 hover:text-white transition duration-200">
+        <span>🔒</span>
+        <span>Ubah Password</span>
+      </a>
+      <a href="/logout" class="flex items-center space-x-2 text-gray-200 hover:text-white transition duration-200">
+        <span>🚪</span>
+        <span>Logout</span>
+      </a>
+    </div>
+  </div>
+</nav>

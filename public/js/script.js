@@ -1,14 +1,22 @@
-const deleteForm = document.getElementById('delete');
-const deleteButton = document.getElementById('submitBtn');
+// Ambil elemen
+const menuBtn = document.getElementById('menu-btn');
+const menu = document.getElementById('menu');
 
-deleteButton.addEventListener('click', function (event) {
-    event.preventDefault(); // Mencegah form langsung dikirim
+// Periksa apakah elemen menuBtn ada
+if (menuBtn && menu) {
+  // Navbar toggle ketika tombol diklik
+  menuBtn.addEventListener('click', () => {
+    menu.classList.toggle('hidden');
+  });
 
-    // Menampilkan pesan konfirmasi kepada user
-    const confirmation = confirm('Apakah Anda yakin ingin menghapus data ini?');
-
-    // Jika user memilih "OK", lanjutkan pengiriman form
-    if (confirmation) {
-        deleteForm.submit();
+  // Tutup menu jika klik di luar area menu
+  document.addEventListener('click', (e) => {
+    // Periksa apakah klik tidak berasal dari menu atau tombol
+    if (!menu.contains(e.target) && !menuBtn.contains(e.target)) {
+      menu.classList.add('hidden');
     }
-});
+  });
+} else {
+  // Tangani kasus di mana elemen tidak ditemukan
+  console.error('Error: menu-btn atau menu tidak ditemukan di DOM.');
+}

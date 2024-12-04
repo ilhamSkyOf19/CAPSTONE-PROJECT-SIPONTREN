@@ -4,6 +4,9 @@ import { unlink, access } from 'node:fs/promises';
 import fs from 'fs/promises';
 import Pendaftaran from '../models/pendaftaran.js';
 import Berita from '../models/skemaBerita.js';
+import User from '../models/skemaLogin.js';
+
+const today = new Date().toISOString().split('T')[0];
 
 async function checkFile(path) {
     try {
@@ -71,6 +74,8 @@ class FileValidator {
     }    
     async checkFileType2(req, res, next, fileLocation) {
         let dataPendaftar = await Pendaftaran.findByPk(req.body._id);
+        const user = await User.findOne({ where: { id: req.session.loggedIn } });
+        const dataUsername = user.username;
         try {
             // Cek apakah file ada dalam request
             const fotoFormal = req.files['foto_formal'] ? req.files['foto_formal'][0] : null;
@@ -105,6 +110,7 @@ class FileValidator {
                         errors: [{ msg: error.message }],
                         data: req.body, // Menyimpan input sebelumnya
                         dataFile: dataPendaftar,
+                        dataUsername,
                     });
                 }
             }
@@ -161,6 +167,7 @@ class FileValidator {
                     errors: [{ msg: error.message }],
                     data: req.body,
                     dataFile: dataBerita,
+                    today,
                 });
             }
     

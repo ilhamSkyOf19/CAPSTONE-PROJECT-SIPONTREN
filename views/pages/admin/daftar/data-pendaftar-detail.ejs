@@ -1,54 +1,101 @@
-<div class="container mt-3">
-    <div class="row">
-        <div class="col-md-8">
-            <h2>Detail Contact</h2>
-            <% if (!idPendaftar) { %>
-              <div class="alert alert-danger fw-bold" role="alert">
-                Data Tidak Ada! <br> <a href="/data-pendaftar" class="alert-link fw-normal">Kembali</a>.
-              </div>
-            <% } else { %>
-            <div class="card" style="width: 18rem;">
-                <div class="card-body">
-                    <h5 class="card-title">Data Siswa </h5>
-                  <p class="card-text">Nama: <%= idPendaftar.nama_lengkap  %> </p>
-                  <p class="card-text">NISN: <%= idPendaftar.nisn  %> </p>
-                  <p class="card-text">NIK: <%= idPendaftar.nik  %> </p>
-                  <p class="card-text">Jenis Kelamin: <%= idPendaftar.jenis_kelamin %> </p>
-                  <p class="card-text">Usia :<%= idPendaftar.usia %> </p>
-                  <p class="card-text">Tempat Tanggal Lahir : </p>
-                  <div class="mb-3" style="margin-left: 30px;">
-                      <p class="card-text "><%= idPendaftar.tempat_tanggal_lahir.tempat_lahir %> /<%= idPendaftar.tempat_tanggal_lahir.tanggal_lahir %> </p>
-                  </div>
-                  <p class="card-text">Nomor Hp: <%= idPendaftar.nomor_telephone %> </p>
-                  <p>Alamat :</p>
-                  <div class="mb-3" style="margin-left: 30px;">
-                      <p class="card-text">Desa: <%= idPendaftar.alamat.desa %> </p>
-                      <p class="card-text">Rw: <%= idPendaftar.alamat.rw %> </p>
-                      <p class="card-text">Rt: <%= idPendaftar.alamat.rt %> </p>
-                      <p class="card-text">Kecamatan: <%= idPendaftar.alamat.kecamatan %> </p>
-                      <p class="card-text">Kabupaten: <%= idPendaftar.alamat.kabupaten %> </p>
-                      <p class="card-text">Provinsi <%= idPendaftar.alamat.provinsi %> </p>
-                      <p class="card-text">Kode Pos <%= idPendaftar.kode_pos %> </p>
-                    </div>
-                  <p class="card-text">Anak ke :<%= idPendaftar.anak_ke %></p>
-                  <p class="card-text">Jumlah Saudara :<%= idPendaftar.jumlah_saudara %></p>
-                  <p class="card-text">Alumni sd :<%= idPendaftar.alumni_sd %></p>
-                  <p class="card-text">alamat sekolah asal :<%= idPendaftar.alamat_sekolah_asal %></p>
-                  <p class="card-text">Nama Lengkap Ayah :<%= idPendaftar.nama_lengkap_ayah %></p>
-                  <p class="card-text">Nama Lengkap Ibu :<%= idPendaftar.nama_lengkap_ibu %></p>
-                  <p class="card-text">Nama Lengkap Wali :<%= idPendaftar.nama_lengkap_wali %></p>
-                  <form id="delete_data" method="POST" action="/data?_method=DELETE" class="d-inline">
-                    <input type="hidden" name="id" value="<%= idPendaftar.id %>">
-                    <button type="submit" class="btn btn-danger" id="submitBtn" onclick="confirm('apakah anda yakin')">Delete</button>
-                  </form>
-                  <a class="btn btn-danger" href="/ubah-data-pendaftar/<%= idPendaftar.id %>">Ubah</a>
-                  <a href="/data-pendaftar" class="card-link d-block mt-4">Kembali ke halaman</a>
-                </div>
-              </div>
-              <% } %>
+<div class="pl-[15rem] container mt-3">
+  <div class="row">
+    <div class="col-md-8">
+      <% if (!pendaftar) { %>
+        <div class="alert alert-danger fw-bold" role="alert">
+          Data Tidak Ada! <br>
+          <a href="/data-pendaftar" class="alert-link fw-normal">Kembali</a>.
         </div>
+      <% } else { %>
+        <div class="max-w-4xl mx-auto mt-8 p-6 bg-white border border-gray-300 rounded-lg shadow-md">
+          <h2 class="text-2xl font-bold mb-6 text-center">Detail Data Pendaftar</h2>
+
+          <!-- Informasi Dasar -->
+          <div class="mb-6 border border-gray-200 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Informasi Dasar</h3>
+            <div class="grid grid-cols-2 gap-4 text-gray-700">
+              <p><span class="font-semibold">NISN:</span> <%= pendaftar.nisn %></p>
+              <p><span class="font-semibold">NIK:</span> <%= pendaftar.nik %></p>
+              <p><span class="font-semibold">Nama Lengkap:</span> <%= pendaftar.nama_lengkap %></p>
+              <p><span class="font-semibold">Jenis Kelamin:</span> <%= pendaftar.jenis_kelamin %></p>
+              <p><span class="font-semibold">Usia:</span> <%= pendaftar.usia %></p>
+              <p><span class="font-semibold">Tempat/Tanggal Lahir:</span> <%= pendaftar.tempat_lahir %>, <%= pendaftar.tanggal_lahir %></p>
+            </div>
+          </div>
+
+          <!-- Alamat -->
+          <div class="mb-6 border border-gray-200 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Alamat</h3>
+            <p class="text-gray-700"><%= pendaftar.alamat %></p>
+          </div>
+
+          <!-- Data Keluarga -->
+          <div class="mb-6 border border-gray-200 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Data Keluarga</h3>
+            <div class="grid grid-cols-2 gap-4 text-gray-700">
+              <p><span class="font-semibold">Anak Ke:</span> <%= pendaftar.anak_ke %></p>
+              <p><span class="font-semibold">Jumlah Saudara:</span> <%= pendaftar.jumlah_saudara %></p>
+              <p><span class="font-semibold">Ayah:</span> <%= pendaftar.nama_lengkap_ayah %></p>
+              <p><span class="font-semibold">Ibu:</span> <%= pendaftar.nama_lengkap_ibu %></p>
+              <p><span class="font-semibold">Wali:</span> <%= pendaftar.nama_lengkap_wali %></p>
+            </div>
+          </div>
+
+          <!-- Sekolah Asal -->
+          <div class="mb-6 border border-gray-200 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Sekolah Asal</h3>
+            <p class="text-gray-700"><span class="font-semibold">SD:</span> <%= pendaftar.alumni_sd %></p>
+            <p class="text-gray-700"><span class="font-semibold">Alamat:</span> <%= pendaftar.alamat_sekolah_asal %></p>
+          </div>
+
+          <!-- Dokumen -->
+          <div class="mb-6 border border-gray-200 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Dokumen</h3>
+            <a 
+              href="/path/to/your/project.zip" 
+              download
+              class="w-[25%] bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center space-x-2 mb-4"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-3-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span>Download ZIP</span>
+            </a>
+            <ul class="list-disc pl-6 text-gray-700">
+              <li>Foto Formal: <%= pendaftar.foto_formal ? 'Tersedia' : 'Tidak Ada' %></li>
+              <li>Akta Kelahiran: <%= pendaftar.akta_kelahiran ? 'Tersedia' : 'Tidak Ada' %></li>
+              <li>Kartu Keluarga: <%= pendaftar.kartu_keluarga ? 'Tersedia' : 'Tidak Ada' %></li>
+              <li>Fotokopi KTP: <%= pendaftar.fc_ktp ? 'Tersedia' : 'Tidak Ada' %></li>
+              <li>KIP/KIS: <%= pendaftar.kip_kis ? 'Tersedia' : 'Tidak Ada' %></li>
+            </ul>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="mt-6 flex justify-between">
+            <form method="POST" action="/data/<%= pendaftar.id %>?_method=DELETE">
+              <button
+                type="submit"
+                class="px-4 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600"
+                onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')"
+              >
+                Hapus
+              </button>
+            </form>
+            <a
+              href="/ubah-data-pendaftar/<%= pendaftar.id %>"
+              class="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+            >
+              Ubah
+            </a>
+            <a
+              href="/data-pendaftar"
+              class="px-4 py-2 text-white bg-gray-500 rounded-lg hover:bg-gray-600"
+            >
+              Kembali
+            </a>
+          </div>
+        </div>
+      <% } %>
     </div>
   </div>
-
- 
-  
+</div>

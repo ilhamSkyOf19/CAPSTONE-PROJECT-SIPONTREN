@@ -1,44 +1,106 @@
-<div class="container">
-    <div class="row">
-        <div class="col-md-5">
-            <% if (typeof errors != 'undefined') { %>
-                <div class="alert alert-danger" role="alert">
-                  <ul>
-                    <% errors.forEach(error => { %>
-                     <li><%= error.msg %></li>
-                    <% }) %>
-                  </ul>
-                </div>
-              <% } %>
-              <% if (typeof errorsMongoose != 'undefined') { %>
-                <div class="alert alert-danger" role="alert">
-                  <ul>
-                    <% errorsMongoose.forEach(error => { %>
-                     <li><%= error.message %></li>
-                    <% }) %>
-                  </ul>
-                </div>
-              <% } %>
-            <h1>Tambah Berita</h1>
-            <form action="/ubah-berita?_method=PUT" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="id" value="<%= data.id %>">
-                <div class="mb-3">
-                    <label for="title" class="form-label">Title</label>
-                    <input type="text" class="form-control" id="title" name="title" placeholder="masukan judul" value="<%= data ? data.title : '' %>" required >
-                  </div>
-                
-                <div class="mb-3">
-                    <label for="content" class="form-label">content</label>
-                    <textarea class="form-control" id="content" name="content" rows="10" required><%= data ? data.content : '' %></textarea>
-                  </div>
+<div class="container mx-auto mt-8 p-4">
+  <div class="flex justify-center">
+    <div class="w-full max-w-2xl bg-white shadow-lg rounded-lg p-6">
+      <!-- Judul Halaman -->
+      <div class="text-center">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Ubah Berita</h1>
+        <p class="text-gray-600">Perbarui data berita sesuai kebutuhan.</p>
+      </div>
 
-                  <div class="mb-3">
-                    <label for="thumbnail" class="form-label">Upload Thumnail</label>
-                    <input class="form-control" type="file" id="thumbnail" name="thumbnail">
-                    <input class="form-control" type="text" name="thumbnailOld" value="<%= dataFile.thumbnail ? dataFile.thumbnail : data.thumbnail %>">
-                  </div>
-                <button type="submit">Submit</button>
-            </form>
+      <!-- Pesan Error -->
+      <% if (typeof errors != 'undefined') { %>
+        <div class="mb-4 p-4 bg-red-100 text-red-700 border border-red-300 rounded-lg">
+          <h2 class="text-lg font-semibold mb-2">Kesalahan Input:</h2>
+          <ul class="list-disc pl-5">
+            <% errors.forEach(error => { %>
+              <li><%= error.msg %></li>
+            <% }) %>
+          </ul>
         </div>
+      <% } %>
+      <% if (typeof errorsMongoose != 'undefined') { %>
+        <div class="mb-4 p-4 bg-red-100 text-red-700 border border-red-300 rounded-lg">
+          <h2 class="text-lg font-semibold mb-2">Kesalahan Sistem:</h2>
+          <ul class="list-disc pl-5">
+            <% errorsMongoose.forEach(error => { %>
+              <li><%= error.message %></li>
+            <% }) %>
+          </ul>
+        </div>
+      <% } %>
+
+      <!-- Form Ubah Berita -->
+      <form action="/ubah-berita?_method=PUT" method="POST" enctype="multipart/form-data" class="space-y-6 mt-6">
+        <!-- ID Berita -->
+        <input type="hidden" name="id" value="<%= data.id %>">
+
+        <!-- Judul Berita -->
+        <div>
+          <label for="title" class="block text-gray-700 font-semibold mb-2">Judul Berita</label>
+          <input 
+            type="text" 
+            id="title" 
+            name="title" 
+            placeholder="Masukkan judul berita" 
+            value="<%= data ? data.title : '' %>" 
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
+          />
+        </div>
+
+        <!-- Konten Berita -->
+        <div>
+          <label for="content" class="block text-gray-700 font-semibold mb-2">Konten</label>
+          <textarea 
+            id="content" 
+            name="content" 
+            rows="10" 
+            required 
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
+            placeholder="Tulis konten berita..."><%= data ? data.content : '' %></textarea>
+        </div>
+
+        <!-- Thumbnail -->
+        <div>
+          <label for="thumbnail" class="block text-gray-700 font-semibold mb-2">Upload Thumbnail Baru</label>
+          <input 
+            type="file" 
+            id="thumbnail" 
+            name="thumbnail" 
+            accept="image/*" 
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
+          />
+          <p class="text-sm text-gray-500 mt-2">Kosongkan jika tidak ingin mengganti thumbnail.</p>
+          <!-- Input Thumbnail Lama -->
+          <input 
+            type="text" 
+            name="thumbnailOld" 
+            value="<%= dataFile.thumbnail ? dataFile.thumbnail : data.thumbnail %>"
+          />
+          <!-- Tampilan Thumbnail Lama -->
+          <div class="mt-4">
+            <p class="text-gray-700 font-semibold mb-2">Thumbnail Saat Ini:</p>
+            <img 
+              src="/public/imageBerita/<%= today %>/<%= dataFile.thumbnail ? dataFile.thumbnail : data.thumbnail %>" 
+              alt="Thumbnail lama" 
+              class="w-32 h-32 rounded-lg border"
+            />
+          </div>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="flex justify-between items-center">
+          <a href="/daftar-berita" class="px-4 py-2 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600">
+            Kembali
+          </a>
+          <button 
+            type="submit" 
+            class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring focus:ring-blue-300"
+          >
+            Simpan Perubahan
+          </button>
+        </div>
+      </form>
     </div>
+  </div>
 </div>

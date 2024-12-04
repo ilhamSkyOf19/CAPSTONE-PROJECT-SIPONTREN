@@ -3,7 +3,7 @@
     <h1 class="text-3xl font-semibold text-gray-800">Data Pendaftar</h1>
 
     <!-- Form Pencarian -->
-    <form action="/data-pendaftar" method="get" class="mb-6 flex space-x-4">
+    <form action="/data-alumni" method="get" class="mb-6 flex space-x-4">
       <input
         type="text"
         name="query"
@@ -37,17 +37,16 @@
           <tr class="bg-indigo-600 text-white">
             <th class="px-4 py-2">No</th>
             <th class="px-4 py-2">Nama</th>
-            <th class="px-4 py-2">NISN</th>
-            <th class="px-4 py-2">NIK</th>
-            <th class="px-4 py-2">Jenis Kelamin</th>
-            <th class="px-4 py-2">Usia</th>
+            <th class="px-4 py-2">Tanggal lahir</th>
+            <th class="px-4 py-2">Angkatan</th>
+            <th class="px-4 py-2" >Pesan</th>
             <th class="px-4 py-2">Ubah</th>
             <th class="px-4 py-2">Delete</th>
             <th class="px-4 py-2">Detail</th>
           </tr>
         </thead>
         <tbody>
-          <% if (dataPendaftar.length === 0) { %>
+          <% if (dataAlumni.length === 0) { %>
             <tr>
               <td colspan="9" class="text-center py-4 text-red-600">
                 <div class="bg-red-100 p-4 rounded-lg">
@@ -56,24 +55,23 @@
               </td>
             </tr>
           <% } else { %>
-            <% dataPendaftar.forEach((data, i) => { %>
+            <% dataAlumni.forEach((data, i) => { %>
               <tr class="border-b hover:bg-gray-100">
                 <td class="px-4 py-2 text-center"><%= i + 1 %></td>
-                <td class="px-4 py-2"><%= data.nama_lengkap %></td>
-                <td class="px-4 py-2"><%= data.nisn %></td>
-                <td class="px-4 py-2"><%= data.nik %></td>
-                <td class="px-4 py-2"><%= data.jenis_kelamin %></td>
-                <td class="px-4 py-2"><%= data.usia %></td>
+                <td class="px-4 py-2 text-center"><%= data.nama_alumni %></td>
+                <td class="px-4 py-2 text-center"><%= data.tanggal_lahir %></td>
+                <td class="px-4 py-2 text-center"><%= data.angkatan %></td>
+                <td class="px-4 py-2 text-center break-words whitespace-normal max-w-56"><%= data.pesan %></td>
                 <td class="px-4 py-2 text-center">
                   <a
                     class="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600 transition duration-200"
-                    href="/ubah-data-pendaftar/<%= data.id %>"
+                    href="/ubah-data-alumni/<%= data.id %>"
                   >
                     Ubah
                   </a>
                 </td>
                 <td class="px-4 py-2 text-center">
-                  <form method="POST" action="/data-pendaftar/<%= data.id %>?_method=DELETE">
+                  <form method="POST" action="/data-alumni/<%= data.id %>?_method=DELETE">
                     <button
                       type="submit"
                       class="bg-red-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-700 transition duration-200"
@@ -85,7 +83,7 @@
                 <td class="px-4 py-2 text-center">
                   <a
                     class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
-                    href="/data-pendaftar-detail/<%= data.id %>"
+                    href="/data-detail-alumni/<%= data.id %>"
                   >
                     Detail
                   </a>

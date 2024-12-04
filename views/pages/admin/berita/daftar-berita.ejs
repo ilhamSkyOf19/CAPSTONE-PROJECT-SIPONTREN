@@ -1,34 +1,46 @@
-<div class="container">
-    <div class="row">
-        <% if (typeof msg !== 'undefined' && msg.length !== 0) { %>
-            <div class="alert alert-success" role="alert">
-              <h3><%= msg %></h3>
-            </div>
-          <% } %>
-      <% if (berita.length > 0) { %>
+<div class="flex-1 ml-64 p-4 overflow-x-hidden">
+  <div class="container mx-auto px-4">
+    <!-- Pesan Sukses -->
+    <% if (typeof msg !== 'undefined' && msg.length !== 0) { %>
+      <div class="mb-4 p-4 bg-green-100 text-green-700 border border-green-300 rounded-lg">
+        <h3 class="text-lg font-bold"><%= msg %></h3>
+      </div>
+    <% } %>
+
+    <!-- Daftar Berita -->
+    <% if (berita.length > 0) { %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <% berita.forEach((item) => { %>
-          <div class="col-md-4 mb-4"> <!-- Atur setiap card dalam grid kolom -->
-            <div class="card" style="width: 100%; min-height: 500px;">
-              <% if (item.thumbnail) { %>
-                <img src="/public/imageBerita/<%= today %>/<%= item.thumbnail %>" class="card-img-top" alt=" berita ">
-              <% } %>
-              <div class="card-body">
-                <h5 class="card-title"><%= item.title %></h5>
-                <p class="card-text">
-                  <%= item.content.split(" ").slice(0, 20).join(" ") %>... <!-- Ambil 20 kata pertama -->
-                </p>
-                <a href="/detail-berita/<%= item.id %>" class="btn btn-primary">Baca selengkapnya</a>
-                <form id="delete" method="POST" action="/daftar-berita/<%= item.id %>?_method=DELETE" class="d-inline">
-                    <input type="hidden" name="id" value="<%= item.id %>">
-                    <button type="submit" class="btn btn-danger" id="submitBtn" onclick="confirm('apakah anda yakin')">Delete</button>
+          <div class="bg-white shadow-md rounded-lg p-6 min-h-[350px] min-w-[300px] flex flex-col justify-between">
+            <!-- Gambar Thumbnail -->
+            <% if (item.thumbnail) { %>
+              <img src="/public/imageBerita/<%= today %>/<%= item.thumbnail %>" 
+                   class="w-full h-48 object-cover rounded-t-lg" alt="Thumbnail">
+            <% } %>
+
+            <!-- Konten Card -->
+            <div class="p-2">
+              <h5 class="text-lg font-semibold text-gray-800 mb-4"><%= item.title %></h5>
+              <p class="text-gray-600 text-sm mb-6">
+                <%= item.content.split(" ").slice(0, 15).join(" ") %>...
+              </p>
+              <div class="flex items-center justify-between space-x-2">
+                <a href="/detail-berita/<%= item.id %>" 
+                   class="bg-blue-600 text-white px-4 py-2 rounded-md">Baca Selengkapnya</a>
+                <a href="/ubah-berita/<%= item.id %>" 
+                   class="bg-yellow-500 text-white px-4 py-2 rounded-md">Ubah</a>
+                <form action="/daftar-berita/<%= item.id %>?_method=DELETE" method="POST" class="inline">
+                  <button type="submit" 
+                          class="bg-red-600 text-white px-4 py-2 rounded-md" 
+                          onclick="return confirm('Apakah Anda yakin ingin menghapus berita ini?')">Hapus</button>
                 </form>
-                  <a class="btn btn-warning" href="/ubah-berita/<%= item.id %>">Ubah</a>
               </div>
             </div>
           </div>
         <% }) %>
-      <% } else { %>
-        <p>Tidak ada berita untuk hari ini.</p>
-      <% } %>
-    </div>
-</div> 
+      </div>
+    <% } else { %>
+      <p class="text-center text-gray-600">Tidak ada berita untuk hari ini.</p>
+    <% } %>
+  </div>
+</div>

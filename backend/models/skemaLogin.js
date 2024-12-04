@@ -1,4 +1,4 @@
-import { Sequelize, DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import db from '../config/database.js'; // Pastikan path database yang benar
 import argon2 from 'argon2';  // Library untuk hashing password
 

@@ -31,9 +31,7 @@ const port = process.env.PORT || 3001;
 // set view engine ejs
 app.use(expressLayouts);
 
-// Buat __filename dan __dirname manual
 
-app.set('view engine', 'ejs');
 
 // public static
 const __filename = fileURLToPath(import.meta.url); // Mendapatkan nama file saat ini
@@ -41,6 +39,9 @@ const __dirname = path.dirname(__filename); // Mendapatkan direktori dari nama f
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
+// Buat __filename dan __dirname manual
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 // express session
 app.use(session({
     secret: 'rahasia',
