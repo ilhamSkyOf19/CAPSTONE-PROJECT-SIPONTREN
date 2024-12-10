@@ -13,7 +13,6 @@ import  Pendaftaran  from '../models/pendaftaran.js';
 import  Berita  from '../models/skemaBerita.js';
 import User from '../models/skemaLogin.js';
 import Alumni from '../models/skemaAlumni.js';
-import { Sequelize } from 'sequelize';
 import argon2 from 'argon2';
 import { verifyPassword } from '../utils/auth.js';
 import PdfPrinter from 'pdfmake';
@@ -28,6 +27,40 @@ const __dirname = path.dirname(__filename);
 const router = express.Router();
 
 const today = new Date().toISOString().split('T')[0]; // Format tanggal
+
+const formatTanggal = (tanggal) => {
+    const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const bulan = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+    const date = new Date(tanggal);
+    return `${hari[date.getDay()]}, ${date.getDate()} ${bulan[date.getMonth()]} ${date.getFullYear()}`;
+};
+  
+// listNavbar
+const listNavbar = {
+    home: {
+        title: 'Home',
+        router: '/'
+    },
+    profile: {
+        title: 'Profile',
+        router: '/profile'
+    },
+    kemahadan: {
+        title: "Kema'hadan",
+        router: '/kemahadan'
+    },
+    extrakulikuler: {
+        title: 'Ektrakulikuler',
+        router: '#ekstrakurikuler'
+    },
+    psb: {
+        title: 'PSB',
+        router: '/psb'
+    },
+}
 
 
 
@@ -49,21 +82,26 @@ router.get('/', async (req, res) => {
     }
 
     // Ambil berita yang diterbitkan setelah hari ini
-    const berita = await Berita.findAll({
-        where: {
-            date: {
-                [Sequelize.Op.gte]: today, // Mengambil berita yang memiliki tanggal >= hari ini
-            },
-        },
-        order: [['date', 'DESC']], // Urutkan berita berdasarkan tanggal terbaru
-    });
+    const berita = await Berita.findAll(
+        // {
+        // where: {
+        //     date: {
+        //         [Sequelize.Op.gte]: today, // Mengambil berita yang memiliki tanggal >= hari ini
+        //     },
+        // },
+        // order: [['date', 'DESC']], // Urutkan berita berdasarkan tanggal terbaru
+        // }
+    );
 
+   
     return res.render('pages/home/index', {
         layout: 'layouts/main-ejs-layouts',
         title: 'Halaman Utama',
         dataUsername,
         berita,
         today,
+        formatTanggal,
+        listNavbar,
     });
 });
 
@@ -74,6 +112,7 @@ router.get('/login-admin', (req, res) => {
         title: 'Form Pendaftaran',
         data: req.body,
         msg: req.flash('msg'),
+        listNavbar,
     });
 });
 
@@ -95,6 +134,7 @@ router.post('/login-admin',
                 title: 'Halaman Login',
                 errors: errors.array(),
                 data: req.body,
+                listNavbar,
             });
         } else {
             try {
@@ -107,6 +147,7 @@ router.post('/login-admin',
                         title: 'Halaman Login',
                         errors: [{ msg: 'Username tidak terdaftar!' }],
                         data: req.body,
+                        listNavbar,
                     });
                 }
 
@@ -118,6 +159,7 @@ router.post('/login-admin',
                         title: 'Halaman Login',
                         errors: [{ msg: 'Password salah!' }],
                         data: req.body,
+                        listNavbar,
                     });
                 }
 
@@ -143,6 +185,7 @@ router.get('/form-pendaftaran', (req, res) => {
         layout: 'layouts/main-ejs-layouts',
         msg: req.flash('msg'),
         data: req.body,
+        listNavbar,
     });
 });
 
@@ -172,6 +215,7 @@ router.post('/form-pendaftaran', [
                     title: 'Halaman Pendaftaran',
                     errors: [{ msg: errorMessage }],
                     data: req.body,
+                    listNavbar,
                 });
             }
             next(); // Jika tidak ada error, lanjut ke middleware berikutnya
@@ -179,7 +223,7 @@ router.post('/form-pendaftaran', [
     },
     async (req, res, next) => {
         // Validasi tipe file di sini dengan checkFileType, arahkan ke 'index' jika error
-        await FileValidator.checkFileType(req, res, next, 'pages/user/form-pendaftaran');
+        await FileValidator.checkFileType(req, res, next, listNavbar, 'pages/user/form-pendaftaran');
     }, 
 
     // Validasi NIK dan NISN
@@ -601,6 +645,7 @@ router.get('/data-alumni', async (req, res) => {
             }
             return alumni;
         });
+        
 
         // Render halaman dengan data yang sudah diproses
         res.render('pages/admin/daftar/data-alumni', {
@@ -618,10 +663,61 @@ router.get('/data-alumni', async (req, res) => {
     }
 });
 
+router.get('/data-alumni-user', async (req, res) => {
+    try {
+        // Ambil query untuk pencarian
+        const query = req.query.query || '';
+        
+        // Ambil data pendaftar dari MySQL berdasarkan query
+        let dataAlumni = [];
+        if (query) {
+            dataAlumni = await Alumni.findAll({
+                where: {
+                    [Op.or]: [
+                        { nama_alumni: { [Op.like]: `%${query}%` } },
+                        { angkatan: { [Op.like]: `%${query}%` } },
+                    ],
+                },
+            });
+        } else {
+            dataAlumni = await Alumni.findAll();
+        }
+
+        // Proses data pendaftar untuk kapitalisasi kecuali beberapa field
+        dataAlumni = dataAlumni.map(data => {
+            let alumni = data.dataValues; // Ambil data yang telah dimuat
+
+            // Kapitalisasi setiap kata untuk semua field string kecuali beberapa field tertentu
+            for (let key in alumni) {
+                if (typeof alumni[key] === 'string') {
+                    alumni[key] = capitalizeWords(alumni[key]);
+                }
+            }
+            return alumni;
+        });
+        
+
+        // Render halaman dengan data yang sudah diproses
+        res.render('pages/admin/daftar/data-alumni-user', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'Data Alumni',
+            dataAlumni,
+            msg: req.flash('msg'),
+            query, // Kirim query ke frontend untuk menampilkan ulang nilai pencarian
+            listNavbar,
+        });
+    } catch (err) {
+        console.error(err);
+        req.flash('msg', 'Terjadi kesalahan saat mengambil data pendaftar.');
+        res.redirect('/');
+    }
+});
+
 // data alumni detail
 router.get('/data-detail-alumni/:id', async (req, res) => {
     if (!req.session.loggedIn) {
         return res.redirect('/login-admin');
+        
     }
     try {
         // Cari user yang sedang login
@@ -740,10 +836,6 @@ router.put('/ubah-data-alumni', [validatorUbahDataAlumni]
 });
 
 
-
-
-
-
 // daftar berita 
 router.get('/daftar-berita', async (req, res) => {
     if (!req.session.loggedIn) {
@@ -754,14 +846,7 @@ router.get('/daftar-berita', async (req, res) => {
 
     try {
         // Mengambil berita dengan kondisi `date >= today` dan mengurutkan berdasarkan tanggal (desc)
-        const berita = await Berita.findAll({
-            where: {
-                date: {
-                    [Sequelize.Op.gte]: today,  // Filter berita yang tanggalnya >= hari ini
-                }
-            },
-            order: [['date', 'DESC']]  // Urutkan berdasarkan tanggal terbaru
-        });
+        const berita = await Berita.findAll();
 
         // Mengambil data pengguna berdasarkan ID session
         const user = await User.findOne({ where: { id: req.session.loggedIn } });
@@ -806,7 +891,7 @@ const uploaderberita = new FileSingleUploader('public/imageBerita', maxSize, 'th
 router.post('/form-berita', [
     (req, res, next) => {
         // Pertama, jalankan Upload middleware untuk menangani file
-        uploaderberita.upload(req, res, function (error) {
+        uploaderberita.upload(req, res, async function (error) {
             // Tangani kesalahan dari multer jika ada
             if (error) {
                 let errorMessage;
@@ -823,12 +908,15 @@ router.post('/form-berita', [
                     errorMessage = error.message || 'Terjadi kesalahan saat upload file!';
                 }
 
+                const user = await User.findOne({ _id: req.session.loggedIn });
+                const dataUsername = user.username;
                 // Render kembali form dengan pesan error dan data input
                 return res.render('pages/admin/berita/form-berita', {
                     layout: 'layouts/main-ejs-layouts',
                     title: 'form berita',
                     errors: [{ msg: errorMessage }],
                     data: req.body, // Menyimpan input sebelumnya
+                    dataUsername,
                 });
             }
 
@@ -865,7 +953,7 @@ router.post('/form-berita', [
             data: req.body,
         });
     } else {
-        const { title, content } = req.body;
+        const { title, content, tanggal_berita, kategori } = req.body;
         const thumbnail = req.file ? req.file.filename : null;
       
         try {
@@ -873,7 +961,9 @@ router.post('/form-berita', [
             await Berita.create({
                 title,
                 content,
-                thumbnail
+                thumbnail,
+                kategori,
+                tanggal_berita,
             });
             // tampilkan pesan berhasil
             req.flash('msg', 'Data berhasil ditambah!');
@@ -984,9 +1074,6 @@ router.put('/ubah-berita',
         try {
             let thumbnailOld = req.body.thumbnailOld || ''; // Ambil nama file lama
             let thumbnail = req.body.thumbnail || thumbnailOld; // Jika tidak ada file baru, gunakan file lama
-            console.log('Thumbnail Old:', thumbnailOld);
-            console.log('Thumbnail:', thumbnail);
-            console.log('File Data:', req.file);
         
            // Jika ada file yang diupload
         if (req.file) {
@@ -1023,7 +1110,9 @@ router.put('/ubah-berita',
                 {
                     title: req.body.title,
                     content: req.body.content,
+                    tanggal_berita: req.body.tanggal_berita,
                     thumbnail: thumbnail, // Gunakan thumbnail yang baru diproses
+                    ketegori: req.body.kategori,
                 },
                 {
                     where: { id: req.body.id } // Gantilah _id dengan id jika sesuai dengan skema Anda
@@ -1048,8 +1137,6 @@ router.put('/ubah-berita',
             });
         }
     }
-
-    
 });
 
 
@@ -1067,6 +1154,9 @@ router.get('/detail-berita/:id', async (req, res) => {
             return res.redirect('/'); // Atau bisa ganti dengan res.status(404).send('Berita tidak ditemukan')
         }
 
+       
+          
+
         // Cek apakah session loggedIn ada (admin)
         if (req.session.loggedIn) {
             // Jika ada session, berarti admin, cari data pengguna
@@ -1080,8 +1170,10 @@ router.get('/detail-berita/:id', async (req, res) => {
                 data,
                 dataUsername,  // Tampilkan data pengguna
                 today,
+                formatTanggal,
             });
         } else {
+
             // Jika session tidak ada, berarti user biasa
             // Render halaman detail berita tanpa data pengguna (user biasa)
             res.render('pages/admin/berita/detail-berita', {
@@ -1089,6 +1181,8 @@ router.get('/detail-berita/:id', async (req, res) => {
                 title: 'Detail Berita',
                 data,
                 today,
+                formatTanggal,
+                listNavbar,
             });
         }
       
@@ -1130,6 +1224,18 @@ router.delete('/data-pendaftar/:id', async (req, res) => {
     // Redirect ke halaman daftar berita
     res.redirect('/data-pendaftar');
 });
+
+// sejarah
+router.get('/profile/sejarah', async (req, res) => {
+    res.render('pages/user/sejarah', {
+        layout: 'layouts/main-ejs-layouts',
+        title: 'Sejarah',
+        data: req.body,
+        listNavbar,
+    });
+  });
+
+
 
 
 // ubah username 
@@ -1436,6 +1542,27 @@ router.get('/download-zip/:nik', (req, res) => {
     // Panggil finalize untuk menyelesaikan pembuatan ZIP
     archive.finalize();
 });
+
+
+
+// Route profile
+router.get('/profile', async (req, res) => {
+    res.render('pages/user/profile', {
+        layout: 'layouts/main-ejs-layouts',
+        title: 'Halaman profile',
+        listNavbar,
+    });
+});
+  
+// Route untuk psb
+router.get('/psb', async (req, res) => {
+    res.render('pages/user/psb', {
+        layout: 'layouts/main-ejs-layouts',
+        title: 'Halaman PSB',
+        listNavbar,
+    });
+  });
+
 
 
 // Logout route

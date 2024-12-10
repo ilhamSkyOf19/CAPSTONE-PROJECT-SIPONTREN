@@ -1,4 +1,4 @@
-<div class="flex-1 ml-64 p-4 overflow-x-hidden">
+<div class="flex-1 p-4 overflow-x-hidden">
   <div class="container mx-auto px-4">
     <!-- Pesan Sukses -->
     <% if (typeof msg !== 'undefined' && msg.length !== 0) { %>
@@ -14,7 +14,7 @@
           <div class="bg-white shadow-md rounded-lg p-6 min-h-[350px] min-w-[300px] flex flex-col justify-between">
             <!-- Gambar Thumbnail -->
             <% if (item.thumbnail) { %>
-              <img src="/public/imageBerita/<%= today %>/<%= item.thumbnail %>" 
+              <img src="/public/imageBerita/<%= new Date(item.date).toISOString().split('T')[0] %>/<%= item.thumbnail %>" 
                    class="w-full h-48 object-cover rounded-t-lg" alt="Thumbnail">
             <% } %>
 

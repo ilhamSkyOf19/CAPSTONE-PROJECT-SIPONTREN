@@ -17,6 +17,16 @@ const Berita = db.define('berita', {
     allowNull: true,              // Kolom opsional
     trim: true,                   // Trim untuk menghilangkan spasi ekstra
   },
+  kategori: {
+    type: DataTypes.STRING(255),  // Menggunakan STRING untuk thumbnail URL/path
+    allowNull: true,              // Kolom opsional
+    trim: true,                   // Trim untuk menghilangkan spasi ekstra
+  },
+  tanggal_berita: {
+    type: DataTypes.DATE,         // Menggunakan DATE untuk tanggal
+    defaultValue: Sequelize.NOW,  // Defaultnya adalah tanggal saat ini
+    allowNull: false,             // Kolom wajib
+  },
   date: {
     type: DataTypes.DATE,         // Menggunakan DATE untuk tanggal
     defaultValue: Sequelize.NOW,  // Defaultnya adalah tanggal saat ini

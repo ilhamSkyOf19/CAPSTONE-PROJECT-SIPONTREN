@@ -48,6 +48,19 @@
           />
         </div>
 
+        <!-- Judul Berita -->
+        <div>
+          <label for="tanggal_berita" class="block text-gray-700 font-semibold mb-2">Tanggal Berita</label>
+          <input 
+            type="date" 
+            id="tanggal_berita" 
+            name="tanggal_berita" 
+            value="<%= data ? data.tanggal_berita : '' %>"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
+          />
+        </div>
+
         <!-- Konten Berita -->
         <div>
           <label for="content" class="block text-gray-700 font-semibold mb-2">Konten</label>

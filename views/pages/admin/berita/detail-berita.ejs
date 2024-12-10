@@ -1,24 +1,55 @@
-<div class="container mx-auto px-4 py-8">
-  <!-- Judul Berita -->
-  <div class="text-center mb-6 ml-[10rem] sm:ml-[12rem] md:ml-[15rem]">
-    <h1 class="text-3xl font-bold text-gray-800 sm:text-4xl md:text-5xl lg:text-6xl">
-      <%= data.title %>
-    </h1>
-  </div>
-  
-  <!-- Gambar Berita -->
-  <div class="flex justify-center mb-6 ml-[10rem] sm:ml-[12rem] md:ml-[15rem]">
-    <img 
-      src="/public/imageBerita/<%= today %>/<%= data.thumbnail %>" 
-      alt="Gambar Berita" 
-      class="w-full sm:w-3/4 md:w-2/3 lg:w-1/2 rounded-lg shadow-md"
-    />
-  </div>
-  
-  <!-- Isi Berita -->
-  <div class="max-w-4xl mx-auto ml-[10rem] sm:ml-[12rem] md:ml-[15rem]">
-    <p class="text-gray-800 text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed text-justify">
-      <%= data.content %>
-    </p>
-  </div>
+<% if (typeof dataUsername !== 'undefined' && dataUsername.length !== 0) { %>
+  <div class="min-h-screen px-6 sm:px-8 md:px-16 lg:px-36 pt-10">
+    <h2 class="text-center text-2xl mb-10">Artikel</h2>
+    <article class="bg-white shadow-md rounded-lg overflow-hidden mb-5">
+      
+      <!-- Gambar Thumbnail -->
+      <div class="w-full h-64 md:h-96 overflow-hidden">
+          <img 
+              src="/public/imageBerita/<%= new Date(data.date).toISOString().split('T')[0] %>/<%= data.thumbnail %>"
+              alt="Thumbnail Berita" 
+              class="w-full h-full object-cover"
+          >
+      </div>
+        <!-- Header Artikel -->
+        <div class="border-b border-gray-200 py-4 px-6 text-start">
+            <h1 class="text-2xl font-bold text-gray-800"><%= data.title %></h1>
+            <p class="text-sm text-gray-500 mt-2"><%= formatTanggal(data.tanggal_berita) %></p>
+
+        </div>
+
+
+        <!-- Isi Artikel -->
+        <div class="p-6 space-y-4 text-gray-700">
+            <p class="whitespace-pre-wrap"><%= data.content.trim() %></p>
+        </div>
+    </article>
 </div>
+<% } else {%>
+  <div class="min-h-screen px-6 sm:px-8 md:px-16 lg:px-36 pt-40 pb-36">
+    <div id="breadcrumb" class="flex items-center space-x-2 text-sm text-blue-500 lg:mb-16"></div>
+    <article class="bg-white shadow-md rounded-lg overflow-hidden mb-5">
+      
+      <!-- Gambar Thumbnail -->
+      <div class="w-full lg:h-[30rem] md:h-96 overflow-hidden">
+          <img 
+              src="../public/imageBerita/<%= new Date(data.date).toISOString().split('T')[0] %>/<%= data.thumbnail %>" 
+              alt="Thumbnail Berita" 
+              class="w-full h-full object-cover"
+          >
+      </div>
+        <!-- Header Artikel -->
+        <div class="border-b border-gray-200 py-4 px-6 text-start">
+            <h1 class="text-2xl font-bold text-gray-800"><%= data.title %></h1>
+            <p class="text-sm text-gray-500 mt-2"><%= formatTanggal(data.tanggal_berita) %></p>
+
+        </div>
+
+
+        <!-- Isi Artikel -->
+        <div class="p-6 space-y-4 text-gray-700">
+            <p class="whitespace-pre-wrap"><%= data.content.trim() %></p>
+        </div>
+    </article>
+</div>
+  <% } %>

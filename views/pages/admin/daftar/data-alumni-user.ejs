@@ -1,0 +1,60 @@
+<div class="container mx-auto px-6 py-8 mt-10"> <!-- Menambahkan mt-10 untuk margin atas -->
+    <div class="mb-6">
+      <h1 class="text-3xl font-semibold text-gray-800 mb-4">Data Pendaftar</h1>
+  
+      <!-- Form Pencarian -->
+      <form action="/data-alumni" method="get" class="mb-6 flex space-x-4">
+        <input
+          type="text"
+          name="query"
+          class="form-control w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+          placeholder="Cari berdasarkan Nama, NISN, atau NIK"
+          value="<%= query || '' %>"
+          required
+        />
+        <button
+          class="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-indigo-700 transition duration-200"
+          type="submit"
+        >
+          Cari
+        </button>
+      </form>
+  
+      <!-- Tabel Data -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full table-auto border-collapse">
+          <thead>
+            <tr class="bg-indigo-600 text-white">
+              <th class="px-4 py-2">No</th>
+              <th class="px-4 py-2">Nama</th>
+              <th class="px-4 py-2">Tanggal lahir</th>
+              <th class="px-4 py-2">Angkatan</th>
+              <th class="px-4 py-2" >Pesan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (dataAlumni.length === 0) { %>
+              <tr>
+                <td colspan="9" class="text-center py-4 text-red-600">
+                  <div class="bg-red-100 p-4 rounded-lg">
+                    <h3 class="text-lg">Data Tidak Ditemukan</h3>
+                  </div>
+                </td>
+              </tr>
+            <% } else { %>
+              <% dataAlumni.forEach((data, i) => { %>
+                <tr class="border-b hover:bg-gray-100">
+                  <td class="px-4 py-2 text-center"><%= i + 1 %></td>
+                  <td class="px-4 py-2 text-center"><%= data.nama_alumni %></td>
+                  <td class="px-4 py-2 text-center"><%= data.tanggal_lahir %></td>
+                  <td class="px-4 py-2 text-center"><%= data.angkatan %></td>
+                  <td class="px-4 py-2 text-center break-words whitespace-normal max-w-56"><%= data.pesan %></td>
+                </tr>
+              <% }) %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  

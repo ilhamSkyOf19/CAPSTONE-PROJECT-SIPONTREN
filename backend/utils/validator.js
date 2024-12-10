@@ -88,12 +88,10 @@ export const validatorLogin = [
 ]
 
 export const validatorUploadBerita = [
-    check('title', 'Title harus berisi huruf, angka, dan simbol').matches(/^[A-Za-z0-9\s!@#$%^&*(),.?":{}|<>]+$/),
     check('content', 'content harus berisi huruf, angka, dan simbol').matches(/^[\s\S]+$/)
 ]
 
 export const validatorUbahBerita = [
-    check('title', 'Title harus berisi huruf, angka, dan simbol').matches(/^[A-Za-z0-9\s!@#$%^&*(),.?":{}|<>]+$/),
     check('content', 'content harus berisi huruf, angka, dan simbol').matches(/^[\s\S]+$/),
 ]
 

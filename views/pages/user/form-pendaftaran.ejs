@@ -1,154 +1,321 @@
-<div class="container">
-    <div class="row">
-        <h1>Data Pendaftar</h1>
-        <div class="col-md-5">
-          <!-- cek jika ada error maka tampilkan pesan error -->
-          <% if (typeof msg !== 'undefined' && msg.length !== 0) { %>
-            <div class="alert alert-success" role="alert">
-              <h3><%= msg %></h3>
-            </div>
-          <% } %>
-          <% if (typeof errors != 'undefined') { %>
-            <div class="alert alert-danger" role="alert">
-              <ul>
-                <% errors.forEach(error => { %>
-                 <li><%= error.msg %></li>
-                <% }) %>
-              </ul>
-            </div>
-          <% } %>
-          <% if (typeof errorsMongoose != 'undefined') { %>
-            <div class="alert alert-danger" role="alert">
-              <ul>
-                <% errorsMongoose.forEach(error => { %>
-                 <li><%= error.message %></li>
-                <% }) %>
-              </ul>
-            </div>
-          <% } %>
+<div class="min-h-screen flex items-center justify-center">
+  <div class="bg-white shadow-md rounded-lg w-full max-w-full pt-24 pb-10 px-20">
+    <h1 class="text-2xl font-bold text-center text-gray-700 mb-6">Form Pendaftaran</h1>
     
-            <form id="MyForm" method="post" action="/form-pendaftaran" enctype="multipart/form-data">
-              <!-- nisn -->
-                <div class="mb-3">
-                  <label for="nisn" class="form-label">NISN</label>
-                  <input type="text" class="form-control" id="nisn" name="nisn" value="<%= data ? data.nisn : '' %>" placeholder="masukan nomor NISN" required autocomplete="off">
-                </div>
-                <!-- nik -->
-                <div class="mb-3">
-                  <label for="nik" class="form-label">NIK</label>
-                  <input type="text" class="form-control" id="nik" name="nik" value="<%= data ? data.nik : '' %>" placeholder="masukan nomor NIK" required autocomplete="off">
-                </div>
-                <!-- nama lengkap -->
-                <div class="mb-3">
-                  <label for="namaLengkap" class="form-label">Nama Lengkap</label>
-                  <input type="text" class="form-control" id="namaLengkap" name="nama_lengkap" value="<%= data ? data.nama_lengkap: '' %>" placeholder="masukan nama" required autocomplete="off">
-                </div>
-                <!-- jenis kelamin -->
-                <div class="mb-3">
-                  <label for="jenisKelamin" class="form-label">Jenis Kelamin</label>
-                  <select id="jenisKelamin" class="form-control" name="jenis_kelamin" required>
-                    <option value="" disabled selected hidden>Pilih jenis kelamin</option>
-                    <option value="Laki-laki" <%= data.jenis_kelamin === 'Laki-laki' ? 'selected' : ''  %> >Laki-laki</option>
-                    <option value="Perempuan" <%= data.jenis_kelamin === 'Perempuan' ? 'selected' : ''  %> >Perempuan</option>
-                  </select>
-                </div>
-                <!-- usia -->
-                <div class="mb-3">
-                  <label for="usia" class="form-label">Usia (Tahun) </label>
-                  <input type="text" class="form-control" id="usia" name="usia" value="<%= data ? data.usia : '' %>" placeholder="masukan Usia" required autocomplete="off" min="" >
-                </div>
-                <!-- tempat tanggal lahir  -->
-                <div class="mb-3">
-                  <label for="tempatTanggalLahir" class="form-label">Tempat / Tanggal Lahir </label>
-                  <!-- tempat lahir  -->
-                  <input type="text" class="form-control" id="tempatLahir" name="tempat_lahir"  value="<%= data ? data.tempat_lahir : '' %>" placeholder="masukan Tempat Lahir" required autocomplete="off">
-                  <!-- tanggal lahir -->
-                  <input type="date" class="form-control mt-2" id="tanggalLahir" name="tanggal_lahir" value="<%= data ? data.tanggal_lahir : '' %>" required autocomplete="off">
-                </div>
-                <div class="mb-4">
-                  <!-- alamat -->
-                        <div class="mb-3">
-                            <label for="alamat" class="form-label">Alamat </label>
-                            <textarea class="form-control" placeholder="Leave a comment here" id="alamat" name="alamat"  value="<%= data ? data.alamat : ''%>" style="height: 100px" required></textarea>
-                        </div>
-                    </div>
-                  </div>
-                  <!-- anak ke  -->
-                  <div class="mb-3">
-                    <label for="anakKe" class="form-label">Anak ke </label>
-                    <input type="number" class="form-control" id="anakKe" name="anak_ke" value="<%= data ? data.anak_ke : '' %>" placeholder="masukan anak ke" required autocomplete="off">
-                  </div>
-                  <!-- jumlah saudara  -->
-                  <div class="mb-3">
-                    <label for="jumlahSaudara" class="form-label">Jumlah Saudara </label>
-                    <input type="number" class="form-control" id="jumlahSaudara" name="jumlah_saudara" value="<%= data ? data.jumlah_saudara : '' %>" placeholder="masukan jumlah saudara" required autocomplete="off">
-                  </div>
-                  <!-- nomor telephone -->
-                  <div class="mb-3">
-                    <label for="nomorTelphone" class="form-label">Nomor Telphone / Nomor Wa </label>
-                    <input type="text" class="form-control" id="nomorTelphone" name="nomor_telephone" value="<%= data ? data.nomor_telephone: '' %>" placeholder="masukan nomor Telphone aktif" required autocomplete="off">
-                  </div>
-                  <!-- alumni sd -->
-                  <div class="mb-3">
-                    <label for="alaumni_sd" class="form-label">Alumni Sd </label>
-                    <input type="text" class="form-control" id="alumniSd" name="alumni_sd" value="<%= data ? data.alumni_sd : '' %>" placeholder="masukan alumni sd" required autocomplete="off">
-                  </div>
-                  <!-- asal sekolah sd-->
-                  <div class="mb-3">
-                    <label for="alamatSekolahAsal" class="form-label">Alamat Sekolah Asal</label>
-                    <input type="text" class="form-control" id="alamatSekolahAsal" name="alamat_sekolah_asal" value="<%= data ? data.alamat_sekolah_asal : '' %>" placeholder="masukan  Alamat Sekolah Asal" required autocomplete="off">
-                  </div>
-                  <!-- nama lengkap ayah-->
-                  <div class="mb-3">
-                    <label for="namaLengkapAyah" class="form-label">Nama Lengkap Ayah</label>
-                    <input type="text" class="form-control" id="namaLengkapAyah" name="nama_lengkap_ayah" value="<%= data ? data.nama_lengkap_ayah : '' %>" placeholder="masukan Nama Lengkap Ayah" required autocomplete="off">
-                    <div id="namaLengkapAyah" class="form-text">ketik 'Tidak ada' jika tidak ada</div>
-                  </div>
-                  <!-- nama lengkap ibu-->
-                  <div class="mb-3">
-                    <label for="namaLengkapIbu" class="form-label">Nama Lengkap Ibu</label>
-                    <input type="text" class="form-control" id="namaLengkapIbu" name="nama_lengkap_ibu" value="<%= data ? data.nama_lengkap_ibu : '' %>" placeholder="masukan Nama Lengkap ibu" required autocomplete="off">
-                    <div id="namaLengkapIbu" class="form-text">ketik 'Tidak ada' jika tidak ada</div>
-                  </div>
-                  <!-- nama lengkap wali-->
-                  <div class="mb-3">
-                    <label for="namaLengkapWali" class="form-label">Nama Lengkap Wali</label>
-                    <input type="text" class="form-control" id="namaLengkapWali" name="nama_lengkap_wali" value="<%= data ? data.nama_lengkap_wali : '' %>" placeholder="masukan Nama Lengkap wali" required autocomplete="off">
-                    <div id="namaLengkapWali" class="form-text">ketik 'Tidak ada' jika tidak ada</div>
-                  </div>
-                  <!-- kode pos -->
-                  <div class="mb-3">
-                    <label for="kodePos" class="form-label">Kode Pos </label>
-                    <input type="number" class="form-control" id="kodePos" name="kode_pos" value="<%= data ? data.kode_pos : '' %>" placeholder="masukan kodePos" required autocomplete="off">
-                  </div>
-                  <!-- foto format -->
-                  <div class="input-group mb-3">
-                    <label class="input-group-text" for="fotoFormal">Foto Formal</label>
-                    <input type="file" class="form-control" id="fotoFormal" name="foto_formal" required>
-                  </div>
-                  <!-- akta kelahiran -->
-                  <div class="input-group mb-3">
-                    <label class="input-group-text" for="aktaKelahiran">Foto Akta Kelahiran</label>
-                    <input type="file" class="form-control" id="aktaKelahiran" name="akta_kelahiran" required>
-                  </div>
-                  <!-- kk -->
-                  <div class="input-group mb-3">
-                    <label class="input-group-text" for="kartuKeluarga">Foto kartu_keluarga</label>
-                    <input type="file" class="form-control" id="kartuKeluarga" name="kartu_keluarga" required>
-                  </div>
-                  <!-- fc ktp orang tua -->
-                  <div class="input-group mb-3">
-                    <label class="input-group-text" for="fcKtp">Fc KTP Ibu/Bapak/Wali</label>
-                    <input type="file" class="form-control" id="fcKtp" name="fc_ktp" required>
-                  </div>
-                  <!-- kip / kis -->
-                  <div class="input-group mb-3">
-                    <label class="input-group-text" for="kipKis">Foto KIP / KIS (bila ada)</label>
-                    <input type="file" class="form-control" id="kipKis" name="kip_kis" required>
-                  </div>
-                <button type="submit" class="btn btn-primary">Selanjutnya</button>
-              </form>
+    <!-- Pesan Error -->
+    <% if (typeof msg !== 'undefined' && msg.length !== 0) { %>
+      <div class="bg-green-100 text-green-700 px-4 py-2 rounded mb-4"><%= msg %></div>
+    <% } %>
+    <% if (typeof errors !== 'undefined') { %>
+      <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
+        <ul>
+          <% errors.forEach(error => { %>
+            <li><%= error.msg %></li>
+          <% }) %>
+        </ul>
+      </div>
+    <% } %>
+    <% if (typeof errorsMongoose !== 'undefined') { %>
+      <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
+        <ul>
+          <% errorsMongoose.forEach(error => { %>
+            <li><%= error.message %></li>
+          <% }) %>
+        </ul>
+      </div>
+    <% } %>
+    
+    <form id="MyForm" method="post" action="/form-pendaftaran" enctype="multipart/form-data" class="grid grid-cols-2 gap-5">
+      <div class="col-span-1">
+        <!-- NISN -->
+      <div class="mb-4">
+        <label for="nisn" class="block text-sm font-semibold text-gray-700">NISN</label>
+        <input 
+          type="text" 
+          id="nisn" 
+          name="nisn" 
+          value="<%= data ? data.nisn : '' %>" 
+          placeholder="Masukkan nomor NISN"
+          class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700"
+          required>
+      </div>
+    
+      <!-- NIK -->
+      <div class="mb-4">
+        <label for="nik" class="block text-sm font-semibold text-gray-700">NIK</label>
+        <input 
+          type="text" 
+          id="nik" 
+          name="nik" 
+          value="<%= data ? data.nik : '' %>" 
+          placeholder="Masukkan nomor NIK"
+          class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700"
+          required>
+      </div>
+    
+      <!-- Nama Lengkap -->
+      <div class="mb-4">
+        <label for="namaLengkap" class="block text-sm font-semibold text-gray-700">Nama Lengkap</label>
+        <input 
+          type="text" 
+          id="namaLengkap" 
+          name="nama_lengkap" 
+          value="<%= data ? data.nama_lengkap : '' %>" 
+          placeholder="Masukkan nama lengkap"
+          class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700"
+          required>
+      </div>
+    
+      <!-- Jenis Kelamin -->
+      <div class="mb-4">
+        <label for="jenisKelamin" class="block text-sm font-semibold text-gray-700">Jenis Kelamin</label>
+        <select 
+          id="jenisKelamin" 
+          name="jenis_kelamin"
+          class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700"
+          required>
+          <option value="" disabled selected hidden>Pilih jenis kelamin</option>
+          <option value="Laki-laki" <%= data.jenis_kelamin === 'Laki-laki' ? 'selected' : '' %>>Laki-laki</option>
+          <option value="Perempuan" <%= data.jenis_kelamin === 'Perempuan' ? 'selected' : '' %>>Perempuan</option>
+        </select>
+      </div>
+
+      <!-- Usia -->
+        <div class="mb-4">
+          <label for="usia" class="block text-sm font-semibold text-gray-700">Usia (Tahun)</label>
+          <input 
+            type="number" 
+            id="usia" 
+            name="usia" 
+            value="<%= data ? data.usia : '' %>" 
+            placeholder="Masukkan usia" 
+            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+            required>
         </div>
-    </div>
+        <!-- Tempat dan Tanggal Lahir -->
+        <div class="mb-4">
+          <label for="tempatTanggalLahir" class="block text-sm font-semibold text-gray-700">Tempat / Tanggal Lahir</label>
+          <!-- Tempat Lahir -->
+          <input 
+            type="text" 
+            id="tempatLahir" 
+            name="tempat_lahir" 
+            value="<%= data ? data.tempat_lahir : '' %>" 
+            placeholder="Masukkan tempat lahir" 
+            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+            required>
+          <!-- Tanggal Lahir -->
+          <input 
+            type="date" 
+            id="tanggalLahir" 
+            name="tanggal_lahir" 
+            value="<%= data ? data.tanggal_lahir : '' %>" 
+            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+            required>
+        </div>
+
+        <!-- Alamat -->
+        <div class="mb-4">
+          <label for="alamat" class="block text-sm font-semibold text-gray-700">Alamat</label>
+          <textarea 
+            id="alamat" 
+            name="alamat" 
+            placeholder="Masukkan alamat lengkap" 
+            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+            style="min-height: 100px;" 
+            required><%= data ? data.alamat : '' %></textarea>
+        </div>
+        <!-- Anak ke -->
+        <div class="mb-4">
+          <label for="anakKe" class="block text-sm font-semibold text-gray-700">Anak ke</label>
+          <input 
+            type="number" 
+            id="anakKe" 
+            name="anak_ke" 
+            value="<%= data ? data.anak_ke : '' %>" 
+            placeholder="Masukkan anak ke" 
+            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+            required>
+        </div>
+        <!-- Jumlah Saudara -->
+        <div class="mb-4">
+          <label for="jumlahSaudara" class="block text-sm font-semibold text-gray-700">Jumlah Saudara</label>
+          <input 
+            type="number" 
+            id="jumlahSaudara" 
+            name="jumlah_saudara" 
+            value="<%= data ? data.jumlah_saudara : '' %>" 
+            placeholder="Masukkan jumlah saudara" 
+            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+            required>
+        </div>
+
+      
+
+      </div>
+
+      <div class="col-span-1">
+          <!-- Nomor Telepon -->
+          <div class="mb-4">
+            <label for="nomorTelphone" class="block text-sm font-semibold text-gray-700">Nomor Telphone / Nomor WA</label>
+            <input 
+              type="text" 
+              id="nomorTelphone" 
+              name="nomor_telephone" 
+              value="<%= data ? data.nomor_telephone : '' %>" 
+              placeholder="Masukkan nomor telphone aktif" 
+              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+              required>
+          </div>
+        
+        <!-- Alumni SD -->
+        <div class="mb-4">
+          <label for="alumniSd" class="block text-sm font-semibold text-gray-700">Alumni SD</label>
+          <input 
+            type="text" 
+            id="alumniSd" 
+            name="alumni_sd" 
+            value="<%= data ? data.alumni_sd : '' %>" 
+            placeholder="Masukkan alumni SD" 
+            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+            required>
+        </div>
+
+        <!-- Alamat Sekolah Asal -->
+        <div class="mb-4">
+          <label for="alamatSekolahAsal" class="block text-sm font-semibold text-gray-700">Alamat Sekolah Asal</label>
+          <input 
+            type="text" 
+            id="alamatSekolahAsal" 
+            name="alamat_sekolah_asal" 
+            value="<%= data ? data.alamat_sekolah_asal : '' %>" 
+            placeholder="Masukkan alamat sekolah asal" 
+            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+            required>
+        </div>
+        <!-- Nama Lengkap Ayah -->
+        <div>
+          <label for="namaLengkapAyah" class="block text-sm font-semibold text-gray-700">Nama Lengkap Ayah</label>
+          <input 
+            type="text" 
+            id="namaLengkapAyah" 
+            name="nama_lengkap_ayah" 
+            value="<%= data ? data.nama_lengkap_ayah : '' %>" 
+            placeholder="Masukkan Nama Lengkap Ayah" 
+            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+            required>
+          <div id="namaLengkapAyah" class="text-sm text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
+        </div>
+
+        <!-- Nama Lengkap Ibu -->
+        <div>
+          <label for="namaLengkapIbu" class="block text-sm font-semibold text-gray-700">Nama Lengkap Ibu</label>
+          <input 
+            type="text" 
+            id="namaLengkapIbu" 
+            name="nama_lengkap_ibu" 
+            value="<%= data ? data.nama_lengkap_ibu : '' %>" 
+            placeholder="Masukkan Nama Lengkap Ibu" 
+            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+            required>
+          <div id="namaLengkapIbu" class="text-sm text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
+        </div>
+
+        <!-- Nama Lengkap Wali -->
+        <div>
+          <label for="namaLengkapWali" class="block text-sm font-semibold text-gray-700">Nama Lengkap Wali</label>
+          <input 
+            type="text" 
+            id="namaLengkapWali" 
+            name="nama_lengkap_wali" 
+            value="<%= data ? data.nama_lengkap_wali : '' %>" 
+            placeholder="Masukkan Nama Lengkap Wali" 
+            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+            required>
+          <div id="namaLengkapWali" class="text-sm text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
+        </div>
+
+        <!-- Kode Pos -->
+        <div>
+          <label for="kodePos" class="block text-sm font-semibold text-gray-700">Kode Pos</label>
+          <input 
+            type="number" 
+            id="kodePos" 
+            name="kode_pos" 
+            value="<%= data ? data.kode_pos : '' %>" 
+            placeholder="Masukkan Kode Pos" 
+            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+            required>
+        </div>
+          <!-- Foto Formal -->
+          <div>
+            <label for="fotoFormal" class="block text-sm font-semibold text-gray-700">Foto Formal</label>
+            <input 
+              type="file" 
+              id="fotoFormal" 
+              name="foto_formal" 
+              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+              required>
+          </div>
+
+          <!-- Foto Akta Kelahiran -->
+          <div>
+            <label for="aktaKelahiran" class="block text-sm font-semibold text-gray-700">Foto Akta Kelahiran</label>
+            <input 
+              type="file" 
+              id="aktaKelahiran" 
+              name="akta_kelahiran" 
+              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+              required>
+          </div>
+
+          <!-- Foto Kartu Keluarga -->
+          <div>
+            <label for="kartuKeluarga" class="block text-sm font-semibold text-gray-700">Foto Kartu Keluarga</label>
+            <input 
+              type="file" 
+              id="kartuKeluarga" 
+              name="kartu_keluarga" 
+              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+              required>
+          </div>
+
+          <!-- Foto KTP Ibu/Bapak/Wali -->
+          <div>
+            <label for="fcKtp" class="block text-sm font-semibold text-gray-700">Foto KTP Ibu/Bapak/Wali</label>
+            <input 
+              type="file" 
+              id="fcKtp" 
+              name="fc_ktp" 
+              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+              required>
+          </div>
+
+          <!-- Foto KIP / KIS -->
+          <div>
+            <label for="kipKis" class="block text-sm font-semibold text-gray-700">Foto KIP / KIS (Bila Ada)</label>
+            <input 
+              type="file" 
+              id="kipKis" 
+              name="kip_kis" 
+              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+              >
+          </div>
+
+          <!-- Tombol Submit -->
+           <div class="flex justify-between gap-10">
+             <button 
+               type="submit" 
+               class="mt-4 w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200 order-2">
+               Selanjutnya
+             </button>
+             <a href="/" class="mt-4 w-full py-3 px-6 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-800 transition-all duration-200 text-center order-1">Kembali</a>
+           </div>
+      </div>
+
+
+      </div>
+    </form>
+  </div>
 </div>
 

@@ -44,34 +44,43 @@
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
           />
         </div>
+        <!-- tanggal berita -->
+        <div>
+          <label for="tanggal_berita" class="block text-gray-700 font-semibold mb-2">Tanggal Berita</label>
+          <input 
+            type="date" 
+            id="tanggal_berita" 
+            name="tanggal_berita"  
+            value="<%= data ? data.tanggal_berita : '' %>" 
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
+          />
+        </div>
 
         <!-- Konten Berita -->
         <div>
-          <label for="content" class="block text-gray-700 font-semibold mb-2">Konten</label>
+          <label for="editor" class="block text-gray-700 font-semibold mb-2">Konten</label>
           <textarea 
             id="content" 
             name="content" 
             rows="10" 
-            required 
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none  whitespace-pre-wrap"
             placeholder="Tulis konten berita..."><%= data ? data.content : '' %></textarea>
         </div>
-
-        <!-- Kategori
+       
         <div>
-          <label for="category" class="block text-gray-700 font-semibold mb-2">Kategori</label>
+          <label for="kategori" class="block text-gray-700 font-semibold mb-2">Kategori</label>
           <select 
-            id="category" 
-            name="category" 
+            id="kategori" 
+            name="kategori" 
             required 
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
           >
             <option value="" disabled selected>Pilih kategori berita</option>
-            <option value="news">Berita</option>
-            <option value="event">Event</option>
-            <option value="announcement">Pengumuman</option>
+            <option value="Berita">Berita</option>
+            <option value="Artikel">Artikel</option>
           </select>
-        </div> -->
+        </div>
 
         <!-- Thumbnail -->
         <div>
