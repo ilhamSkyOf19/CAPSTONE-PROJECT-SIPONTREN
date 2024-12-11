@@ -9,6 +9,31 @@ const TYPE_IMAGE = {
     "image/png": 'png',
 };
 
+// listNavbar
+const listNavbar = {
+    home: {
+        title: 'Home',
+        router: '/'
+    },
+    profile: {
+        title: 'Profile',
+        router: '/profile'
+    },
+    kemahadan: {
+        title: "Kema'hadan",
+        router: '/kemahadan'
+    },
+    extrakulikuler: {
+        title: 'Ektrakulikuler',
+        router: '#ekstrakurikuler'
+    },
+    psb: {
+        title: 'PSB',
+        router: '/psb'
+    },
+}
+
+
 
 // Ukuran file maksimal (2MB)
 const maxSize = 2 * 1024 * 1024; // 2MB
@@ -42,7 +67,7 @@ const storage = multer.diskStorage({
         const ext = TYPE_IMAGE[file.mimetype]; // Ekstensi file berdasarkan MIME type
         const filename = `${file.fieldname}_${Date.now()}.${ext}`.toLowerCase(); // Penamaan file menjadi lowercase
         cb(null, filename); // Mengirimkan nama file yang sudah diubah menjadi lowercase
-    }    
+    }
 });
 
 // Konfigurasi multer
@@ -84,7 +109,7 @@ const storage2 = multer.diskStorage({
         const filename = `${file.fieldname}_${Date.now()}.${ext}`.toLowerCase(); // Penamaan file menjadi lowercase
         cb(null, filename); // Mengirimkan nama file yang sudah diubah menjadi lowercase
     }
-    
+
 });
 
 

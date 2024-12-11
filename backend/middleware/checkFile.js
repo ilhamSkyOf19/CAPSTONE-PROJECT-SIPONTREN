@@ -8,6 +8,31 @@ import User from '../models/skemaLogin.js';
 
 const today = new Date().toISOString().split('T')[0];
 
+// listNavbar
+const listNavbar = {
+    home: {
+        title: 'Home',
+        router: '/'
+    },
+    profile: {
+        title: 'Profile',
+        router: '/profile'
+    },
+    kemahadan: {
+        title: "Kema'hadan",
+        router: '/kemahadan'
+    },
+    extrakulikuler: {
+        title: 'Ektrakulikuler',
+        router: '#ekstrakurikuler'
+    },
+    psb: {
+        title: 'PSB',
+        router: '/psb'
+    },
+}
+
+
 async function checkFile(path) {
     try {
         await access(path);
@@ -25,21 +50,29 @@ class FileValidator {
             const uploadedFiles = req.files; // Ini adalah objek berisi semua file yang di-upload
             const validMimeTypes = ['image/jpeg', 'image/png', 'image/jpg']; // Tipe MIME yang valid
             const filesToCheck = [];
-    
+
             // Iterasi melalui semua file yang di-upload
             for (const [key, files] of Object.entries(uploadedFiles)) {
-                // Ambil file pertama dari array file (jika ada)
-                const file = files[0];
-                if (file) {
-                    filesToCheck.push(file); // Tambahkan file ke daftar untuk diperiksa
+                // Cek apakah file ada (misalnya kip atau kis bisa diisi atau tidak)
+                if (files && files.length > 0) {
+                    // Ambil file pertama dari array file (jika ada)
+                    const file = files[0];
+                    if (file) {
+                        filesToCheck.push(file); // Tambahkan file ke daftar untuk diperiksa
+                    }
                 }
             }
-    
+
+            // Jika tidak ada file yang diupload, lanjutkan
+            if (filesToCheck.length === 0) {
+                return next(); // Lanjutkan ke middleware berikutnya jika tidak ada file untuk diperiksa
+            }
+
             // Membaca chunk awal dari file untuk memeriksa tipe file
             for (const file of filesToCheck) {
                 const buffer = await readChunk(file.path, { length: 4100 });
                 const fileType = await fileTypeFromBuffer(buffer);
-    
+
                 // Validasi tipe file
                 if (!(fileType && validMimeTypes.includes(fileType.mime))) {
                     // Jika file tidak valid, hapus semua file yang ada
@@ -49,7 +82,7 @@ class FileValidator {
                             await unlink(f.path); // Hapus file yang valid sebelumnya
                         }
                     }));
-    
+
                     // Buat error custom dengan kode
                     await fs.rmdir(`public/imagesPendaftar/${req.body.nik}`); // Hapus folder berdasarkan nik
                     const error = new Error('File tidak valid, harus berupa .jpg, .jpeg, atau .png');
@@ -59,10 +92,11 @@ class FileValidator {
                         title: 'halaman pendaftar',
                         errors: [{ msg: error.message }],
                         data: req.body, // Menyimpan input sebelumnya
+                        listNavbar,
                     });
                 }
             }
-    
+
             // Jika semua file valid, lanjutkan ke middleware berikutnya
             return next();
         } catch (error) {
@@ -71,7 +105,7 @@ class FileValidator {
             generalError.code = 'FILE_CHECK_ERROR';
             return next(generalError);
         }
-    }    
+    }
     async checkFileType2(req, res, next, fileLocation) {
         let dataPendaftar = await Pendaftaran.findByPk(req.body._id);
         const user = await User.findOne({ where: { id: req.session.loggedIn } });
@@ -99,7 +133,7 @@ class FileValidator {
                             await unlink(f.path); // Hapus file yang valid sebelumnya
                         }
                     }));
-                    
+
                     // Buat error custom dengan kode
                     // await fs.rmdir(`images/${req.body.nik}`); // Hapus folder berdasarkan nik
                     const error = new Error('File tidak valid, harus berupa .jpg, .jpeg, atau .png');
@@ -130,27 +164,27 @@ class FileValidator {
             // Ambil file dari request (asumsi hanya satu file)
             const file = req.file; // Ganti req.files dengan req.file
             const validMimeTypes = ['image/jpeg', 'image/png', 'image/jpg']; // Tipe MIME yang valid
-            
+
             // Logging untuk melihat file yang di-upload
             console.log('Uploaded file:', file);
-    
+
             // Cek apakah file ada
             if (!file) {
-            // Jika tidak ada file, lanjutkan ke middleware berikutnya tanpa melakukan proses lebih lanjut
-            return next();
+                // Jika tidak ada file, lanjutkan ke middleware berikutnya tanpa melakukan proses lebih lanjut
+                return next();
             }
-    
+
             // Membaca chunk awal dari file untuk memeriksa tipe file
             const buffer = await readChunk(file.path, { length: 4100 }).catch(err => {
                 console.error('Error reading chunk:', err);
                 throw new Error('Gagal membaca file untuk memeriksa tipe.');
             });
-    
+
             const fileType = await fileTypeFromBuffer(buffer).catch(err => {
                 console.error('Error getting file type:', err);
                 throw new Error('Gagal mendapatkan tipe file.');
             });
-    
+
             // Validasi tipe file
             if (!(fileType && validMimeTypes.includes(fileType.mime))) {
                 // Hapus file jika tipe tidak valid
@@ -158,7 +192,7 @@ class FileValidator {
                 if (isExistFile) {
                     await unlink(file.path); // Hapus file yang valid sebelumnya
                 }
-                
+
                 const error = new Error('File tidak valid, harus berupa .jpg, .jpeg, atau .png');
                 error.code = 'INVALID_FILE_TYPE';
                 return res.render(fileLocation, {
@@ -170,7 +204,7 @@ class FileValidator {
                     today,
                 });
             }
-    
+
             // Jika file valid, lanjutkan ke middleware berikutnya
             return next();
         } catch (error) {
@@ -179,8 +213,8 @@ class FileValidator {
             generalError.code = 'FILE_CHECK_ERROR';
             return next(generalError);
         }
-    }    
-    
+    }
+
 }
 
 export default new FileValidator();

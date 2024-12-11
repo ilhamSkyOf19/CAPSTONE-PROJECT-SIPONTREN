@@ -30,7 +30,7 @@ export default {
       addUtilities({
         '.bg-custom': {
           'background-position-x': '32rem',
-          'background-position-y': '-20rem',
+          'background-position-y': '-15rem',
           'background-size': '100%',
         },
         '.bg-custom-sm': {
@@ -41,14 +41,14 @@ export default {
         '.bg-custom-xl': {
           'background-position-x': '32rem',
           'background-position-y': '-10rem',
-          'background-size': '100%',
+          'background-size': '80%',
         },
         '.bg-custom-sejarah': {
           'background-position-x': '40rem',
           'background-position-y': '-5rem',
           'background-size': '65%',
         },
-        
+
       });
     },
     scrollbarPlugin({ nocompatible: true }),

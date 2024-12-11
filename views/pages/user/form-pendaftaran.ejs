@@ -1,161 +1,173 @@
-<div class="min-h-screen flex items-center justify-center">
-  <div class="bg-white shadow-md rounded-lg w-full max-w-full pt-24 pb-10 px-20">
-    <h1 class="text-2xl font-bold text-center text-gray-700 mb-6">Form Pendaftaran</h1>
-    
-    <!-- Pesan Error -->
-    <% if (typeof msg !== 'undefined' && msg.length !== 0) { %>
-      <div class="bg-green-100 text-green-700 px-4 py-2 rounded mb-4"><%= msg %></div>
-    <% } %>
-    <% if (typeof errors !== 'undefined') { %>
-      <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
-        <ul>
-          <% errors.forEach(error => { %>
-            <li><%= error.msg %></li>
-          <% }) %>
-        </ul>
-      </div>
-    <% } %>
-    <% if (typeof errorsMongoose !== 'undefined') { %>
-      <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
-        <ul>
-          <% errorsMongoose.forEach(error => { %>
-            <li><%= error.message %></li>
-          <% }) %>
-        </ul>
-      </div>
-    <% } %>
-    
-    <form id="MyForm" method="post" action="/form-pendaftaran" enctype="multipart/form-data" class="grid grid-cols-2 gap-5">
-      <div class="col-span-1">
-        <!-- NISN -->
-      <div class="mb-4">
-        <label for="nisn" class="block text-sm font-semibold text-gray-700">NISN</label>
-        <input 
-          type="text" 
-          id="nisn" 
-          name="nisn" 
-          value="<%= data ? data.nisn : '' %>" 
-          placeholder="Masukkan nomor NISN"
-          class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700"
-          required>
-      </div>
-    
-      <!-- NIK -->
-      <div class="mb-4">
-        <label for="nik" class="block text-sm font-semibold text-gray-700">NIK</label>
-        <input 
-          type="text" 
-          id="nik" 
-          name="nik" 
-          value="<%= data ? data.nik : '' %>" 
-          placeholder="Masukkan nomor NIK"
-          class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700"
-          required>
-      </div>
-    
-      <!-- Nama Lengkap -->
-      <div class="mb-4">
-        <label for="namaLengkap" class="block text-sm font-semibold text-gray-700">Nama Lengkap</label>
-        <input 
-          type="text" 
-          id="namaLengkap" 
-          name="nama_lengkap" 
-          value="<%= data ? data.nama_lengkap : '' %>" 
-          placeholder="Masukkan nama lengkap"
-          class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700"
-          required>
-      </div>
-    
-      <!-- Jenis Kelamin -->
-      <div class="mb-4">
-        <label for="jenisKelamin" class="block text-sm font-semibold text-gray-700">Jenis Kelamin</label>
-        <select 
-          id="jenisKelamin" 
-          name="jenis_kelamin"
-          class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700"
-          required>
-          <option value="" disabled selected hidden>Pilih jenis kelamin</option>
-          <option value="Laki-laki" <%= data.jenis_kelamin === 'Laki-laki' ? 'selected' : '' %>>Laki-laki</option>
-          <option value="Perempuan" <%= data.jenis_kelamin === 'Perempuan' ? 'selected' : '' %>>Perempuan</option>
-        </select>
-      </div>
-
-      <!-- Usia -->
-        <div class="mb-4">
-          <label for="usia" class="block text-sm font-semibold text-gray-700">Usia (Tahun)</label>
-          <input 
-            type="number" 
-            id="usia" 
-            name="usia" 
-            value="<%= data ? data.usia : '' %>" 
-            placeholder="Masukkan usia" 
-            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
-            required>
+<section class="w-full h-auto overflow-hidden" id="psb">
+  <section class="w-full h-auto overflow-hidden">
+    <section class="h-[80vh] w-100% lg:max-w-100% flex items-center justify-center bg-contain bg-right bg-no-repeat bg-[#0747A6] bg-opacity-90 bg-custom-sejarah overflow-hidden" style="background-image: url('/public/asset/bangunan (1).png');">
+        <div class="w-full h-full max-w-full flex flex-row items-center justify-between gap-4 text-white pr-6 pl-20 bg-[#0747A6] bg-opacity-60 lg:pb-16 lg:pt-40">
+          <div class="flex flex-col items-start justify-start">
+            <h2 class="font-semibold text-3xl">Penerimaan Santri Baru</h2>
+            <h2 class="font-semibold text-3xl lg:mb-4 text-yellow-400">Tahun Ajaran 2025/2026</h2>
+            <p class="text-sm lg:w-[80%] text-left leading-relaxed">Kunjungi website PSB Pondok Pesantren Muhammadiyah Al-Amin Seputih Banyak, lengkapi setiap persyaratan, ikuti semua alur pendaftaran dan jadilah bagian dari Pondok Pesantren Muhammadiyah Al-Amin Septuih Banyak</p>
+          </div>
+          <div class="lg:pr-32">
+            <img src="/public/asset/file_thumb.png" alt="" class="w-96">
+          </div>
         </div>
-        <!-- Tempat dan Tanggal Lahir -->
+    </section>
+  <section class="min-h-screen flex items-center justify-center">
+    <div class="bg-white shadow-md rounded-lg w-full max-w-full pt-10 pb-10 px-20">
+      <div class="w-full flex justify-start items-start flex-col gap-2 lg:mb-14">
+        <div class="text-[#0747A6] font-semibold text-4xl text-center">
+            Formulir Pendaftaran
+          </div>
+          <div class="bg-yellow-300 w-48 h-[2px]"></div>
+      </div>
+      
+      <!-- Pesan Error -->
+      <% if (typeof msg !== 'undefined' && msg.length !== 0) { %>
+        <div class="bg-green-100 text-green-700 px-4 py-2 rounded mb-4"><%= msg %></div>
+      <% } %>
+      <% if (typeof errors !== 'undefined') { %>
+        <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
+          <ul>
+            <% errors.forEach(error => { %>
+              <li><%= error.msg %></li>
+            <% }) %>
+          </ul>
+        </div>
+      <% } %>
+      <% if (typeof errorsMongoose !== 'undefined') { %>
+        <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
+          <ul>
+            <% errorsMongoose.forEach(error => { %>
+              <li><%= error.message %></li>
+            <% }) %>
+          </ul>
+        </div>
+      <% } %>
+      
+      <form id="MyForm" method="post" action="/form-pendaftaran" enctype="multipart/form-data" class="grid grid-cols-2 gap-5">
+        <div class="col-span-1">
+          <!-- NISN -->
         <div class="mb-4">
-          <label for="tempatTanggalLahir" class="block text-sm font-semibold text-gray-700">Tempat / Tanggal Lahir</label>
-          <!-- Tempat Lahir -->
+          <label for="nisn" class="block text-sm font-semibold text-gray-700">NISN</label>
           <input 
             type="text" 
-            id="tempatLahir" 
-            name="tempat_lahir" 
-            value="<%= data ? data.tempat_lahir : '' %>" 
-            placeholder="Masukkan tempat lahir" 
-            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
-            required>
-          <!-- Tanggal Lahir -->
-          <input 
-            type="date" 
-            id="tanggalLahir" 
-            name="tanggal_lahir" 
-            value="<%= data ? data.tanggal_lahir : '' %>" 
-            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+            id="nisn" 
+            name="nisn" 
+            value="<%= data ? data.nisn : '' %>" 
+            placeholder="Masukkan nomor NISN"
+            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700"
             required>
         </div>
-
-        <!-- Alamat -->
-        <div class="mb-4">
-          <label for="alamat" class="block text-sm font-semibold text-gray-700">Alamat</label>
-          <textarea 
-            id="alamat" 
-            name="alamat" 
-            placeholder="Masukkan alamat lengkap" 
-            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
-            style="min-height: 100px;" 
-            required><%= data ? data.alamat : '' %></textarea>
-        </div>
-        <!-- Anak ke -->
-        <div class="mb-4">
-          <label for="anakKe" class="block text-sm font-semibold text-gray-700">Anak ke</label>
-          <input 
-            type="number" 
-            id="anakKe" 
-            name="anak_ke" 
-            value="<%= data ? data.anak_ke : '' %>" 
-            placeholder="Masukkan anak ke" 
-            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
-            required>
-        </div>
-        <!-- Jumlah Saudara -->
-        <div class="mb-4">
-          <label for="jumlahSaudara" class="block text-sm font-semibold text-gray-700">Jumlah Saudara</label>
-          <input 
-            type="number" 
-            id="jumlahSaudara" 
-            name="jumlah_saudara" 
-            value="<%= data ? data.jumlah_saudara : '' %>" 
-            placeholder="Masukkan jumlah saudara" 
-            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
-            required>
-        </div>
-
       
-
-      </div>
-
-      <div class="col-span-1">
-          <!-- Nomor Telepon -->
+        <!-- NIK -->
+        <div class="mb-4">
+          <label for="nik" class="block text-sm font-semibold text-gray-700">NIK</label>
+          <input 
+            type="text" 
+            id="nik" 
+            name="nik" 
+            value="<%= data ? data.nik : '' %>" 
+            placeholder="Masukkan nomor NIK"
+            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700"
+            required>
+        </div>
+      
+        <!-- Nama Lengkap -->
+        <div class="mb-4">
+          <label for="namaLengkap" class="block text-sm font-semibold text-gray-700">Nama Lengkap</label>
+          <input 
+            type="text" 
+            id="namaLengkap" 
+            name="nama_lengkap" 
+            value="<%= data ? data.nama_lengkap : '' %>" 
+            placeholder="Masukkan nama lengkap"
+            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700"
+            required>
+        </div>
+      
+        <!-- Jenis Kelamin -->
+        <div class="mb-4">
+          <label for="jenisKelamin" class="block text-sm font-semibold text-gray-700">Jenis Kelamin</label>
+          <select 
+            id="jenisKelamin" 
+            name="jenis_kelamin"
+            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700"
+            required>
+            <option value="" disabled selected hidden>Pilih jenis kelamin</option>
+            <option value="Laki-laki" <%= data.jenis_kelamin === 'Laki-laki' ? 'selected' : '' %>>Laki-laki</option>
+            <option value="Perempuan" <%= data.jenis_kelamin === 'Perempuan' ? 'selected' : '' %>>Perempuan</option>
+          </select>
+        </div>
+  
+        <!-- Usia -->
+          <div class="mb-4">
+            <label for="usia" class="block text-sm font-semibold text-gray-700">Usia (Tahun)</label>
+            <input 
+              type="number" 
+              id="usia" 
+              name="usia" 
+              value="<%= data ? data.usia : '' %>" 
+              placeholder="Masukkan usia" 
+              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+              required>
+          </div>
+          <!-- Tempat dan Tanggal Lahir -->
+          <div class="mb-4">
+            <label for="tempatTanggalLahir" class="block text-sm font-semibold text-gray-700">Tempat / Tanggal Lahir</label>
+            <!-- Tempat Lahir -->
+            <input 
+              type="text" 
+              id="tempatLahir" 
+              name="tempat_lahir" 
+              value="<%= data ? data.tempat_lahir : '' %>" 
+              placeholder="Masukkan tempat lahir" 
+              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+              required>
+            <!-- Tanggal Lahir -->
+            <input 
+              type="date" 
+              id="tanggalLahir" 
+              name="tanggal_lahir" 
+              value="<%= data ? data.tanggal_lahir : '' %>" 
+              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+              required>
+          </div>
+  
+          <!-- Alamat -->
+          <div class="mb-4">
+            <label for="alamat" class="block text-sm font-semibold text-gray-700">Alamat</label>
+            <textarea 
+              id="alamat" 
+              name="alamat" 
+              placeholder="Masukkan alamat lengkap" 
+              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+              style="min-height: 100px;" 
+              required><%= data ? data.alamat : '' %></textarea>
+          </div>
+          <!-- Anak ke -->
+          <div class="mb-4">
+            <label for="anakKe" class="block text-sm font-semibold text-gray-700">Anak ke</label>
+            <input 
+              type="number" 
+              id="anakKe" 
+              name="anak_ke" 
+              value="<%= data ? data.anak_ke : '' %>" 
+              placeholder="Masukkan anak ke" 
+              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+              required>
+          </div>
+          <!-- Jumlah Saudara -->
+          <div class="mb-4">
+            <label for="jumlahSaudara" class="block text-sm font-semibold text-gray-700">Jumlah Saudara</label>
+            <input 
+              type="number" 
+              id="jumlahSaudara" 
+              name="jumlah_saudara" 
+              value="<%= data ? data.jumlah_saudara : '' %>" 
+              placeholder="Masukkan jumlah saudara" 
+              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+              required>
+          </div>
           <div class="mb-4">
             <label for="nomorTelphone" class="block text-sm font-semibold text-gray-700">Nomor Telphone / Nomor WA</label>
             <input 
@@ -167,155 +179,200 @@
               class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
               required>
           </div>
-        
-        <!-- Alumni SD -->
-        <div class="mb-4">
-          <label for="alumniSd" class="block text-sm font-semibold text-gray-700">Alumni SD</label>
-          <input 
-            type="text" 
-            id="alumniSd" 
-            name="alumni_sd" 
-            value="<%= data ? data.alumni_sd : '' %>" 
-            placeholder="Masukkan alumni SD" 
-            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
-            required>
         </div>
-
-        <!-- Alamat Sekolah Asal -->
-        <div class="mb-4">
-          <label for="alamatSekolahAsal" class="block text-sm font-semibold text-gray-700">Alamat Sekolah Asal</label>
-          <input 
-            type="text" 
-            id="alamatSekolahAsal" 
-            name="alamat_sekolah_asal" 
-            value="<%= data ? data.alamat_sekolah_asal : '' %>" 
-            placeholder="Masukkan alamat sekolah asal" 
-            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
-            required>
-        </div>
-        <!-- Nama Lengkap Ayah -->
-        <div>
-          <label for="namaLengkapAyah" class="block text-sm font-semibold text-gray-700">Nama Lengkap Ayah</label>
-          <input 
-            type="text" 
-            id="namaLengkapAyah" 
-            name="nama_lengkap_ayah" 
-            value="<%= data ? data.nama_lengkap_ayah : '' %>" 
-            placeholder="Masukkan Nama Lengkap Ayah" 
-            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
-            required>
-          <div id="namaLengkapAyah" class="text-sm text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
-        </div>
-
-        <!-- Nama Lengkap Ibu -->
-        <div>
-          <label for="namaLengkapIbu" class="block text-sm font-semibold text-gray-700">Nama Lengkap Ibu</label>
-          <input 
-            type="text" 
-            id="namaLengkapIbu" 
-            name="nama_lengkap_ibu" 
-            value="<%= data ? data.nama_lengkap_ibu : '' %>" 
-            placeholder="Masukkan Nama Lengkap Ibu" 
-            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
-            required>
-          <div id="namaLengkapIbu" class="text-sm text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
-        </div>
-
-        <!-- Nama Lengkap Wali -->
-        <div>
-          <label for="namaLengkapWali" class="block text-sm font-semibold text-gray-700">Nama Lengkap Wali</label>
-          <input 
-            type="text" 
-            id="namaLengkapWali" 
-            name="nama_lengkap_wali" 
-            value="<%= data ? data.nama_lengkap_wali : '' %>" 
-            placeholder="Masukkan Nama Lengkap Wali" 
-            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
-            required>
-          <div id="namaLengkapWali" class="text-sm text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
-        </div>
-
-        <!-- Kode Pos -->
-        <div>
-          <label for="kodePos" class="block text-sm font-semibold text-gray-700">Kode Pos</label>
-          <input 
-            type="number" 
-            id="kodePos" 
-            name="kode_pos" 
-            value="<%= data ? data.kode_pos : '' %>" 
-            placeholder="Masukkan Kode Pos" 
-            class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
-            required>
-        </div>
-          <!-- Foto Formal -->
-          <div>
-            <label for="fotoFormal" class="block text-sm font-semibold text-gray-700">Foto Formal</label>
+  
+        <div class="col-span-1">
+            <!-- Nomor Telepon -->
+          
+          
+          <!-- Alumni SD -->
+          <div class="mb-4">
+            <label for="alumniSd" class="block text-sm font-semibold text-gray-700">Alumni SD</label>
             <input 
-              type="file" 
-              id="fotoFormal" 
-              name="foto_formal" 
+              type="text" 
+              id="alumniSd" 
+              name="alumni_sd" 
+              value="<%= data ? data.alumni_sd : '' %>" 
+              placeholder="Masukkan alumni SD" 
               class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
               required>
+          </div>
+  
+          <!-- Alamat Sekolah Asal -->
+          <div class="mb-4">
+            <label for="alamatSekolahAsal" class="block text-sm font-semibold text-gray-700">Alamat Sekolah Asal</label>
+            <input 
+              type="text" 
+              id="alamatSekolahAsal" 
+              name="alamat_sekolah_asal" 
+              value="<%= data ? data.alamat_sekolah_asal : '' %>" 
+              placeholder="Masukkan alamat sekolah asal" 
+              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+              required>
+          </div>
+          <!-- Nama Lengkap Ayah -->
+          <div class="mb-4">
+            <label for="namaLengkapAyah" class="block text-sm font-semibold text-gray-700">Nama Lengkap Ayah</label>
+            <input 
+              type="text" 
+              id="namaLengkapAyah" 
+              name="nama_lengkap_ayah" 
+              value="<%= data ? data.nama_lengkap_ayah : '' %>" 
+              placeholder="Masukkan Nama Lengkap Ayah" 
+              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+              required>
+            <div id="namaLengkapAyah" class="text-sm text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
+          </div>
+  
+          <!-- Nama Lengkap Ibu -->
+          <div class="mb-4">
+            <label for="namaLengkapIbu" class="block text-sm font-semibold text-gray-700">Nama Lengkap Ibu</label>
+            <input 
+              type="text" 
+              id="namaLengkapIbu" 
+              name="nama_lengkap_ibu" 
+              value="<%= data ? data.nama_lengkap_ibu : '' %>" 
+              placeholder="Masukkan Nama Lengkap Ibu" 
+              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+              required>
+            <div id="namaLengkapIbu" class="text-sm text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
+          </div>
+  
+          <!-- Nama Lengkap Wali -->
+          <div class="mb-4">
+            <label for="namaLengkapWali" class="block text-sm font-semibold text-gray-700">Nama Lengkap Wali</label>
+            <input 
+              type="text" 
+              id="namaLengkapWali" 
+              name="nama_lengkap_wali" 
+              value="<%= data ? data.nama_lengkap_wali : '' %>" 
+              placeholder="Masukkan Nama Lengkap Wali" 
+              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+              required>
+            <div id="namaLengkapWali" class="text-sm text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
+          </div>
+  
+          <!-- Kode Pos -->
+          <div class="mb-4">
+            <label for="kodePos" class="block text-sm font-semibold text-gray-700">Kode Pos</label>
+            <input 
+              type="number" 
+              id="kodePos" 
+              name="kode_pos" 
+              value="<%= data ? data.kode_pos : '' %>" 
+              placeholder="Masukkan Kode Pos" 
+              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
+              required>
+          </div>
+
+            <!-- Foto Formal -->
+          <div class="mb-4">
+            <label for="fotoFormal" class="block text-sm font-semibold text-gray-700">Foto Formal</label>
+            <div class="flex items-center mt-2">
+              <input 
+                type="file" 
+                id="fotoFormal" 
+                name="foto_formal" 
+                class="hidden"
+                required>
+              <label 
+                for="fotoFormal" 
+                class="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                Choose File
+              </label>
+              <span id="fotoFormal-name" class="ml-4 text-gray-500">No file chosen</span>
+            </div>
           </div>
 
           <!-- Foto Akta Kelahiran -->
-          <div>
+          <div class="mb-4">
             <label for="aktaKelahiran" class="block text-sm font-semibold text-gray-700">Foto Akta Kelahiran</label>
-            <input 
-              type="file" 
-              id="aktaKelahiran" 
-              name="akta_kelahiran" 
-              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
-              required>
+            <div class="flex items-center mt-2">
+              <input 
+                type="file" 
+                id="aktaKelahiran" 
+                name="akta_kelahiran" 
+                class="hidden"
+                required>
+              <label 
+                for="aktaKelahiran" 
+                class="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                Choose File
+              </label>
+              <span id="aktaKelahiran-name" class="ml-4 text-gray-500">No file chosen</span>
+            </div>
           </div>
 
           <!-- Foto Kartu Keluarga -->
-          <div>
+          <div class="mb-4">
             <label for="kartuKeluarga" class="block text-sm font-semibold text-gray-700">Foto Kartu Keluarga</label>
-            <input 
-              type="file" 
-              id="kartuKeluarga" 
-              name="kartu_keluarga" 
-              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
-              required>
+            <div class="flex items-center mt-2">
+              <input 
+                type="file" 
+                id="kartuKeluarga" 
+                name="kartu_keluarga" 
+                class="hidden"
+                required>
+              <label 
+                for="kartuKeluarga" 
+                class="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                Choose File
+              </label>
+              <span id="kartuKeluarga-name" class="ml-4 text-gray-500">No file chosen</span>
+            </div>
           </div>
 
           <!-- Foto KTP Ibu/Bapak/Wali -->
-          <div>
+          <div class="mb-4">
             <label for="fcKtp" class="block text-sm font-semibold text-gray-700">Foto KTP Ibu/Bapak/Wali</label>
-            <input 
-              type="file" 
-              id="fcKtp" 
-              name="fc_ktp" 
-              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
-              required>
+            <div class="flex items-center mt-2">
+              <input 
+                type="file" 
+                id="fcKtp" 
+                name="fc_ktp" 
+                class="hidden"
+                required>
+              <label 
+                for="fcKtp" 
+                class="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                Choose File
+              </label>
+              <span id="fcKtp-name" class="ml-4 text-gray-500">No file chosen</span>
+            </div>
           </div>
 
           <!-- Foto KIP / KIS -->
-          <div>
+          <div class="mb-4">
             <label for="kipKis" class="block text-sm font-semibold text-gray-700">Foto KIP / KIS (Bila Ada)</label>
-            <input 
-              type="file" 
-              id="kipKis" 
-              name="kip_kis" 
-              class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
-              >
+            <div class="flex items-center mt-2">
+              <input 
+                type="file" 
+                id="kipKis" 
+                name="kip_kis" 
+                class="hidden">
+              <label 
+                for="kipKis" 
+                class="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                Choose File
+              </label>
+              <span id="kipKis-name" class="ml-4 text-gray-500">No file chosen</span>
+            </div>
           </div>
-
-          <!-- Tombol Submit -->
-           <div class="flex justify-between gap-10">
-             <button 
-               type="submit" 
-               class="mt-4 w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200 order-2">
-               Selanjutnya
-             </button>
-             <a href="/" class="mt-4 w-full py-3 px-6 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-800 transition-all duration-200 text-center order-1">Kembali</a>
-           </div>
-      </div>
-
-
-      </div>
-    </form>
+  
+            <!-- Tombol Submit -->
+             <div class="flex justify-between gap-10">
+               <button 
+                 type="submit" 
+                 class="mt-4 w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200 order-2">
+                 Kirim
+               </button>
+               <a href="/psb" class="mt-4 w-full py-3 px-6 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-800 transition-all duration-200 text-center order-1">Kembali</a>
+             </div>
+        </div>  
+        </div>
+      </form>
+    </div>
   </div>
-</div>
+  
+</section>
 

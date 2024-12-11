@@ -1,19 +1,19 @@
 
-  const menuToggle = document.getElementById('menu-btn');
-  const menu = document.getElementById('menu');
+const menuToggle = document.getElementById('menu-btn');
+const menu = document.getElementById('menu');
 
-    if(menuToggle && menu) {      
-      // Tambahkan event listener pada tombol menu
-      menuToggle.addEventListener('click', function() {
-        if (menu.classList.contains('hidden')) {
-          menu.classList.remove('hidden');
-          menu.classList.add('block');
-        } else {
-          menu.classList.remove('block');
-          menu.classList.add('hidden');
-        }
-      });
+if (menuToggle && menu) {
+  // Tambahkan event listener pada tombol menu
+  menuToggle.addEventListener('click', function () {
+    if (menu.classList.contains('hidden')) {
+      menu.classList.remove('hidden');
+      menu.classList.add('block');
+    } else {
+      menu.classList.remove('block');
+      menu.classList.add('hidden');
     }
+  });
+}
 
 
 
@@ -190,17 +190,17 @@ if (containerBerita) {
 }
 
 // tujuan higlight 
-  const tujuan = ['tujuan-1.jpg', 'tujuan-2.jpg', 'tujuan-3.jpg', 'tujuan-4.jpg'];
+const tujuan = ['tujuan-1.jpg', 'tujuan-2.jpg', 'tujuan-3.jpg', 'tujuan-4.jpg'];
 
-  // Ambil semua elemen grid
-  const gridItems = [
-    document.getElementById('grid-item-1'),
-    document.getElementById('grid-item-2'),
-    document.getElementById('grid-item-3'),
-  ];
+// Ambil semua elemen grid
+const gridItems = [
+  document.getElementById('grid-item-1'),
+  document.getElementById('grid-item-2'),
+  document.getElementById('grid-item-3'),
+];
 
-  const duration = 500; // Durasi transisi (ms)
-  const updateInterval = 3000; // Interval pergantian gambar (ms)
+const duration = 500; // Durasi transisi (ms)
+const updateInterval = 3000; // Interval pergantian gambar (ms)
 
 // Fungsi untuk memperbarui gambar
 if (gridItems) {
@@ -293,7 +293,7 @@ if (breadcrumbContainer) {
   const homeLink = document.createElement('a');
   homeLink.href = '/';
   homeLink.textContent = 'Home';
-  homeLink.classList.add( 'hover:underline');
+  homeLink.classList.add('hover:underline');
   breadcrumbContainer.appendChild(homeLink);
 
   // Tambahkan separator untuk breadcrumb pertama
@@ -308,7 +308,7 @@ if (breadcrumbContainer) {
     basePath += `/${segment}`;
 
     const link = document.createElement('a');
-    
+
     // Kondisi khusus: Jika segmen adalah 'profile', maka router-nya harus mengarah ke '/'
     if (segment === 'profile') {
       link.href = '/';
@@ -333,5 +333,27 @@ if (breadcrumbContainer) {
 
 
 
-// navbar 
+// file input
+
+const psb = document.getElementById('psb')
+
+if (psb) {
+  function updateFileName(inputId, displayId) {
+    const input = document.getElementById(inputId);
+    const display = document.getElementById(displayId);
+
+    input.addEventListener('change', function () {
+      const fileName = input.files[0]?.name || 'No file chosen';
+      display.textContent = fileName;
+    });
+  }
+
+  // Daftar elemen input file
+  updateFileName('fotoFormal', 'fotoFormal-name');
+  updateFileName('aktaKelahiran', 'aktaKelahiran-name');
+  updateFileName('kartuKeluarga', 'kartuKeluarga-name');
+  updateFileName('fcKtp', 'fcKtp-name');
+  updateFileName('kipKis', 'kipKis-name');
+}
+
 
