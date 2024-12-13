@@ -1,7 +1,7 @@
 import { body, validationResult } from 'express-validator';
 import multer from 'multer';
-import { validatorUbahUsername, validatorLogin, validatorUploadBerita, validatorUbahBerita, validatorUbahPassword, validatorUbahDataAlumni, validatorResultPendaftar } from '../utils/validator.js';
-import { capitalizeWords, deleteBeritaById, deletePendaftarById } from '../utils/controller.js';
+import { validatorUbahUsername, validatorLogin, validatorUploadBerita, validatorUbahBerita, validatorUbahPassword, validatorUbahDataAlumni, validatorResultPendaftar, validatorTambahAlumni } from '../utils/validator.js';
+import { capitalizeWords, deleteAlumniById, deleteBeritaById, deletePendaftarById } from '../utils/controller.js';
 import express from 'express';
 import { Upload, Upload2 } from '../middleware/uploadFile.js';
 import FileValidator from '../middleware/checkFile.js';
@@ -54,7 +54,7 @@ const listNavbar = {
     },
     extrakulikuler: {
         title: 'Ektrakulikuler',
-        router: '#ekstrakurikuler'
+        router: '/#ekstrakurikuler'
     },
     psb: {
         title: 'PSB',
@@ -616,7 +616,7 @@ router.put('/ubah-data', [
 
 
 
-// UBAHH KE MYSQL!!!
+// Data alumni
 router.get('/data-alumni', async (req, res) => {
     if (!req.session.loggedIn) {
         return res.redirect('/login-admin');
@@ -725,6 +725,161 @@ router.get('/data-alumni-user', async (req, res) => {
     }
 });
 
+// tambah data alumni
+
+router.get('/tambah-data-alumni', async (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');
+    }
+    const user = await User.findOne({ _id: req.session.loggedIn });
+    const dataUsername = user.username;
+    res.render('pages/admin/daftar/tambah-data-alumni', {
+        layout: 'layouts/main-ejs-layouts',
+        title: 'tambah data alumni',
+        dataUsername,
+        data: req.body,
+    });
+});
+
+
+// Route untuk menambah berita ke database
+const maxSizeGambar = 2 * 1024 * 1024; // 2MB limit
+const uploaderAlumni = new FileSingleUploader('public/imagesAlumni', maxSizeGambar, 'imgAlumni', false);
+router.post('/form-alumni', [
+    (req, res, next) => {
+        // Pertama, jalankan Upload middleware untuk menangani file
+        uploaderAlumni.upload(req, res, async function (error) {
+            // Tangani kesalahan dari multer jika ada
+            if (error) {
+                let errorMessage;
+                if (error.code === 'INVALID_FILE_TYPE') {
+                    errorMessage = 'File tidak sesuai dengan yang diharapkan (harus .jpg, .jpeg, atau .png)!';
+                } else if (error instanceof multer.MulterError) {
+                    // Tangani kesalahan dari multer (seperti ukuran file terlalu besar)
+                    if (error.code === 'LIMIT_FILE_SIZE') {
+                        errorMessage = 'Ukuran file terlalu besar! Maksimum 2MB.';
+                    } else {
+                        errorMessage = `Terjadi kesalahan upload file! ${error}`;
+                    }
+                } else {
+                    errorMessage = error.message || 'Terjadi kesalahan saat upload file!';
+                }
+
+                const user = await User.findOne({ _id: req.session.loggedIn });
+                const dataUsername = user.username;
+                // Render kembali form dengan pesan error dan data input
+                return res.render('pages/admin/daftar/tambah-data-alumni', {
+                    layout: 'layouts/main-ejs-layouts',
+                    title: 'tambah data alumni',
+                    errors: [{ msg: errorMessage }],
+                    data: req.body, // Menyimpan input sebelumnya
+                    dataUsername,
+                });
+            }
+
+            // Jika file upload berhasil, lanjutkan ke middleware validasi berikutnya
+            next();
+        });
+    },
+    async (req, res, next) => {
+        // Validasi tipe file di sini dengan checkFileType, arahkan ke 'index' jika error
+        await FileValidator.checkFileType3(req, res, next, 'pages/admin/daftar/tambah-data-alumni');
+    },
+
+    validatorTambahAlumni
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        // Memeriksa dan menghapus file jika ada error
+        const uploadedFile = req.file; // Menggunakan req.file, bukan req.files
+
+        try {
+            if (uploadedFile) {
+                await fs.unlink(uploadedFile.path); // Hapus file
+            }
+        } catch (err) {
+            console.error('Error while deleting file:', err);
+            // Anda dapat memberikan pesan kesalahan yang sesuai kepada pengguna jika diperlukan
+        }
+
+        // Jika ada error dari validasi, render kembali form dengan pesan error
+        return res.render('pages/admin/daftar/tambah-data-alumni', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'tambah data alumni',
+            errors: errors.array(),
+            data: req.body,
+        });
+    } else {
+        const { nama_alumni, angkatan, pesan } = req.body;
+        const imgAlumni = req.file ? req.file.filename : null;
+
+        try {
+            // Simpan berita ke dalam MySQL menggunakan Sequelize
+            await Alumni.create({
+                nama_alumni,
+                angkatan,
+                imgAlumni,
+                pesan,
+            });
+            // tampilkan pesan berhasil
+            req.flash('msg', 'Data berhasil ditambah!');
+            res.redirect('/data-alumni'); // Setelah sukses, redirect ke halaman utama
+        } catch (err) {
+            console.error('Error saving berita:', err);
+            res.status(500).send('Terjadi kesalahan saat menyimpan berita');
+        }
+    }
+});
+
+
+
+
+
+
+router.get('/ubah-data-alumni/:id', async (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');
+    }
+
+    try {
+        const id = req.params.id;  // Mendapatkan ID dari parameter URL
+
+        // Mengambil data pendaftar berdasarkan ID dengan Sequelize
+        let data = await Alumni.findOne({ where: { id } });
+
+        // Jika data tidak ditemukan, arahkan ke halaman data pendaftar
+        if (!data) {
+            return res.redirect('/data-alumni');
+        }
+
+        // Mengakses data dengan dataValues (mengambil data sesungguhnya dari Sequelize)
+        let alumni = data.dataValues;
+
+        // Lakukan kapitalisasi untuk semua string kecuali beberapa field tertentu
+        for (let key in data) {
+            if (typeof alumni[key] === 'string') {
+                alumni[key] = capitalizeWords(alumni[key]);
+            }
+        }
+
+        // Ambil data user yang sedang login
+        const user = await User.findOne({ where: { id: req.session.loggedIn } });
+        const dataUsername = user.username;
+
+        // Render halaman ubah data pendaftar dengan data yang sudah diproses
+        res.render('pages/admin/daftar/ubah-data-alumni', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'Ubah Data Pendaftar',
+            data: alumni,
+            dataUsername
+        });
+    } catch (err) {
+        console.error(err);
+        // Jika ada error, arahkan kembali ke halaman data pendaftar
+        res.redirect('/data-pendaftar');
+    }
+});
+
 // data alumni detail
 router.get('/data-detail-alumni/:id', async (req, res) => {
     if (!req.session.loggedIn) {
@@ -786,53 +941,120 @@ router.get('/ubah-data-alumni/:id', async (req, res) => {
         // Ambil data user yang sedang login
         const user = await User.findOne({ where: { id: req.session.loggedIn } });
         const dataUsername = user.username;
-
         // Render halaman ubah data pendaftar dengan data yang sudah diproses
         res.render('pages/admin/daftar/ubah-data-alumni', {
             layout: 'layouts/main-ejs-layouts',
             title: 'Ubah Data Pendaftar',
             data: alumni,
-            dataUsername
+            dataUsername,
+            dataFile,
         });
     } catch (err) {
         console.error(err);
         // Jika ada error, arahkan kembali ke halaman data pendaftar
-        res.redirect('/data-pendaftar');
+        res.redirect('/data-alumni');
     }
 });
 
 // PUT ubah data pendaftar
-router.put('/ubah-data-alumni', [validatorUbahDataAlumni]
-    , async (req, res) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            // Jika ada error validasi, tampilkan kembali form dengan error
-            return res.render('pages/admin/daftar/ubah-data-alumni', {
-                layout: 'layouts/main-ejs-layouts',
-                title: 'Form Ubah Data Alumni',
-                errors: errors.array(),
-                data: req.body,
-                msg: req.flash('msg'),
-            });
+router.put('/ubah-data-alumni', [
+    (req, res, next) => {
+        // Jalankan upload middleware untuk menangani file
+        uploaderAlumni.upload(req, res, async function (error) {
+            let dataAlumni = await Alumni.findByPk(req.body._id);
+            // Tangani kesalahan jika ada
+            if (error) {
+                let errorMessage;
+                if (error.code === 'INVALID_FILE_TYPE') {
+                    errorMessage = 'File tidak sesuai dengan yang diharapkan (harus .jpg, .jpeg, atau .png)!';
+                } else if (error instanceof multer.MulterError) {
+                    // Tangani kesalahan dari multer (seperti ukuran file terlalu besar)
+                    if (error.code === 'LIMIT_FILE_SIZE') {
+                        errorMessage = 'Ukuran file terlalu besar! Maksimum 2MB.';
+                    } else {
+                        errorMessage = `Terjadi kesalahan upload file! ${error}`;
+                    }
+                } else {
+                    errorMessage = error.message || 'Terjadi kesalahan saat upload file!';
+                }
+
+                const user = await User.findOne({ _id: req.session.loggedIn });
+                const dataUsername = user.username;
+                // Render kembali form dengan pesan error dan data input
+                return res.render('pages/admin/daftar/ubah-data-alumni', {
+                    layout: 'layouts/main-ejs-layouts',
+                    title: 'Ubah Data Alumni',
+                    errors: [{ msg: errorMessage }],
+                    data: req.body,  // Menyimpan input sebelumnya
+                    dataUsername,
+                    dataFile: dataAlumni,
+                });
+            }
+
+            // Jika file upload berhasil, lanjutkan ke middleware validasi berikutnya
+            next();
+        });
+    },
+    async (req, res, next) => {
+        // Validasi tipe file di sini dengan checkFileType jika perlu
+        await FileValidator.checkFileType3(req, res, next, 'pages/admin/daftar/ubah-data-alumni');
+    },
+
+    validatorUbahDataAlumni
+], async (req, res) => {
+    let dataAlumni = await Alumni.findByPk(req.body._id);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        // Memeriksa dan menghapus file jika ada error
+        const uploadedFile = req.file; // Menggunakan req.file, bukan req.files
+
+        try {
+            if (uploadedFile) {
+                await fs.unlink(uploadedFile.path); // Hapus file yang baru diunggah
+            }
+        } catch (err) {
+            console.error('Error while deleting file:', err);
+            // Anda dapat memberikan pesan kesalahan yang sesuai kepada pengguna jika diperlukan
         }
 
-        // Jika tidak ada error, lanjutkan dengan update data
+        // Jika ada error dari validasi, render kembali form dengan pesan error
+        return res.render('pages/admin/daftar/ubah-data-alumni', {
+            layout: 'layouts/main-ejs-layouts',
+            title: 'Ubah Data Alumni',
+            errors: errors.array(),
+            data: req.body,
+            datFile: dataAlumni,
+        });
+    } else {
+        const { nama_alumni, angkatan, pesan, _id, oldImgAlumni } = req.body;
+
+        // Tentukan gambar alumni yang baru (jika ada) atau gunakan gambar lama
+        let imgAlumni = req.file ? req.file.filename : oldImgAlumni;
+
+        // Hapus gambar lama jika ada gambar baru yang diunggah
+        if (req.file && oldImgAlumni) {
+            const oldImgPath = path.join('public', 'imagesAlumni', oldImgAlumni);
+            if (fsSync.existsSync(oldImgPath)) {
+                fsSync.unlinkSync(oldImgPath); // Menghapus gambar lama
+            }
+        }
+
         try {
-            // Update data di database menggunakan Sequelize
+            // Update data alumni di database
             await Alumni.update(
                 {
-                    nama_alumni: req.body.nama_alumni,
-                    tanggal_lahir: req.body.tanggal_lahir,
-                    angkatan: req.body.angkatan,
-                    pesan: req.body.pesan,
+                    nama_alumni,
+                    angkatan,
+                    pesan,
+                    imgAlumni, // Menggunakan gambar baru atau gambar lama
                 },
-                { where: { id: req.body._id } }
+                { where: { id: _id } }
             );
 
-            req.flash('msg', 'Data berhasil diubah!');
-            res.redirect('/data-alumni'); // Redirect ke halaman data pendaftar
+            req.flash('msg', 'Data alumni berhasil diubah!');
+            res.redirect('/data-alumni'); // Redirect ke halaman data alumni setelah berhasil
         } catch (error) {
-            console.error(error);
+            console.error('Terjadi kesalahan:', error);
             let errorMessage = 'Terjadi kesalahan saat menyimpan data ke database!';
             if (error.name === 'SequelizeValidationError') {
                 errorMessage = error.errors.map(err => err.message).join(', ');
@@ -843,9 +1065,26 @@ router.put('/ubah-data-alumni', [validatorUbahDataAlumni]
                 errors: [{ msg: errorMessage }],
                 data: req.body,
                 msg: req.flash('msg'),
+                dataFile: dataAlumni,
             });
         }
-    });
+    }
+});
+
+
+// delete alumni
+router.delete('/data-alumni/:id', async (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login-admin');
+    }
+    const result = await deleteAlumniById(req.params.id);
+
+    // Menggunakan flash untuk mengirim pesan ke pengguna
+    req.flash('msg', result.message);
+
+    // Redirect ke halaman daftar berita
+    res.redirect('/data-alumni');
+});
 
 
 // daftar berita 
@@ -1580,6 +1819,15 @@ router.get('/faq', async (req, res) => {
     res.render('pages/user/faq', {
         layout: 'layouts/main-ejs-layouts',
         title: 'Halaman FAQ',
+        listNavbar,
+    });
+});
+
+// Route untuk FAQ
+router.get('/kemahadan', async (req, res) => {
+    res.render('pages/user/kemahadan', {
+        layout: 'layouts/main-ejs-layouts',
+        title: "Halaman Kema'hadan",
         listNavbar,
     });
 });

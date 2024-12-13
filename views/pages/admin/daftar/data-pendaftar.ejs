@@ -1,4 +1,9 @@
-<div class="container mx-auto px-6 py-8 mt-10"> <!-- Menambahkan mt-10 untuk margin atas -->
+<div class="container mx-auto px-6 py-8 mt-10"> 
+  <% if (msg && msg.length > 0) { %>
+    <div class="mb-4 p-4 bg-green-100 text-green-700 border border-green-300 rounded-lg">
+      <h2 class="text-lg font-semibold mb-2"><%= msg %></h2>
+    </div>
+  <% } %>
   <div class="mb-6">
     <h1 class="text-3xl font-semibold text-gray-800">Data Pendaftar</h1>
 

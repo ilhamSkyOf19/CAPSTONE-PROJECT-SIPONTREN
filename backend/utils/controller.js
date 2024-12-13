@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import Berita from '../models/skemaBerita.js';
 import Pendaftaran from "../models/pendaftaran.js";
+import Alumni from '../models/skemaAlumni.js';
 
 // capitalize teks
 export function capitalizeWords(str) {
@@ -35,7 +36,7 @@ export async function deleteBeritaById(id) {
         await berita.destroy(); // Menggunakan method destroy() dari Sequelize untuk menghapus data
 
         return { success: true, message: 'Data dan gambar berhasil dihapus!' };
-        
+
     } catch (error) {
         console.error('Error saat menghapus berita:', error);
         return { success: false, message: 'Gagal menghapus data!' };
@@ -82,5 +83,37 @@ export async function deletePendaftarById(id) {
     } catch (error) {
         console.error('Error saat menghapus data pendaftar:', error);
         return { success: false, message: 'Gagal menghapus data!' };
+    }
+}
+
+
+export async function deleteAlumniById(id) {
+    try {
+        // Query untuk mendapatkan data alumni berdasarkan ID
+        const alumni = await Alumni.findByPk(id); // Menggunakan Sequelize untuk mencari berdasarkan PK (id)
+
+        if (!alumni) {
+            return { success: false, message: 'Alumni tidak ditemukan!' };
+        }
+
+        // Path direktori image (tanggal hari ini dari alumni)
+        const imgAlumniPath = path.join(process.cwd(), 'public', 'imagesAlumni', alumni.imgAlumni); // Susun path gambar
+
+        // Cek apakah file gambar ada dan hapus
+        if (fs.existsSync(imgAlumniPath)) {
+            fs.unlinkSync(imgAlumniPath); // Hapus gambar
+            console.log('Gambar alumni berhasil dihapus:', imgAlumniPath);
+        } else {
+            console.log('File gambar alumni tidak ditemukan:', imgAlumniPath);
+        }
+
+        // Hapus data alumni dari MySQL menggunakan Sequelize
+        await alumni.destroy(); // Menggunakan method destroy() dari Sequelize untuk menghapus data
+
+        return { success: true, message: 'Data alumni dan gambar berhasil dihapus!' };
+
+    } catch (error) {
+        console.error('Error saat menghapus alumni:', error);
+        return { success: false, message: 'Gagal menghapus data alumni!' };
     }
 }

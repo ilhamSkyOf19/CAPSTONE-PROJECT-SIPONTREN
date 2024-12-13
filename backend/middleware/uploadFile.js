@@ -128,10 +128,11 @@ export const Upload2 = multer({
 
 
 export class FileSingleUploader {
-    constructor(dirName, maxSize, thumbnail) {
+    constructor(dirName, maxSize, thumbnail, useDateDir = true) {
         this.dirName = dirName;
         this.maxSize = maxSize;
         this.thumbnail = thumbnail;
+        this.useDateDir = useDateDir; // Opsi untuk menggunakan tanggal sebagai subfolder
 
         // Initialize multer
         this.upload = multer({
@@ -144,7 +145,12 @@ export class FileSingleUploader {
     storage() {
         return multer.diskStorage({
             destination: async (req, file, cb) => {
-                const dir = `${this.dirName}/${new Date().toISOString().split('T')[0]}`;
+                let dir;
+                if (this.useDateDir) {
+                    dir = `${this.dirName}/${new Date().toISOString().split('T')[0]}`;
+                } else {
+                    dir = this.dirName; // Gunakan direktori statis
+                }
 
                 // Check if the directory exists
                 if (!existsSync(dir)) {
@@ -165,4 +171,5 @@ export class FileSingleUploader {
         });
     }
 }
+
 

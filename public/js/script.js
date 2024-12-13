@@ -190,7 +190,7 @@ if (containerBerita) {
 }
 
 // tujuan higlight 
-const tujuan = ['tujuan-1.jpg', 'tujuan-2.jpg', 'tujuan-3.jpg', 'tujuan-4.jpg'];
+const tujuan = ['img-6.jpg', 'img-7.jpg', 'img_8.jpg', 'img_9.jpg'];
 
 // Ambil semua elemen grid
 const gridItems = [
@@ -279,7 +279,7 @@ const breadcrumbContainer = document.getElementById('breadcrumb');
 if (breadcrumbContainer) {
   // Mapping nama segmen untuk menampilkan nama yang lebih ramah pengguna
   const segmentDisplayNames = {
-    'detail-berita': 'Detail Berita',
+    'detail-berita': 'Berita',
     'profile': 'Profile',
     'sejarah': 'Sejarah',
     'visi-misi': 'Visi & Misi',
@@ -310,8 +310,8 @@ if (breadcrumbContainer) {
     const link = document.createElement('a');
 
     // Kondisi khusus: Jika segmen adalah 'profile', maka router-nya harus mengarah ke '/'
-    if (segment === 'profile') {
-      link.href = '/';
+    if (segment === 'detail-berita') {
+      link.href = '/#berita';
     } else {
       link.href = basePath;
     }
@@ -355,5 +355,6 @@ if (psb) {
   updateFileName('fcKtp', 'fcKtp-name');
   updateFileName('kipKis', 'kipKis-name');
 }
+
 
 

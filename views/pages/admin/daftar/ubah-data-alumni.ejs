@@ -38,52 +38,84 @@
       <% } %>
   
       <!-- Form -->
-      <form action="/ubah-data-alumni?_method=PUT" method="POST" class="mt-8 space-y-6">
-        <!-- Nama -->
+      <form action="/ubah-data-alumni?_method=PUT" method="POST" enctype="multipart/form-data" class="space-y-6 mt-6">
+        <!-- Hidden Field for ID (only on update) -->
         <div>
-            <input type="hidden" value="<%= data.id %>" name="_id">
-          <label for="nama" class="block text-sm font-medium text-gray-600">Nama</label>
-          <input type="text" id="nama" name="nama_alumni" value="<%= data.nama_alumni%>" 
-            class="w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            required>
+            <% if (data) { %>
+                <input type="hidden" value="<%= data.id ? data.id : dataFile.id %>" name="_id">
+            <% } %>
         </div>
-  
-        <!-- Tanggal Lahir -->
+      
+        <!-- Nama Alumni -->
         <div>
-          <label for="tanggal_lahir" class="block text-sm font-medium text-gray-600">Tanggal Lahir</label>
-          <input type="date" id="tanggal_lahir" name="tanggal_lahir" value="<%= data.tanggal_lahir %>" 
-            class="w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            required>
+            <label for="nama_alumni" class="block text-gray-700 font-semibold mb-2">Nama Alumni</label>
+            <input 
+                type="text" 
+                id="nama_alumni" 
+                name="nama_alumni" 
+                placeholder="Masukkan nama alumni" 
+                value="<%= data ? data.nama_alumni : '' %>" 
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
+            />
         </div>
-  
+      
         <!-- Angkatan -->
         <div>
-          <label for="angkatan" class="block text-sm font-medium text-gray-600">Angkatan</label>
-          <input type="number" id="angkatan" name="angkatan" value="<%= data.angkatan %>" 
-            class="w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            required>
+            <label for="angkatan" class="block text-gray-700 font-semibold mb-2">Angkatan</label>
+            <input 
+                type="number" 
+                id="angkatan" 
+                name="angkatan"  
+                value="<%= data ? data.angkatan : '' %>" 
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
+            />
         </div>
-  
-        <!-- Pesan -->
+    
+        <!-- Konten Pesan -->
         <div>
-          <label for="pesan" class="block text-sm font-medium text-gray-600">Pesan</label>
-          <textarea id="pesan" name="pesan" rows="4" 
-            class="w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            required><%= data.pesan %></textarea>
+            <label for="pesan" class="block text-gray-700 font-semibold mb-2">Pesan</label>
+            <textarea 
+                id="pesan" 
+                name="pesan" 
+                rows="10" 
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none whitespace-pre-wrap"
+                placeholder="Tulis pesan..."><%= data ? data.pesan : '' %></textarea>
         </div>
-  
-        <!-- Tombol -->
+    
+        <!-- Gambar Alumni -->
+        <div>
+            <label for="imgAlumni" class="block text-gray-700 font-semibold mb-2">Gambar Alumni</label>
+                <div class="mb-2">
+                    <img src="/public/imagesAlumni/<%= data.imgAlumni ? data.imgAlumni : dataFile.imgAlumni %>" alt="Gambar Alumni" class="w-32 h-32 object-cover mb-2">
+                    <p class="text-sm text-gray-500">Gambar yang saat ini terpasang</p>
+                </div>
+        
+            <input 
+                type="file" 
+                id="imgAlumni" 
+                name="imgAlumni" 
+                accept="image/*" 
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
+            />
+            <input type="text" name="oldImgAlumni" value="<%=  data.imgAlumni ? data.imgAlumni : dataFile.imgAlumni %>">
+         
+            <p class="text-sm text-gray-500 mt-2">Format yang diizinkan: JPG, PNG (maksimal 1MB).</p>
+        </div>
+      
+        <!-- Tombol Aksi -->
         <div class="flex justify-between items-center">
-          <a href="/data-alumni" 
-            class="text-gray-600 hover:text-white bg-gray-200 hover:bg-gray-700 px-6 py-2 rounded-lg shadow transition duration-200">
-            Kembali
-          </a>
-          <button type="submit" 
-            class="bg-indigo-600 text-white px-6 py-2 rounded-lg shadow hover:bg-indigo-700 transition duration-200">
-            Simpan Perubahan
-          </button>
+            <a href="/data-alumni" 
+                class="text-gray-600 hover:text-white bg-gray-200 hover:bg-gray-700 px-6 py-2 rounded-lg shadow transition duration-200">
+                Kembali
+            </a>
+            <button type="submit" 
+                class="bg-indigo-600 text-white px-6 py-2 rounded-lg shadow hover:bg-indigo-700 transition duration-200">
+                <%= data ? 'Simpan Perubahan' : 'Tambah Alumni' %>
+            </button>
         </div>
-      </form>
+    </form>    
     </div>
   </div>
   

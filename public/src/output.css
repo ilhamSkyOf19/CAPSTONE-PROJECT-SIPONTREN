@@ -691,6 +691,10 @@ video {
   grid-row: span 1 / span 1;
 }
 
+.row-span-5 {
+  grid-row: span 5 / span 5;
+}
+
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -812,10 +816,6 @@ video {
   display: grid;
 }
 
-.list-item {
-  display: list-item;
-}
-
 .hidden {
   display: none;
 }
@@ -920,6 +920,10 @@ video {
   height: 2px;
 }
 
+.h-\[3px\] {
+  height: 3px;
+}
+
 .h-\[40vh\] {
   height: 40vh;
 }
@@ -934,10 +938,6 @@ video {
 
 .h-\[70vh\] {
   height: 70vh;
-}
-
-.h-\[75vh\] {
-  height: 75vh;
 }
 
 .h-\[80vh\] {
@@ -1104,10 +1104,6 @@ video {
   width: 80%;
 }
 
-.w-\[85\%\] {
-  width: 85%;
-}
-
 .w-\[90\%\] {
   width: 90%;
 }
@@ -1178,6 +1174,11 @@ video {
 
 .-rotate-90 {
   --tw-rotate: -90deg;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.scale-x-\[-1\] {
+  --tw-scale-x: -1;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
@@ -1637,8 +1638,12 @@ video {
   background-image: url('/public/asset/image4.png');
 }
 
-.bg-\[url\(\'\/public\/asset\/kapas\.png\'\)\] {
-  background-image: url('/public/asset/kapas.png');
+.bg-\[url\(\'\/public\/asset\/logo\/kapas\.png\'\)\] {
+  background-image: url('/public/asset/logo/kapas.png');
+}
+
+.bg-custom-kemahadan {
+  background-image: url('/public/asset/bangunan/bangunan_1.png');
 }
 
 .bg-gradient-to-b {
@@ -1665,6 +1670,10 @@ video {
 
 .bg-cover {
   background-size: cover;
+}
+
+.bg-fixed {
+  background-attachment: fixed;
 }
 
 .bg-center {
@@ -2231,6 +2240,18 @@ video {
   background-size: 65%;
 }
 
+.bg-custom-kemahadan {
+  background-position-x: 30rem;
+  background-position-y: 25rem;
+  background-size: 80%;
+}
+
+.bg-custom-kemahadan-pages-3 {
+  background-position-x: 30rem;
+  background-position-y: 10rem;
+  background-size: 80%;
+}
+
 .file\:cursor-pointer::file-selector-button {
   cursor: pointer;
 }
@@ -2287,6 +2308,11 @@ video {
 .hover\:border-gray-400:hover {
   --tw-border-opacity: 1;
   border-color: rgb(156 163 175 / var(--tw-border-opacity, 1));
+}
+
+.hover\:bg-\[\#0747A6\]:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(7 71 166 / var(--tw-bg-opacity, 1));
 }
 
 .hover\:bg-\[\#73b0ff\]:hover {
@@ -2576,6 +2602,10 @@ video {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .md\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .md\:flex-row {
     flex-direction: row;
   }
@@ -2803,12 +2833,12 @@ video {
     height: 16rem;
   }
 
-  .lg\:h-\[18rem\] {
-    height: 18rem;
-  }
-
   .lg\:h-\[20rem\] {
     height: 20rem;
+  }
+
+  .lg\:h-\[22rem\] {
+    height: 22rem;
   }
 
   .lg\:h-\[28rem\] {
@@ -2823,16 +2853,16 @@ video {
     height: 30vh;
   }
 
+  .lg\:h-\[4rem\] {
+    height: 4rem;
+  }
+
   .lg\:h-\[55vh\] {
     height: 55vh;
   }
 
   .lg\:h-\[58vh\] {
     height: 58vh;
-  }
-
-  .lg\:h-\[6rem\] {
-    height: 6rem;
   }
 
   .lg\:h-\[70vh\] {
@@ -2877,10 +2907,6 @@ video {
 
   .lg\:min-h-\[9rem\] {
     min-height: 9rem;
-  }
-
-  .lg\:w-2\/3 {
-    width: 66.666667%;
   }
 
   .lg\:w-32 {

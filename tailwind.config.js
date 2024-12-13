@@ -11,7 +11,10 @@ export default {
       },
       boxShadow: {
         'custom': '0 5px 20px rgba(0, 0, 0, 0.1), 0 10px 6px rgba(0, 0, 0, 0.05)', // Custom shadow
-      }
+      },
+      backgroundImage: {
+        'custom-kemahadan': "url('/public/asset/bangunan/bangunan_1.png')", // Ganti path dengan URL gambar
+      },
     },
   },
   plugins: [
@@ -47,6 +50,16 @@ export default {
           'background-position-x': '40rem',
           'background-position-y': '-5rem',
           'background-size': '65%',
+        },
+        '.bg-custom-kemahadan': {
+          'background-position-x': '30rem',
+          'background-position-y': '25rem',
+          'background-size': '80%',
+        },
+        '.bg-custom-kemahadan-pages-3': {
+          'background-position-x': '30rem',
+          'background-position-y': '10rem',
+          'background-size': '80%',
         },
 
       });

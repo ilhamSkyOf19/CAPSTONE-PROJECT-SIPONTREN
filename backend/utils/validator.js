@@ -19,31 +19,31 @@ export const validatorResultPendaftar = [
     check('tempat_lahir', 'tempat harus berisi huruf!').isAlpha('en-US', { ignore: ' ' }), // cek tempat lahir
     check('tanggal_lahir', 'tanggal lahir tidak valid').isDate(),  // cek tanggal lahir
     check('anak_ke')    // cek berat badan
-    .notEmpty().withMessage('anak ke harus diisi!')
-    .bail()
-    .isInt().withMessage('anak ke tidak valid!')
-    .bail()
-    .isLength({max : 2}).withMessage('anak ke tidak valid!')
-    .bail()
-    .custom(value => {
-        if (value < 1) {
-            throw new Error('anak ke tidak valid');
-        }
-        return true; // Validasi berhasil
-    }),
+        .notEmpty().withMessage('anak ke harus diisi!')
+        .bail()
+        .isInt().withMessage('anak ke tidak valid!')
+        .bail()
+        .isLength({ max: 2 }).withMessage('anak ke tidak valid!')
+        .bail()
+        .custom(value => {
+            if (value < 1) {
+                throw new Error('anak ke tidak valid');
+            }
+            return true; // Validasi berhasil
+        }),
     check('jumlah_saudara')       // cek tinggi badan
-    .notEmpty().withMessage('jumlah saudara tidak valid!')
-    .bail()
-    .isInt().withMessage('jumlah saudara tidak valid!')
-    .bail()
-    .isLength({max : 2}).withMessage('jumlah saudara tidak valid!')
-    .bail()
-    .custom(value => {
-        if (value < 1) {
-            throw new Error('jumlah sudara tidak valid');
-        }
-        return true; // Validasi berhasil
-    }),
+        .notEmpty().withMessage('jumlah saudara tidak valid!')
+        .bail()
+        .isInt().withMessage('jumlah saudara tidak valid!')
+        .bail()
+        .isLength({ max: 2 }).withMessage('jumlah saudara tidak valid!')
+        .bail()
+        .custom(value => {
+            if (value < 1) {
+                throw new Error('jumlah sudara tidak valid');
+            }
+            return true; // Validasi berhasil
+        }),
     check('nomor_telephone')    // cek nomor telephone
         .isMobilePhone('id-ID').withMessage('yang ada masukan bukan nomor telephone indonesia')
         .bail()
@@ -51,17 +51,17 @@ export const validatorResultPendaftar = [
         .bail()
         .isInt().withMessage('nomor telephone harus berupa angka')
         .bail()
-        .isLength({max: 13}).withMessage('nomor telephone tidak boleh lebih dari 13 digit!')
+        .isLength({ max: 13 }).withMessage('nomor telephone tidak boleh lebih dari 13 digit!')
         .bail()
         .custom(value => {
-        if (value < 1) {
-            throw new Error('nomor telephone harus lebih dari 0!');
-        }
-        return true; // Validasi berhasil
+            if (value < 1) {
+                throw new Error('nomor telephone harus lebih dari 0!');
+            }
+            return true; // Validasi berhasil
         }),
     check('alumni_sd', 'alumni sd tidak valid!').matches(/^[a-zA-Z0-9 ]+$/), // cek alumni sd
     check('alamat_sekolah_asal', 'Alamat sekolah asal tidak valid!')
-    .matches(/^[a-zA-Z, ]*$/), // Hanya huruf, spasi, dan simbol ','
+        .matches(/^[a-zA-Z, ]*$/), // Hanya huruf, spasi, dan simbol ','
     check('nama_lengkap_ayah', 'nama lengkap ayah tidak valid!').isAlpha('en-US', { ignore: ' ' }),    // cek nama_lengkap
     check('nama_lengkap_ibu', 'nama lengkap ibu tidak valid!').isAlpha('en-US', { ignore: ' ' }),    // cek nama_lengkap
     check('nama_lengkap_wali', 'nama lengkap wali tidak valid!').isAlpha('en-US', { ignore: ' ' }),    // cek nama_lengkap
@@ -70,7 +70,7 @@ export const validatorResultPendaftar = [
         .bail()
         .isNumeric({ no_symbols: true }).withMessage('kode pos harus berupa angka')
         .bail()
-        .isLength({max : 5}).withMessage('kode pos tidak boleh lebih dari 5 digit!')
+        .isLength({ max: 5 }).withMessage('kode pos tidak boleh lebih dari 5 digit!')
         .bail()
         .custom(value => {
             if (value < 1) {
@@ -78,7 +78,7 @@ export const validatorResultPendaftar = [
             }
             return true; // Validasi berhasil
         }),
-    
+
 ];
 
 
@@ -110,8 +110,12 @@ export const validatorUbahPassword = [
 
 export const validatorUbahDataAlumni = [
     check('nama_alumni', 'Nama alumni hanya boleh berisi huruf dan spasi').matches(/^[a-zA-Z\s]+$/).withMessage('Nama alumni tidak valid'),
-    check('tanggal_lahir', 'Tanggal lahir tidak valid').isISO8601().withMessage('Gunakan format tanggal yang valid (YYYY-MM-DD)'),
     check('angkatan', 'Angkatan hanya boleh berisi angka').isNumeric().withMessage('Angkatan harus berupa angka'),
     check('pesan', 'Pesan mengandung karakter yang tidak valid').isString().withMessage('Pesan harus berupa string')
 ]
 
+export const validatorTambahAlumni = [
+    check('nama_alumni', 'Nama alumni hanya boleh berisi huruf dan spasi').matches(/^[a-zA-Z\s]+$/).withMessage('Nama alumni tidak valid'),
+    check('angkatan', 'Angkatan hanya boleh berisi angka').isNumeric().withMessage('Angkatan harus berupa angka'),
+    check('pesan', 'Pesan mengandung karakter yang tidak valid').isString().withMessage('Pesan harus berupa string')
+]
