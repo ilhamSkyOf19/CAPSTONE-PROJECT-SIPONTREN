@@ -4,13 +4,12 @@
         <!-- Judul Halaman -->
         <div class="text-center">
           <h1 class="text-3xl font-bold text-gray-800 mb-2">Tambah Alumni</h1>
-          <p class="text-gray-600">Isi data berikut untuk menambahkan Alumni.</p>
+          <p class="text-gray-600 text-sm ">Isi data berikut untuk menambahkan Alumni.</p>
         </div>
   
         <!-- Pesan Error -->
         <% if (typeof errors != 'undefined') { %>
           <div class="mb-4 p-4 bg-red-100 text-red-700 border border-red-300 rounded-lg">
-            <h2 class="text-lg font-semibold mb-2">Kesalahan Input:</h2>
             <ul class="list-disc pl-5">
               <% errors.forEach(error => { %>
                 <li><%= error.msg %></li>
@@ -20,7 +19,6 @@
         <% } %>
         <% if (typeof errorsMongoose != 'undefined') { %>
           <div class="mb-4 p-4 bg-red-100 text-red-700 border border-red-300 rounded-lg">
-            <h2 class="text-lg font-semibold mb-2">Kesalahan Sistem:</h2>
             <ul class="list-disc pl-5">
               <% errorsMongoose.forEach(error => { %>
                 <li><%= error.message %></li>
@@ -29,9 +27,9 @@
           </div>
         <% } %>
   
-        <!-- Form Tambah Berita -->
-        <form action="/form-alumni" method="POST" enctype="multipart/form-data" class="space-y-6 mt-6">
-          <!-- Judul Berita -->
+        <!-- Form Tambah Alumni -->
+        <form action="/form-alumni" method="POST" enctype="multipart/form-data" class="space-y-6 mt-6 text-sm md:text-base">
+          <!-- Nama Alumni -->
           <div>
             <label for="nama_alumni" class="block text-gray-700 font-semibold mb-2">Nama ALumni</label>
             <input 
@@ -41,10 +39,10 @@
               placeholder="Masukkan nama alumni" 
               value="<%= data ? data.nama_alumni : '' %>" 
               required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none text-sm"
             />
           </div>
-          <!-- tanggal berita -->
+          <!-- Angkatan -->
           <div>
             <label for="angkatan" class="block text-gray-700 font-semibold mb-2">Angkatan</label>
             <input 
@@ -57,18 +55,18 @@
             />
           </div>
   
-          <!-- Konten Berita -->
+          <!-- Pesan -->
           <div>
             <label for="pesan" class="block text-gray-700 font-semibold mb-2">Konten</label>
             <textarea 
               id="pesan" 
               name="pesan" 
               rows="10" 
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none  whitespace-pre-wrap"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none  whitespace-pre-wrap text-sm"
               placeholder="Tulis pesan..."><%= data ? data.pesan : '' %></textarea>
           </div>
-          <!-- Thumbnail -->
-          <div>
+          <!-- Gambar Alumni -->
+          <div class="text-sm">
             <label for="imgAlumni" class="block text-gray-700 font-semibold mb-2">Gambar Alumni</label>
             <input 
               type="file" 
@@ -78,16 +76,23 @@
               required 
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
             />
-            <p class="text-sm text-gray-500 mt-2">Format yang diizinkan: JPG, PNG (maksimal 1MB).</p>
+            <p class="text-xs md:text-sm text-gray-500 mt-2">Format yang diizinkan: JPG, JPEG, PNG (maksimal 1MB).</p>
           </div>
           <!-- Tombol Aksi -->
           <div class="flex justify-between items-center">
+            <a 
+              href="/data-alumni" 
+              class="px-6 py-2 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-900 focus:ring focus:ring-blue-300"
+            >
+              Kembali
+            </a>
             <button 
               type="submit" 
               class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring focus:ring-blue-300"
             >
-              Tambah Alumni
+              Tambah
             </button>
+            
           </div>
         </form>
       </div>

@@ -1,4 +1,4 @@
-<div class="container mt-3">
+<div class="container mx-auto px-4 mt-3">
   <div class="row">
     <div class="col-md-8">
       <% if (!pendaftar) { %>
@@ -7,13 +7,13 @@
           <a href="/data-pendaftar" class="alert-link fw-normal">Kembali</a>.
         </div>
       <% } else { %>
-        <div class="max-w-4xl mx-auto mt-8 p-6 bg-white border border-gray-300 rounded-lg shadow-md">
-          <h2 class="text-2xl font-bold mb-6 text-center">Detail Data Pendaftar</h2>
+        <div class="max-w-4xl mx-auto mt-16 mb-6 lg:mt-8 p-6 bg-white border border-gray-300 rounded-lg shadow-md">
+          <h2 class="text-xl sm:text-2xl font-bold mb-6 text-center">Detail Data Pendaftar</h2>
 
           <!-- Informasi Dasar -->
           <div class="mb-6 border border-gray-200 rounded-lg p-4">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Informasi Dasar</h3>
-            <div class="grid grid-cols-2 gap-4 text-gray-700">
+            <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">Informasi Dasar</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
               <p><span class="font-semibold">NISN:</span> <%= pendaftar.nisn %></p>
               <p><span class="font-semibold">NIK:</span> <%= pendaftar.nik %></p>
               <p><span class="font-semibold">Nama Lengkap:</span> <%= pendaftar.nama_lengkap %></p>
@@ -25,14 +25,14 @@
 
           <!-- Alamat -->
           <div class="mb-6 border border-gray-200 rounded-lg p-4">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Alamat</h3>
+            <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">Alamat</h3>
             <p class="text-gray-700"><%= pendaftar.alamat %></p>
           </div>
 
           <!-- Data Keluarga -->
           <div class="mb-6 border border-gray-200 rounded-lg p-4">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Data Keluarga</h3>
-            <div class="grid grid-cols-2 gap-4 text-gray-700">
+            <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">Data Keluarga</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
               <p><span class="font-semibold">Anak Ke:</span> <%= pendaftar.anak_ke %></p>
               <p><span class="font-semibold">Jumlah Saudara:</span> <%= pendaftar.jumlah_saudara %></p>
               <p><span class="font-semibold">Ayah:</span> <%= pendaftar.nama_lengkap_ayah %></p>
@@ -43,18 +43,18 @@
 
           <!-- Sekolah Asal -->
           <div class="mb-6 border border-gray-200 rounded-lg p-4">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Sekolah Asal</h3>
+            <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">Sekolah Asal</h3>
             <p class="text-gray-700"><span class="font-semibold">SD:</span> <%= pendaftar.alumni_sd %></p>
             <p class="text-gray-700"><span class="font-semibold">Alamat:</span> <%= pendaftar.alamat_sekolah_asal %></p>
           </div>
 
           <!-- Dokumen -->
           <div class="mb-6 border border-gray-200 rounded-lg p-4">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Dokumen</h3>
+            <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">Dokumen</h3>
             <a 
               href="/download-zip/<%= pendaftar.nik %>" 
               download
-              class="w-[25%] bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center space-x-2 mb-4"
+              class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center space-x-2 mb-4"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-3-4l-4 4m0 0l-4-4m4 4V4" />
@@ -71,11 +71,11 @@
           </div>
 
           <!-- Action Buttons -->
-          <div class="mt-6 flex justify-between">
+          <div class="mt-6 flex flex-col sm:flex-row sm:justify-between gap-4">
             <form method="POST" action="/data/<%= pendaftar.id %>?_method=DELETE">
               <button
                 type="submit"
-                class="px-4 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600"
+                class="w-full sm:w-auto px-4 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600"
                 onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')"
               >
                 Hapus
@@ -83,14 +83,11 @@
             </form>
             <a
               href="/ubah-data-pendaftar/<%= pendaftar.id %>"
-              class="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+              class="w-full sm:w-auto px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 text-center"
             >
               Ubah
             </a>
-            <a
-              href="/data-pendaftar"
-              class="px-4 py-2 text-white bg-gray-500 rounded-lg hover:bg-gray-600"
-            >
+            <a href="/data-pendaftar" class="text-center px-4 py-2 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600">
               Kembali
             </a>
           </div>

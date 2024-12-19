@@ -1,0 +1,33 @@
+<% if (!dataUstadUstadzah) { %>
+    <div class="alert alert-danger fw-bold" role="alert">
+        Data Tidak Ada! <br>
+        <a href="/data-ustad-ustadzah" class="alert-link fw-normal">Kembali</a>.
+    </div>
+<% } else { %>
+    <div class="flex items-center justify-center min-h-screen bg-gray-100 px-2">
+        <!-- Card -->
+        <div class="w-full max-w-lg bg-white shadow-md rounded-lg overflow-hidden">
+            <!-- Gambar Bulat -->
+            <div class="flex justify-center mt-6">
+                <div class="w-52 h-52 rounded-full overflow-hidden border-4 border-gray-300 shadow-md">
+                    <img class="w-full h-full object-cover" 
+                         src="/public/imagesUstadUstadzah/<%= dataUstadUstadzah.img_ustad_ustadzah %>" 
+                         alt="Foto Ustad/Ustadzah">
+                </div>
+            </div>
+            <!-- Detail Profil -->
+            <div class="p-6">
+                <div class="text-center">
+                    <h2 class="text-2xl font-bold text-gray-800"><%= dataUstadUstadzah.nama_ustad_ustadzah %></h2>
+                    <p class="text-base text-gray-600 mt-2"><%= dataUstadUstadzah.posisi %></p>
+                </div>
+                <!-- Tombol -->
+                <div class="flex justify-center mt-6">
+                    <a href="/data-ustad-ustadzah" class="px-4 py-2 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600">
+                        Kembali
+                      </a>
+                </div>
+            </div>
+        </div>
+    </div>
+<% } %>

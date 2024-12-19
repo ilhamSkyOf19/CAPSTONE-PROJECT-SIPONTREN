@@ -1,6 +1,6 @@
 <section class="w-full h-auto overflow-hidden" id="psb">
   <section class="w-full h-auto overflow-hidden">
-    <section class="h-[80vh] w-100% lg:max-w-100% flex items-center justify-center bg-contain bg-right bg-no-repeat bg-[#0747A6] bg-opacity-90 bg-custom-sejarah overflow-hidden" style="background-image: url('/public/asset/bangunan (1).png');">
+    <section class="h-[80vh] w-100% lg:max-w-100% flex items-center justify-center bg-contain bg-right bg-no-repeat bg-[#0747A6] bg-opacity-90 bg-custom-sejarah overflow-hidden" style="background-image: url('/public/asset/bangunan/bangunan_1.png');">
         <div class="w-full h-full max-w-full flex flex-row items-center justify-between gap-4 text-white pr-6 pl-20 bg-[#0747A6] bg-opacity-60 lg:pb-16 lg:pt-40">
           <div class="flex flex-col items-start justify-start">
             <h2 class="font-semibold text-3xl">Penerimaan Santri Baru</h2>
@@ -8,7 +8,7 @@
             <p class="text-sm lg:w-[80%] text-left leading-relaxed">Kunjungi website PSB Pondok Pesantren Muhammadiyah Al-Amin Seputih Banyak, lengkapi setiap persyaratan, ikuti semua alur pendaftaran dan jadilah bagian dari Pondok Pesantren Muhammadiyah Al-Amin Septuih Banyak</p>
           </div>
           <div class="lg:pr-32">
-            <img src="/public/asset/file_thumb.png" alt="" class="w-96">
+            <img src="/public/asset/logo/file_thumb.png" alt="" class="w-96">
           </div>
         </div>
     </section>
@@ -44,11 +44,11 @@
         </div>
       <% } %>
       
-      <form id="MyForm" method="post" action="/form-pendaftaran" enctype="multipart/form-data" class="grid grid-cols-2 gap-5">
+      <form id="MyForm" method="post" action="/form-pendaftaran" enctype="multipart/form-data" class="grid grid-cols-2 gap-5 text-xs md:text-base">
         <div class="col-span-1">
           <!-- NISN -->
         <div class="mb-4">
-          <label for="nisn" class="block text-sm font-semibold text-gray-700">NISN</label>
+          <label for="nisn" class="block  font-semibold text-gray-700">NISN</label>
           <input 
             type="text" 
             id="nisn" 
@@ -61,7 +61,7 @@
       
         <!-- NIK -->
         <div class="mb-4">
-          <label for="nik" class="block text-sm font-semibold text-gray-700">NIK</label>
+          <label for="nik" class="block  font-semibold text-gray-700">NIK</label>
           <input 
             type="text" 
             id="nik" 
@@ -74,7 +74,7 @@
       
         <!-- Nama Lengkap -->
         <div class="mb-4">
-          <label for="namaLengkap" class="block text-sm font-semibold text-gray-700">Nama Lengkap</label>
+          <label for="namaLengkap" class="block  font-semibold text-gray-700">Nama Lengkap</label>
           <input 
             type="text" 
             id="namaLengkap" 
@@ -87,7 +87,7 @@
       
         <!-- Jenis Kelamin -->
         <div class="mb-4">
-          <label for="jenisKelamin" class="block text-sm font-semibold text-gray-700">Jenis Kelamin</label>
+          <label for="jenisKelamin" class="block  font-semibold text-gray-700">Jenis Kelamin</label>
           <select 
             id="jenisKelamin" 
             name="jenis_kelamin"
@@ -101,7 +101,7 @@
   
         <!-- Usia -->
           <div class="mb-4">
-            <label for="usia" class="block text-sm font-semibold text-gray-700">Usia (Tahun)</label>
+            <label for="usia" class="block  font-semibold text-gray-700">Usia (Tahun)</label>
             <input 
               type="number" 
               id="usia" 
@@ -113,7 +113,7 @@
           </div>
           <!-- Tempat dan Tanggal Lahir -->
           <div class="mb-4">
-            <label for="tempatTanggalLahir" class="block text-sm font-semibold text-gray-700">Tempat / Tanggal Lahir</label>
+            <label for="tempatTanggalLahir" class="block  font-semibold text-gray-700">Tempat / Tanggal Lahir</label>
             <!-- Tempat Lahir -->
             <input 
               type="text" 
@@ -135,7 +135,7 @@
   
           <!-- Alamat -->
           <div class="mb-4">
-            <label for="alamat" class="block text-sm font-semibold text-gray-700">Alamat</label>
+            <label for="alamat" class="block  font-semibold text-gray-700">Alamat</label>
             <textarea 
               id="alamat" 
               name="alamat" 
@@ -146,7 +146,7 @@
           </div>
           <!-- Anak ke -->
           <div class="mb-4">
-            <label for="anakKe" class="block text-sm font-semibold text-gray-700">Anak ke</label>
+            <label for="anakKe" class="block  font-semibold text-gray-700">Anak ke</label>
             <input 
               type="number" 
               id="anakKe" 
@@ -158,7 +158,7 @@
           </div>
           <!-- Jumlah Saudara -->
           <div class="mb-4">
-            <label for="jumlahSaudara" class="block text-sm font-semibold text-gray-700">Jumlah Saudara</label>
+            <label for="jumlahSaudara" class="block  font-semibold text-gray-700">Jumlah Saudara</label>
             <input 
               type="number" 
               id="jumlahSaudara" 
@@ -169,7 +169,7 @@
               required>
           </div>
           <div class="mb-4">
-            <label for="nomorTelphone" class="block text-sm font-semibold text-gray-700">Nomor Telphone / Nomor WA</label>
+            <label for="nomorTelphone" class="block  font-semibold text-gray-700">Nomor Telphone / Nomor WA</label>
             <input 
               type="text" 
               id="nomorTelphone" 
@@ -187,7 +187,7 @@
           
           <!-- Alumni SD -->
           <div class="mb-4">
-            <label for="alumniSd" class="block text-sm font-semibold text-gray-700">Alumni SD</label>
+            <label for="alumniSd" class="block  font-semibold text-gray-700">Alumni SD</label>
             <input 
               type="text" 
               id="alumniSd" 
@@ -200,7 +200,7 @@
   
           <!-- Alamat Sekolah Asal -->
           <div class="mb-4">
-            <label for="alamatSekolahAsal" class="block text-sm font-semibold text-gray-700">Alamat Sekolah Asal</label>
+            <label for="alamatSekolahAsal" class="block  font-semibold text-gray-700">Alamat Sekolah Asal</label>
             <input 
               type="text" 
               id="alamatSekolahAsal" 
@@ -212,7 +212,7 @@
           </div>
           <!-- Nama Lengkap Ayah -->
           <div class="mb-4">
-            <label for="namaLengkapAyah" class="block text-sm font-semibold text-gray-700">Nama Lengkap Ayah</label>
+            <label for="namaLengkapAyah" class="block  font-semibold text-gray-700">Nama Lengkap Ayah</label>
             <input 
               type="text" 
               id="namaLengkapAyah" 
@@ -221,12 +221,12 @@
               placeholder="Masukkan Nama Lengkap Ayah" 
               class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
               required>
-            <div id="namaLengkapAyah" class="text-sm text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
+            <div id="namaLengkapAyah" class=" text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
           </div>
   
           <!-- Nama Lengkap Ibu -->
           <div class="mb-4">
-            <label for="namaLengkapIbu" class="block text-sm font-semibold text-gray-700">Nama Lengkap Ibu</label>
+            <label for="namaLengkapIbu" class="block  font-semibold text-gray-700">Nama Lengkap Ibu</label>
             <input 
               type="text" 
               id="namaLengkapIbu" 
@@ -235,12 +235,12 @@
               placeholder="Masukkan Nama Lengkap Ibu" 
               class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
               required>
-            <div id="namaLengkapIbu" class="text-sm text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
+            <div id="namaLengkapIbu" class=" text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
           </div>
   
           <!-- Nama Lengkap Wali -->
           <div class="mb-4">
-            <label for="namaLengkapWali" class="block text-sm font-semibold text-gray-700">Nama Lengkap Wali</label>
+            <label for="namaLengkapWali" class="block  font-semibold text-gray-700">Nama Lengkap Wali</label>
             <input 
               type="text" 
               id="namaLengkapWali" 
@@ -249,12 +249,12 @@
               placeholder="Masukkan Nama Lengkap Wali" 
               class="mt-2 w-full px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 text-gray-700" 
               required>
-            <div id="namaLengkapWali" class="text-sm text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
+            <div id="namaLengkapWali" class=" text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
           </div>
   
           <!-- Kode Pos -->
           <div class="mb-4">
-            <label for="kodePos" class="block text-sm font-semibold text-gray-700">Kode Pos</label>
+            <label for="kodePos" class="block  font-semibold text-gray-700">Kode Pos</label>
             <input 
               type="number" 
               id="kodePos" 
@@ -267,7 +267,7 @@
 
             <!-- Foto Formal -->
           <div class="mb-4">
-            <label for="fotoFormal" class="block text-sm font-semibold text-gray-700">Foto Formal</label>
+            <label for="fotoFormal" class="block  font-semibold text-gray-700">Foto Formal</label>
             <div class="flex items-center mt-2">
               <input 
                 type="file" 
@@ -287,7 +287,7 @@
 
           <!-- Foto Akta Kelahiran -->
           <div class="mb-4">
-            <label for="aktaKelahiran" class="block text-sm font-semibold text-gray-700">Foto Akta Kelahiran</label>
+            <label for="aktaKelahiran" class="block  font-semibold text-gray-700">Foto Akta Kelahiran</label>
             <div class="flex items-center mt-2">
               <input 
                 type="file" 
@@ -307,7 +307,7 @@
 
           <!-- Foto Kartu Keluarga -->
           <div class="mb-4">
-            <label for="kartuKeluarga" class="block text-sm font-semibold text-gray-700">Foto Kartu Keluarga</label>
+            <label for="kartuKeluarga" class="block  font-semibold text-gray-700">Foto Kartu Keluarga</label>
             <div class="flex items-center mt-2">
               <input 
                 type="file" 
@@ -327,13 +327,14 @@
 
           <!-- Foto KTP Ibu/Bapak/Wali -->
           <div class="mb-4">
-            <label for="fcKtp" class="block text-sm font-semibold text-gray-700">Foto KTP Ibu/Bapak/Wali</label>
+            <label for="fcKtp" class="block  font-semibold text-gray-700">Foto KTP Ibu/Bapak/Wali</label>
             <div class="flex items-center mt-2">
               <input 
                 type="file" 
                 id="fcKtp" 
                 name="fc_ktp" 
                 class="hidden"
+                accept="image/*"
                 required>
               <label 
                 for="fcKtp" 
@@ -346,13 +347,16 @@
 
           <!-- Foto KIP / KIS -->
           <div class="mb-4">
-            <label for="kipKis" class="block text-sm font-semibold text-gray-700">Foto KIP / KIS (Bila Ada)</label>
+            <label for="kipKis" class="block  font-semibold text-gray-700">Foto KIP / KIS (Bila Ada)</label>
             <div class="flex items-center mt-2">
               <input 
                 type="file" 
                 id="kipKis" 
                 name="kip_kis" 
-                class="hidden">
+                class="hidden"
+                accept="image/*"
+                >
+                
               <label 
                 for="kipKis" 
                 class="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">

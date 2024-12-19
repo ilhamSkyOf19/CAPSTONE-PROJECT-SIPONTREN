@@ -1,6 +1,6 @@
 <% if (typeof dataUsername !== 'undefined' && dataUsername.length !== 0) { %>
-  <div class="min-h-screen px-6 sm:px-8 md:px-16 lg:px-36 pt-10">
-    <h2 class="text-center text-2xl mb-10">Artikel</h2>
+  <div class="min-h-screen px-6 sm:px-8 md:px-16 lg:px-36 pt-20">
+    <h2 class="text-center text-3xl mb-10 font-semibold text-[#3d90fd]"><%= data.kategori %></h2>
     <article class="bg-white shadow-md rounded-lg overflow-hidden mb-5">
       
       <!-- Gambar Thumbnail -->
@@ -26,9 +26,9 @@
     </article>
 </div>
 <% } else {%>
-  <div class="min-h-screen px-6 sm:px-8 md:px-16 lg:px-36 pt-40 pb-36">
-    <h2 class="text-center text-4xl font-semibold mb-10"><%= data.kategori %></h2>
-    <div id="breadcrumb" class="flex items-center space-x-2 text-sm text-blue-500 lg:mb-16"></div>
+  <div class="min-h-screen px-6 sm:px-8 md:px-16 lg:px-36 pt-24 mb:pt-40 pb-36">
+    <h2 class="text-center text-3xl mb-10 font-semibold text-[#3d90fd]"><%= data.kategori %></h2>
+    <div id="breadcrumb" class="flex items-center space-x-2 text-sm text-blue-500 mb-6 lg:mb-16"></div>
     <article class="bg-white shadow-md rounded-lg overflow-hidden mb-5">
       
       <!-- Gambar Thumbnail -->

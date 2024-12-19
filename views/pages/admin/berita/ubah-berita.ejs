@@ -10,29 +10,27 @@
       <!-- Pesan Error -->
       <% if (typeof errors != 'undefined') { %>
         <div class="mb-4 p-4 bg-red-100 text-red-700 border border-red-300 rounded-lg">
-          <h2 class="text-lg font-semibold mb-2">Kesalahan Input:</h2>
-          <ul class="list-disc pl-5">
-            <% errors.forEach(error => { %>
-              <li><%= error.msg %></li>
-            <% }) %>
-          </ul>
+          <% errors.forEach(error => { %>
+            <p>
+              <%= error.msg %>
+            </p>
+          <% }) %>
         </div>
       <% } %>
       <% if (typeof errorsMongoose != 'undefined') { %>
         <div class="mb-4 p-4 bg-red-100 text-red-700 border border-red-300 rounded-lg">
-          <h2 class="text-lg font-semibold mb-2">Kesalahan Sistem:</h2>
-          <ul class="list-disc pl-5">
-            <% errorsMongoose.forEach(error => { %>
-              <li><%= error.message %></li>
-            <% }) %>
-          </ul>
+          <% errors.forEach(error => { %>
+            <p>
+              <%= error.message %>
+            </p>
+          <% }) %>
         </div>
       <% } %>
 
       <!-- Form Ubah Berita -->
-      <form action="/ubah-berita?_method=PUT" method="POST" enctype="multipart/form-data" class="space-y-6 mt-6">
+      <form action="/ubah-berita?_method=PUT" method="POST" enctype="multipart/form-data" class="space-y-6 mt-6 text-sm mb:sm-base">
         <!-- ID Berita -->
-        <input type="hidden" name="id" value="<%= data.id %>">
+        <input type="hidden" name="_id" value="<%= data.id ? data.id : dataFile.id %>">
 
         <!-- Judul Berita -->
         <div>
@@ -86,19 +84,20 @@
           <p class="text-sm text-gray-500 mt-2">Kosongkan jika tidak ingin mengganti thumbnail.</p>
           <!-- Input Thumbnail Lama -->
           <input 
-            type="text" 
+            type="hidden" 
             name="thumbnailOld" 
             value="<%= dataFile.thumbnail ? dataFile.thumbnail : data.thumbnail %>"
           />
           <!-- Tampilan Thumbnail Lama -->
           <div class="mt-4">
             <p class="text-gray-700 font-semibold mb-2">Thumbnail Saat Ini:</p>
-            <img 
-              src="/public/imageBerita/<%= today %>/<%= dataFile.thumbnail ? dataFile.thumbnail : data.thumbnail %>" 
-              alt="Thumbnail lama" 
-              class="w-32 h-32 rounded-lg border"
-            />
+            <div 
+              class="w-32 h-32 rounded-lg border bg-cover bg-center"
+              style="background-image: url('/public/imageBerita/<%= (dataFile && dataFile.date ? new Date(dataFile.date).toISOString().split(`T`)[0] : new Date(data.date).toISOString().split(`T`)[0]) %>/<%= (dataFile && dataFile.thumbnail) ? dataFile.thumbnail : data.thumbnail %>')">
+            </div>
           </div>
+          
+          
         </div>
 
         <!-- Tombol Aksi -->

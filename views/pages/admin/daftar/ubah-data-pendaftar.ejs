@@ -1,5 +1,5 @@
-<div class="container mx-auto p-6">
-  <div class="row">
+<div class="container mx-auto p-6 py-12">
+  <div class="row mt-10">
       <h1 class="text-3xl font-semibold mb-6">Data Pendaftar</h1>
 
       <div class="col-md-12">
@@ -12,52 +12,50 @@
 
           <% if (typeof errors != 'undefined' && errors.length > 0) { %>
               <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                  <ul>
                       <% errors.forEach(error => { %>
-                          <li><%= error.msg %></li>
+                        <p class=" lg:text-base">
+                          <%= error.msg %>
+                        </p>
                       <% }) %>
-                  </ul>
               </div>
           <% } %>
 
           <% if (typeof errorsMongoose != 'undefined' && errorsMongoose.length > 0) { %>
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                  <ul>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4  lg:text-base">
                       <% errorsMongoose.forEach(error => { %>
-                          <li><%= error.message %></li>
+                          <p><%= error.message %></p>
                       <% }) %>
-                  </ul>
               </div>
           <% } %>
 
-            <form id="MyForm" method="post" action="/ubah-data?_method=PUT" enctype="multipart/form-data">
-              <input type="hidden" name="_id" value="<%= data.id %>">
-              <input type="text" class="form-control" name="old_nik" value="<%= (dataFile && dataFile.nik) || (data && data.nik) || '' %>" >
+            <form id="MyForm" method="post" action="/ubah-data?_method=PUT" enctype="multipart/form-data" class="text-sm md:text-base">
+              <input type="hidden" name="_id" value="<%= data.id ? data.id : dataFile.id %>">
+              <input type="hidden" class="form-control" name="old_nik" value="<%= (dataFile && dataFile.nik) || (data && data.nik) || '' %>" >
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <!-- NISN -->
                   <div>
-                      <label for="nisn" class="text-sm font-medium text-gray-700">NISN</label>
+                      <label for="nisn" class=" font-medium text-gray-700">NISN</label>
                       <input type="text" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="nisn" name="nisn" value="<%= data.nisn %>" placeholder="Masukkan NISN" required autocomplete="off">
                   </div>
   
                   <!-- NIK -->
                   <div>
-                      <label for="nik" class="text-sm font-medium text-gray-700">NIK</label>
+                      <label for="nik" class=" font-medium text-gray-700">NIK</label>
                       <input type="text" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="nik" name="nik" value="<%= data.nik || '' %>" placeholder="Masukkan NIK" required autocomplete="off">
                   </div>
               </div>
   
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <!-- Nama Lengkap -->
                   <div>
-                      <label for="namaLengkap" class="text-sm font-medium text-gray-700">Nama Lengkap</label>
+                      <label for="namaLengkap" class=" font-medium text-gray-700">Nama Lengkap</label>
                       <input type="text" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="namaLengkap" name="nama_lengkap" value="<%= data.nama_lengkap || '' %>" placeholder="Masukkan nama lengkap" required autocomplete="off">
                   </div>
   
                   <!-- Jenis Kelamin -->
                   <div>
-                      <label for="jenisKelamin" class="text-sm font-medium text-gray-700">Jenis Kelamin</label>
+                      <label for="jenisKelamin" class=" font-medium text-gray-700">Jenis Kelamin</label>
                       <select id="jenisKelamin" name="jenis_kelamin" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
                           <option value="" disabled selected hidden>Pilih Jenis Kelamin</option>
                           <option value="Laki-laki" <%= data.jenis_kelamin === 'Laki-laki' ? 'selected' : ''  %>>Laki-laki</option>
@@ -66,16 +64,16 @@
                   </div>
               </div>
   
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <!-- Usia -->
                   <div>
-                      <label for="usia" class="text-sm font-medium text-gray-700">Usia (Tahun)</label>
+                      <label for="usia" class=" font-medium text-gray-700">Usia (Tahun)</label>
                       <input type="text" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="usia" name="usia" value="<%= data.usia || '' %>" placeholder="Masukkan usia" required autocomplete="off">
                   </div>
   
                   <!-- Tempat / Tanggal Lahir -->
                   <div>
-                      <label for="tempatTanggalLahir" class="text-sm font-medium text-gray-700">Tempat / Tanggal Lahir</label>
+                      <label for="tempatTanggalLahir" class=" font-medium text-gray-700">Tempat / Tanggal Lahir</label>
                       <div class="flex gap-4">
                           <input type="text" class="mt-1 block w-1/2 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="tempatLahir" name="tempat_lahir" value="<%= data.tempat_lahir || '' %>" placeholder="Masukkan Tempat Lahir" required autocomplete="off">
                           <input type="date" class="mt-1 block w-1/2 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="tanggalLahir" name="tanggal_lahir" value="<%= data.tanggal_lahir || '' %>" required>
@@ -83,122 +81,124 @@
                   </div>
               </div>
   
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <!-- Alamat -->
                   <div class="col-span-2">
-                      <label for="alamat" class="text-sm font-medium text-gray-700">Alamat</label>
+                      <label for="alamat" class=" font-medium text-gray-700">Alamat</label>
                       <textarea id="alamat" name="alamat" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" style="height: 120px" required><%= data.alamat || ' ' %></textarea>
                   </div>
               </div>
-              <div>
-                <label for="anakKe" class="text-sm font-medium text-gray-700">Anak Ke</label>
+              <!-- anak ke -->
+              <div class="mb-4">
+                <label for="anakKe" class=" font-medium text-gray-700">Anak Ke</label>
                 <input type="number" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="anakKe" name="anak_ke" value="<%= data.anak_ke || '' %>" placeholder="Masukkan anak ke" required autocomplete="off">
-            </div>
-
+              </div>
             <!-- Jumlah Saudara -->
-            <div>
-                <label for="jumlahSaudara" class="text-sm font-medium text-gray-700">Jumlah Saudara</label>
+            <div class="mb-4">
+                <label for="jumlahSaudara" class=" font-medium text-gray-700">Jumlah Saudara</label>
                 <input type="number" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="jumlahSaudara" name="jumlah_saudara" value="<%= data.jumlah_saudara || '' %>" placeholder="Masukkan jumlah saudara" required autocomplete="off">
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 text-sm md:text-base">
             <!-- Nomor Telepon -->
             <div>
-                <label for="nomorTelphone" class="text-sm font-medium text-gray-700">Nomor Telepon</label>
+                <label for="nomorTelphone" class=" font-medium text-gray-700">Nomor Telepon</label>
                 <input type="text" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="nomorTelphone" name="nomor_telephone" value="<%= data.nomor_telephone || '' %>" placeholder="Masukkan nomor telepon aktif" required autocomplete="off">
             </div>
 
             <!-- Alumni SD -->
             <div>
-                <label for="alumni_sd" class="text-sm font-medium text-gray-700">Alumni SD</label>
+                <label for="alumni_sd" class=" font-medium text-gray-700">Alumni SD</label>
                 <input type="text" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="alumniSd" name="alumni_sd" value="<%= data.alumni_sd || '' %>" placeholder="Masukkan alumni SD" required autocomplete="off">
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 text-sm md:text-base">
             <!-- Alamat Sekolah Asal -->
             <div>
-                <label for="alamatSekolahAsal" class="text-sm font-medium text-gray-700">Alamat Sekolah Asal</label>
+                <label for="alamatSekolahAsal" class=" font-medium text-gray-700">Alamat Sekolah Asal</label>
                 <input type="text" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="alamatSekolahAsal" name="alamat_sekolah_asal" value="<%= data.alamat_sekolah_asal || '' %>" placeholder="Masukkan alamat sekolah asal" required autocomplete="off">
             </div>
 
             <!-- Nama Lengkap Ayah -->
             <div>
-                <label for="namaLengkapAyah" class="text-sm font-medium text-gray-700">Nama Lengkap Ayah</label>
+                <label for="namaLengkapAyah" class=" font-medium text-gray-700">Nama Lengkap Ayah</label>
                 <input type="text" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="namaLengkapAyah" name="nama_lengkap_ayah" value="<%= data.nama_lengkap_ayah || '' %>" placeholder="Masukkan nama lengkap ayah" required autocomplete="off">
-                <div class="text-xs text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
+                <div class="text-sm text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 text-sm md:text-base">
             <!-- Nama Lengkap Ibu -->
             <div>
-                <label for="namaLengkapIbu" class="text-sm font-medium text-gray-700">Nama Lengkap Ibu</label>
+                <label for="namaLengkapIbu" class=" font-medium text-gray-700">Nama Lengkap Ibu</label>
                 <input type="text" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="namaLengkapIbu" name="nama_lengkap_ibu" value="<%= data.nama_lengkap_ibu || '' %>" placeholder="Masukkan nama lengkap ibu" required autocomplete="off">
-                <div class="text-xs text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
+                <div class="text-sm text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
             </div>
 
             <!-- Nama Lengkap Wali -->
             <div>
-                <label for="namaLengkapWali" class="text-sm font-medium text-gray-700">Nama Lengkap Wali</label>
+                <label for="namaLengkapWali" class=" font-medium text-gray-700">Nama Lengkap Wali</label>
                 <input type="text" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="namaLengkapWali" name="nama_lengkap_wali" value="<%= data.nama_lengkap_wali || '' %>" placeholder="Masukkan nama lengkap wali" required autocomplete="off">
-                <div class="text-xs text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
+                <div class="text-sm text-gray-500 mt-1">Ketik 'Tidak ada' jika tidak ada</div>
             </div>
         </div>
 
         <!-- Kode Pos -->
-        <div class="mb-6">
-            <label for="kodePos" class="text-sm font-medium text-gray-700">Kode Pos</label>
+        <div class="mb-6 text-sm md:text-base">
+            <label for="kodePos" class=" font-medium text-gray-700">Kode Pos</label>
             <input type="number" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="kodePos" name="kode_pos" value="<%= data.kode_pos || '' %>" placeholder="Masukkan kode pos" required autocomplete="off">
         </div>
         <!-- Foto Formal -->
-          <div class="mb-6">
-            <label for="fotoFormal" class="block text-sm font-medium text-gray-700">Foto Formal</label>
+          <div class="mb-6 text-sm md:text-base">
+            <label for="fotoFormal" class="block  font-medium text-gray-700">Foto Formal</label>
             <div class="flex items-center space-x-4">
-                <input type="file" class="block w-full text-sm text-gray-500 file:border file:border-gray-300 file:rounded-md file:p-2 file:cursor-pointer focus:ring-2 focus:ring-indigo-500" id="fotoFormal" name="foto_formal">
-                <input type="hidden" class="form-control w-full text-sm border-gray-300 rounded-md p-2" name="old_foto_formal" value="<%= (dataFile && dataFile.foto_formal) ? dataFile.foto_formal : data.foto_formal %>">
+                <input type="file" class="block w-full  text-gray-500 file:border file:border-gray-300 file:rounded-md file:p-2 file:cursor-pointer focus:ring-2 focus:ring-indigo-500" id="fotoFormal" name="foto_formal" accept="image/*">
+                <input type="hidden" class="form-control w-full  border-gray-300 rounded-md p-2" name="old_foto_formal" value="<%= (dataFile && dataFile.foto_formal) ? dataFile.foto_formal : data.foto_formal %>">
             </div>
         </div>
 
           <!-- Foto Akta Kelahiran -->
-          <div class="mb-6">
-              <label for="aktaKelahiran" class="block text-sm font-medium text-gray-700">Foto Akta Kelahiran</label>
+          <div class="mb-6 text-sm md:text-base">
+              <label for="aktaKelahiran" class="block  font-medium text-gray-700">Foto Akta Kelahiran</label>
               <div class="flex items-center space-x-4">
-                  <input type="file" class="block w-full text-sm text-gray-500 file:border file:border-gray-300 file:rounded-md file:p-2 file:cursor-pointer focus:ring-2 focus:ring-indigo-500" id="aktaKelahiran" name="akta_kelahiran">
-                  <input type="hidden" class="form-control w-full text-sm border-gray-300 rounded-md p-2" name="old_akta_kelahiran" value="<%= (dataFile && dataFile.akta_kelahiran) ? dataFile.akta_kelahiran : data.akta_kelahiran %>">
+                  <input type="file" class="block w-full  text-gray-500 file:border file:border-gray-300 file:rounded-md file:p-2 file:cursor-pointer focus:ring-2 focus:ring-indigo-500" id="aktaKelahiran" name="akta_kelahiran" accept="image/*">
+                  <input type="hidden" class="form-control w-full  border-gray-300 rounded-md p-2" name="old_akta_kelahiran" value="<%= (dataFile && dataFile.akta_kelahiran) ? dataFile.akta_kelahiran : data.akta_kelahiran %>">
               </div>
           </div>
 
           <!-- Foto Kartu Keluarga -->
-          <div class="mb-6">
-              <label for="kartuKeluarga" class="block text-sm font-medium text-gray-700">Foto Kartu Keluarga</label>
+          <div class="mb-6 text-sm md:text-base">
+              <label for="kartuKeluarga" class="block  font-medium text-gray-700">Foto Kartu Keluarga</label>
               <div class="flex items-center space-x-4">
-                  <input type="file" class="block w-full text-sm text-gray-500 file:border file:border-gray-300 file:rounded-md file:p-2 file:cursor-pointer focus:ring-2 focus:ring-indigo-500" id="kartuKeluarga" name="kartu_keluarga" >
-                  <input type="hidden" class="form-control w-full text-sm border-gray-300 rounded-md p-2" name="old_kartu_keluarga" value="<%= (dataFile && dataFile.kartu_keluarga) ? dataFile.kartu_keluarga : data.kartu_keluarga %>">
+                  <input type="file" class="block w-full  text-gray-500 file:border file:border-gray-300 file:rounded-md file:p-2 file:cursor-pointer focus:ring-2 focus:ring-indigo-500" id="kartuKeluarga" name="kartu_keluarga" accept="image/*">
+                  <input type="hidden" class="form-control w-full  border-gray-300 rounded-md p-2" name="old_kartu_keluarga" value="<%= (dataFile && dataFile.kartu_keluarga) ? dataFile.kartu_keluarga : data.kartu_keluarga %>">
               </div>
           </div>
 
           <!-- Foto FC KTP Orang Tua -->
-          <div class="mb-6">
-              <label for="fcKtp" class="block text-sm font-medium text-gray-700">Foto FC KTP Ibu/Bapak/Wali</label>
+          <div class="mb-6 text-sm md:text-base">
+              <label for="fcKtp" class="block  font-medium text-gray-700">Foto FC KTP Ibu/Bapak/Wali</label>
               <div class="flex items-center space-x-4">
-                  <input type="file" class="block w-full text-sm text-gray-500 file:border file:border-gray-300 file:rounded-md file:p-2 file:cursor-pointer focus:ring-2 focus:ring-indigo-500" id="fcKtp" name="fc_ktp" >
-                  <input type="hidden" class="form-control w-full text-sm border-gray-300 rounded-md p-2" name="old_fc_ktp" value="<%= (dataFile && dataFile.fc_ktp) ? dataFile.fc_ktp : data.fc_ktp %>">
+                  <input type="file" class="block w-full  text-gray-500 file:border file:border-gray-300 file:rounded-md file:p-2 file:cursor-pointer focus:ring-2 focus:ring-indigo-500" id="fcKtp" name="fc_ktp" accept="image/*">
+                  <input type="hidden" class="form-control w-full  border-gray-300 rounded-md p-2" name="old_fc_ktp" value="<%= (dataFile && dataFile.fc_ktp) ? dataFile.fc_ktp : data.fc_ktp %>">
               </div>
           </div>
 
           <!-- Foto KIP / KIS -->
-          <div class="mb-6">
-              <label for="kipKis" class="block text-sm font-medium text-gray-700">Foto KIP / KIS (Bila Ada)</label>
+          <div class="mb-6 text-sm md:text-base">
+              <label for="kipKis" class="block  font-medium text-gray-700">Foto KIP / KIS (Bila Ada)</label>
               <div class="flex items-center space-x-4">
-                  <input type="file" class="block w-full text-sm text-gray-500 file:border file:border-gray-300 file:rounded-md file:p-2 file:cursor-pointer focus:ring-2 focus:ring-indigo-500" id="kipKis" name="kip_kis">
-                  <input type="hidden" class="form-control w-full text-sm border-gray-300 rounded-md p-2" name="old_kip_kis" value="<%= (dataFile && dataFile.kip_kis) ? dataFile.kip_kis : data.kip_kis %>">
+                  <input type="file" class="block w-full  text-gray-500 file:border file:border-gray-300 file:rounded-md file:p-2 file:cursor-pointer focus:ring-2 focus:ring-indigo-500" id="kipKis" name="kip_kis" accept="image/*">
+                  <input type="hidden" class="form-control w-full  border-gray-300 rounded-md p-2" name="old_kip_kis" value="<%= (dataFile && dataFile.kip_kis) ? dataFile.kip_kis : data.kip_kis %>">
               </div>
           </div>
                <!-- button submit -->
               <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Simpan</button>
-              <a href="/data-pendaftar" class="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">Batal</a>
+              <a href="/data-pendaftar" class="px-4 py-2 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600">
+                Kembali
+              </a>
 
             </form>
         </div>

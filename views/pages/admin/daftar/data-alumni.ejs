@@ -1,100 +1,110 @@
-<div class="container mx-auto px-6 py-8 mt-10">
+<div class="container mx-auto px-4 py-8 mt-10">
   <% if (msg && msg.length > 0) { %>
     <div class="mb-4 p-4 bg-green-100 text-green-700 border border-green-300 rounded-lg">
       <h2 class="text-lg font-semibold mb-2"><%= msg %></h2>
     </div>
   <% } %>
-  <div class="mb-6">
-    <h1 class="text-3xl font-semibold text-gray-800">Data Pendaftar</h1>
 
-    <!-- Form Pencarian -->
-    <form action="/data-alumni" method="get" class="mb-6 flex space-x-4">
-      <input
-        type="text"
-        name="query"
-        class="form-control w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
-        placeholder="Cari berdasarkan Nama, NISN, atau NIK"
-        value="<%= query || '' %>"
-        required
-      />
-      <button
-        class="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-indigo-700 transition duration-200"
-        type="submit"
-      >
-        Cari
-      </button>
-    </form>
+  <h1 class="text-3xl font-semibold text-gray-800 mb-10">Data Alumni</h1>
 
-    <!-- Tombol Download PDF -->
-    <div class="mb-6">
-      <a
-        href="/download-pdf"
-        class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition duration-200 inline-block"
-      >
-        Download PDF
-      </a>
-    </div>
+   <!-- Form Pencarian -->
+   <form action="/data-alumni" method="get" class="mb-6 flex space-x-4 text-sm lg:text-base">
+    <input
+      type="text"
+      name="query"
+      class="form-control w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+      placeholder="Cari..."
+      value="<%= query || '' %>"
+      required
+    />
+    <button
+      class="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-indigo-700 transition duration-200"
+      type="submit"
+    >
+      Cari
+    </button>
+  </form>
 
-    <!-- Tabel Data -->
-    <div class="overflow-x-auto">
-      <table class="min-w-full table-auto border-collapse">
-        <thead>
-          <tr class="bg-indigo-600 text-white">
-            <th class="px-4 py-2">No</th>
-            <th class="px-4 py-2">Nama</th>
-            <th class="px-4 py-2">Angkatan</th>
-            <th class="px-4 py-2" >Pesan</th>
-            <th class="px-4 py-2">Ubah</th>
-            <th class="px-4 py-2">Delete</th>
-            <th class="px-4 py-2">Detail</th>
+
+  <!-- Tombol Aksi -->
+  <div class="mb-6 flex flex-wrap items-center gap-4 text-center">
+    <a
+      href="/download-pdf"
+      class="bg-green-600 text-sm text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition duration-200 flex-1 sm:flex-none"
+    >
+      Download PDF
+    </a>
+    <a
+      href="/tambah-data-alumni"
+      class="bg-green-600 text-sm text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition duration-200 flex-1 sm:flex-none"
+    >
+      Tambah Data
+    </a>
+  </div>
+  
+
+  <!-- Tabel Data -->
+  <div class="flex lg:mt-0 justify-start w-full bg-transparent overflow-x-auto py-8 rounded-lg scrollbar-hidden scroll-smooth text-sm"
+  id="scroll-container-berita">
+    <table class="min-w-full table-auto border-collapse text-xs md:text-base">
+      <thead>
+        <tr class="bg-indigo-600 text-white">
+          <th class="px-4 py-2">No</th>
+          <th class="px-16 py-2">Nama</th>
+          <th class="px-4 py-2">Angkatan</th>
+          <th class="px-4 py-2">Pesan</th>
+          <th class="px-4 py-2">Ubah</th>
+          <th class="px-4 py-2">Delete</th>
+          <th class="px-4 py-2">Detail</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (dataAlumni.length === 0) { %>
+          <tr>
+            <td colspan="7" class="text-center py-4 text-red-600">
+              <div class="bg-red-100 p-4 rounded-lg">
+                <h3 class="text-lg">Data Tidak Ditemukan</h3>
+              </div>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          <% if (dataAlumni.length === 0) { %>
-            <tr>
-              <td colspan="9" class="text-center py-4 text-red-600">
-                <div class="bg-red-100 p-4 rounded-lg">
-                  <h3 class="text-lg">Data Tidak Ditemukan</h3>
-                </div>
+        <% } else { %>
+          <% dataAlumni.forEach((data, i) => { %>
+            <tr class="border-b hover:bg-gray-100 text-left">
+              <td class="px-4 py-4 "><%= i + 1 %></td>
+              <td class="px-4 py-4 "><%= data.nama_alumni %></td>
+              <td class="px-4 py-4 "><%= data.angkatan %></td>
+              <td class="px-4 py-4  break-words whitespace-normal max-w-xs"><%= data.pesan %></td>
+              <td class="px-4 py-4 ">
+                <a
+                  class="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600 transition duration-200"
+                  href="/ubah-data-alumni/<%= data.id %>"
+                >
+                  Ubah
+                </a>
+              </td>
+              <td class="px-4 py-2 text-center">
+                <form action="/data-alumni/<%= data.id %>?_method=DELETE" method="POST" class="inline">
+                  <button
+                    type="submit"
+                    class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"
+                    onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')"
+                  >
+                    Delete
+                  </button>
+                </form>
+              </td>
+              <td class="px-4 py-2 text-center">
+                <a
+                  class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
+                  href="/data-detail-alumni/<%= data.id %>"
+                >
+                  Detail
+                </a>
               </td>
             </tr>
-          <% } else { %>
-            <% dataAlumni.forEach((data, i) => { %>
-              <tr class="border-b hover:bg-gray-100">
-                <td class="px-4 py-2 text-center"><%= i + 1 %></td>
-                <td class="px-4 py-2 text-center"><%= data.nama_alumni %></td>
-                <td class="px-4 py-2 text-center"><%= data.angkatan %></td>
-                <td class="px-4 py-2 text-center break-words whitespace-normal max-w-56"><%= data.pesan %></td>
-                <td class="px-4 py-2 text-center">
-                  <a
-                    class="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600 transition duration-200"
-                    href="/ubah-data-alumni/<%= data.id %>"
-                  >
-                    Ubah
-                  </a>
-                </td>
-                <td class="px-4 py-2 text-center">
-                  <form method="POST" action="/data-alumni/<%= data.id %>?_method=DELETE">
-                    <form action="/data-alumni/<%= data.id %>?_method=DELETE" method="POST" class="inline">
-                      <button type="submit" 
-                              class="bg-red-600 text-white px-4 py-2 rounded-md" 
-                              onclick="return confirm('Apakah Anda yakin ingin menghapus berita ini?')">Delete</button>
-                    </form>
-                  </form>
-                </td>
-                <td class="px-4 py-2 text-center">
-                  <a
-                    class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
-                    href="/data-detail-alumni/<%= data.id %>"
-                  >
-                    Detail
-                  </a>
-                </td>
-              </tr>
-            <% }) %>
-          <% } %>
-        </tbody>
-      </table>
-    </div>
+          <% }) %>
+        <% } %>
+      </tbody>
+    </table>
   </div>
 </div>

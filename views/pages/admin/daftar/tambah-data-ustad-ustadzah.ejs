@@ -1,0 +1,89 @@
+<div class="container mx-auto mt-8 p-4">
+    <div class="flex justify-center">
+      <div class="w-full max-w-2xl bg-white shadow-lg rounded-lg p-6">
+        <!-- Judul Halaman -->
+        <div class="text-center">
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">Tambah Ustad / Ustadzah</h1>
+          <p class="text-gray-600 text-sm">Isi data berikut untuk menambahkan Ustad / Ustadzah.</p>
+        </div>
+  
+        <!-- Pesan Error -->
+        <% if (typeof errors != 'undefined') { %>
+          <div class="mb-4 p-4 bg-red-100 text-red-700 border border-red-300 rounded-lg">
+            <% errors.forEach(error => { %>
+              <p>
+                <%= error.msg %>
+              </p>
+            <% }) %>
+          </div>
+        <% } %>
+        <% if (typeof errorsMongoose != 'undefined') { %>
+          <div class="mb-4 p-4 bg-red-100 text-red-700 border border-red-300 rounded-lg">
+            <% errors.forEach(error => { %>
+              <p>
+                <%= error.message %>
+              </p>
+            <% }) %>
+          </div>
+        <% } %>
+  
+        <!-- Form Tambah Ustad / Ustadzah -->
+        <form action="/form-ustad-ustadzah" method="POST" enctype="multipart/form-data" class="space-y-6 mt-6 text-sm lg:text-base">
+          <!-- Nama Ustad / Ustadzah -->
+          <div>
+            <label for="nama_ustad_ustadzah" class="block text-gray-700 font-semibold mb-2">Nama Ustad / Ustadzah</label>
+            <input 
+              type="text" 
+              id="nama_ustad_ustadzah" 
+              name="nama_ustad_ustadzah" 
+              placeholder="Masukkan nama ustad ustadzah" 
+              value="<%= data ? data.nama_ustad_ustadzah : '' %>" 
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
+            />
+          </div>
+          <!-- Posisi -->
+          <div>
+            <label for="posisi" class="block text-gray-700 font-semibold mb-2">Posisi</label>
+            <input 
+              type="input" 
+              id="posisi" 
+              name="posisi"  
+              value="<%= data ? data.posisi : '' %>" 
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
+            />
+          </div>
+          <!-- Gambar Ustad Ustadzah -->
+          <div>
+            <label for="img_ustad_ustadzah" class="block text-gray-700 font-semibold mb-2">Gambar Ustad / Ustadzah</label>
+            <input 
+              type="file" 
+              id="img_ustad_ustadzah" 
+              name="img_ustad_ustadzah" 
+              accept="image/*" 
+              required 
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
+            />
+            <p class="text-xs md:text-sm text-gray-500 mt-2">Format yang diizinkan: JPG, JPEG, PNG (maksimal 1MB).</p>
+          </div>
+          <!-- Tombol Aksi -->
+          <div class="flex justify-between items-center">
+            <a 
+              href="/data-ustad-ustadzah" 
+              class="px-6 py-2 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-900 focus:ring focus:ring-blue-300"
+            >
+              Kembali
+            </a>
+            <button 
+              type="submit" 
+              class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring focus:ring-blue-300"
+            >
+              Tambah Data
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  

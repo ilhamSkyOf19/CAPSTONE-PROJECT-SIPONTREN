@@ -4,7 +4,7 @@
       <!-- Judul Halaman -->
       <div class="text-center">
         <h1 class="text-3xl font-bold text-gray-800 mb-2">Tambah Berita Baru</h1>
-        <p class="text-gray-600">Isi data berikut untuk menambahkan berita baru ke sistem.</p>
+        <p class="text-gray-600 text-sm">Isi data berikut untuk menambahkan berita baru ke sistem.</p>
       </div>
 
       <!-- Pesan Error -->
@@ -30,7 +30,7 @@
       <% } %>
 
       <!-- Form Tambah Berita -->
-      <form action="/form-berita" method="POST" enctype="multipart/form-data" class="space-y-6 mt-6">
+      <form action="/form-berita" method="POST" enctype="multipart/form-data" class="space-y-6 mt-6 text-sm md:text-base">
         <!-- Judul Berita -->
         <div>
           <label for="title" class="block text-gray-700 font-semibold mb-2">Judul Berita</label>
@@ -76,9 +76,9 @@
             required 
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
           >
-            <option value="" disabled selected>Pilih kategori berita</option>
-            <option value="Berita">Berita</option>
-            <option value="Artikel">Artikel</option>
+            <option value="" disabled selected class="text-xs md:text-base">Pilih kategori berita</option>
+            <option value="Berita" class="text-xs md:text-base">Berita</option>
+            <option value="Artikel" class="text-xs md:text-base">Artikel</option>
           </select>
         </div>
 
@@ -93,7 +93,7 @@
             required 
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
           />
-          <p class="text-sm text-gray-500 mt-2">Format yang diizinkan: JPG, PNG (maksimal 2MB).</p>
+          <p class="text-xs md:text-sm text-gray-500 mt-2">Format yang diizinkan: JPG, JPEG, PNG (maksimal 2MB).</p>
         </div>
 
         <!-- Tanggal Berita

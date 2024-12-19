@@ -1,6 +1,6 @@
 import { check } from "express-validator";
 
-// validator input
+// validator input pendaftar
 export const validatorResultPendaftar = [
     check('nisn', 'nisn harus berisi angka!').isNumeric({ no_symbols: true }),  // cek nisn
     check('nik', 'nik harus berisi angka!').isNumeric({ no_symbols: true }),    // cek nik
@@ -81,11 +81,13 @@ export const validatorResultPendaftar = [
 
 ];
 
-
+// login
 export const validatorLogin = [
     check('username', 'Username harus berisi huruf!').isAlpha('en-US'),
     check('password', 'Password harus berisi angka dan huruf!').matches(/^[a-zA-Z0-9 ]+$/),
 ]
+
+// berita
 
 export const validatorUploadBerita = [
     check('content', 'content harus berisi huruf, angka, dan simbol').matches(/^[\s\S]+$/)
@@ -95,12 +97,15 @@ export const validatorUbahBerita = [
     check('content', 'content harus berisi huruf, angka, dan simbol').matches(/^[\s\S]+$/),
 ]
 
+// username 
+
 export const validatorUbahUsername = [
     check('usernameLama', 'username lama tidak valid').isAlpha('en-US'),
     check('password', 'password tidak valid').matches(/^[a-zA-Z0-9 ]+$/),
     check('usernameBaru', 'username baru tidak valid').isAlpha('en-US'),
 ];
 
+// password
 export const validatorUbahPassword = [
     check('username', 'username tidak valid').isAlpha('en-US'),
     check('passwordLama', 'password lama tidak valid').matches(/^[a-zA-Z0-9 ]+$/),
@@ -108,14 +113,18 @@ export const validatorUbahPassword = [
     check('konfirmasiPassword', 'konfirmasi password tidak valid').matches(/^[a-zA-Z0-9 ]+$/),
 ]
 
-export const validatorUbahDataAlumni = [
+// alumni
+
+export const validatorAlumni = [
     check('nama_alumni', 'Nama alumni hanya boleh berisi huruf dan spasi').matches(/^[a-zA-Z\s]+$/).withMessage('Nama alumni tidak valid'),
     check('angkatan', 'Angkatan hanya boleh berisi angka').isNumeric().withMessage('Angkatan harus berupa angka'),
-    check('pesan', 'Pesan mengandung karakter yang tidak valid').isString().withMessage('Pesan harus berupa string')
+    check('pesan', 'Pesan hanya boleh berisi huruf dan angka')
+        .matches(/^[a-zA-Z0-9]+$/).withMessage('Pesan mengandung karakter yang tidak valid')
 ]
 
-export const validatorTambahAlumni = [
-    check('nama_alumni', 'Nama alumni hanya boleh berisi huruf dan spasi').matches(/^[a-zA-Z\s]+$/).withMessage('Nama alumni tidak valid'),
-    check('angkatan', 'Angkatan hanya boleh berisi angka').isNumeric().withMessage('Angkatan harus berupa angka'),
-    check('pesan', 'Pesan mengandung karakter yang tidak valid').isString().withMessage('Pesan harus berupa string')
+// ustad ustadzah
+export const validatorUstadUstadzah = [
+    check('nama_ustad_ustadzah', 'Nama ustad dan ustadzah hanya boleh berisi huruf dan spasi').matches(/^[a-zA-Z\s]+$/).withMessage('Nama ustad dan ustadzah tidak valid'),
+    check('posisi', 'Posisi hanya boleh berisi huruf dan angka')
+        .matches(/^[a-zA-Z0-9]+$/).withMessage('Posisi mengandung karakter yang tidak valid')
 ]

@@ -1,12 +1,26 @@
+<!-- Bar untuk navbar (tombol hamburger) -->
+<div id="bar" class="bg-[#0747A6] w-full h-auto fixed top-0 left-0 z-20">
+  <div class="flex justify-between items-center px-4 py-2">
+    <!-- Hamburger Button (untuk mobile dan desktop) -->
+    <div id="hamburger" class="text-white cursor-pointer text-3xl">
+      ☰
+    </div>
+    <!-- Optional Logo or Title -->
+    <div class="text-white text-lg font-bold">
+      Sipontren
+    </div>
+  </div>
+</div>
+
 <!-- Navbar -->
 <nav
   id="navbar"
-  class="bg-indigo-600 text-white shadow-lg fixed top-0 left-0 h-full w-48 flex flex-col py-4"
+  class="z-20 bg-[#0747A6] text-white shadow-lg fixed top-10 -translate-x-72 bottom-0 h-full w-52 flex-col py-4 md:w-52 md:fixed md:h-auto md:-translate-x-72 transition duration-500 ease-in-out"
 >
   <div class="space-y-6">
     <!-- Header Navbar -->
     <div class="px-4 text-xl font-bold hover:text-gray-200 transition duration-200">
-      <a href="#">Navbar</a>
+      <a href="#">Dashboard</a>
     </div>
     <div class="space-y-4 px-4">
       <!-- Menu Links -->
@@ -22,9 +36,9 @@
         <span>🎓</span>
         <span>Data Alumni</span>
       </a>
-      <a href="/data-guru" class="flex items-center space-x-2 text-gray-200 hover:text-white transition duration-200">
+      <a href="/data-ustad-ustadzah" class="flex items-center space-x-2 text-gray-200 hover:text-white transition duration-200">
         <span>👩‍🏫</span>
-        <span>Data Guru</span>
+        <span>Data Ustad/Ustadzah</span>
       </a>
       <a href="/form-berita" class="flex items-center space-x-2 text-gray-200 hover:text-white transition duration-200">
         <span>🖋</span>
@@ -49,3 +63,4 @@
     </div>
   </div>
 </nav>
+

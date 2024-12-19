@@ -3,6 +3,7 @@ import path from 'path';
 import Berita from '../models/skemaBerita.js';
 import Pendaftaran from "../models/pendaftaran.js";
 import Alumni from '../models/skemaAlumni.js';
+import Ustad from '../models/skemaUstad.js';
 
 // capitalize teks
 export function capitalizeWords(str) {
@@ -87,6 +88,7 @@ export async function deletePendaftarById(id) {
 }
 
 
+// delete data alumni
 export async function deleteAlumniById(id) {
     try {
         // Query untuk mendapatkan data alumni berdasarkan ID
@@ -115,5 +117,38 @@ export async function deleteAlumniById(id) {
     } catch (error) {
         console.error('Error saat menghapus alumni:', error);
         return { success: false, message: 'Gagal menghapus data alumni!' };
+    }
+}
+
+
+// delete data ustad dan ustadzah
+export async function deleteUstadUstadzahById(id) {
+    try {
+        // Query untuk mendapatkan data alumni berdasarkan ID
+        const ustadUstadzah = await Ustad.findByPk(id); // Menggunakan Sequelize untuk mencari berdasarkan PK (id)
+
+        if (!ustadUstadzah) {
+            return { success: false, message: 'Ustad / Ustadzah tidak ditemukan!' };
+        }
+
+        // Path direktori image (tanggal hari ini dari alumni)
+        const imgUstadUstadzahPath = path.join(process.cwd(), 'public', 'imagesUstadUstadzah', ustadUstadzah.img_ustad_ustadzah); // Susun path gambar
+
+        // Cek apakah file gambar ada dan hapus
+        if (fs.existsSync(imgUstadUstadzahPath)) {
+            fs.unlinkSync(imgUstadUstadzahPath); // Hapus gambar
+            console.log('Gambar ustad / ustadzah berhasil dihapus:', imgUstadUstadzahPath);
+        } else {
+            console.log('File gambar ustad / ustadzah tidak ditemukan:', imgUstadUstadzahPath);
+        }
+
+        // Hapus data alumni dari MySQL menggunakan Sequelize
+        await ustadUstadzah.destroy(); // Menggunakan method destroy() dari Sequelize untuk menghapus data
+
+        return { success: true, message: 'Data Ustad / Ustadzah dan gambar berhasil dihapus!' };
+
+    } catch (error) {
+        console.error('Error saat menghapus data:', error);
+        return { success: false, message: 'Gagal menghapus data' };
     }
 }

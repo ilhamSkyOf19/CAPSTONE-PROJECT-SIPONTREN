@@ -1,0 +1,109 @@
+<div class="flex items-center justify-center min-h-screen min-w-full max-w-full bg-gradient-to-br p-6 py-16">
+    <div class="w-full max-w-xl bg-white shadow-lg rounded-lg p-8">
+      <!-- Header -->
+      <div class="text-center">
+        <h2 class="text-2xl font-extrabold text-gray-800">Ubah Data Ustad / Ustadzah</h2>
+        <p class="text-sm text-gray-600 mt-1">Silakan perbarui data ustad / ustadzah di bawah ini</p>
+      </div>
+  
+      <!-- Pesan Error -->
+      <% if (!data) { %>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-6" role="alert">
+        <strong class="font-bold">Data Tidak Ada!</strong>
+        <span class="block sm:inline">Silakan kembali ke halaman sebelumnya.</span>
+        <a href="/data-pendaftar" class="underline text-blue-600 hover:text-blue-800 ml-2">Kembali</a>
+      </div>
+      <% } %>
+  
+      <% if (typeof errors != 'undefined' && errors.length > 0) { %>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-6" role="alert">
+        <% errors.forEach(error => { %>
+          <p>
+            <%= error.msg %>
+          </p>
+        <% }) %>
+      </div>
+      <% } %>
+  
+      <% if (typeof errorsMongoose != 'undefined' && errorsMongoose.length > 0) { %>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-6" role="alert">
+        <% errors.forEach(error => { %>
+          <p>
+            <%= error.message %>
+          </p>
+        <% }) %>
+      </div>
+      <% } %>
+  
+      <!-- Form -->
+      <form action="/ubah-data-ustad-ustadzah?_method=PUT" method="POST" enctype="multipart/form-data" class="space-y-6 mt-6 text-sm md:text-base">
+        <!-- Hidden Field for ID (only on update) -->
+        <div>
+            <% if (data) { %>
+                <input type="hidden" value="<%= data.id ? data.id : dataFile.id %>" name="_id">
+            <% } %>
+        </div>
+      
+        <!-- Nama Alumni -->
+        <div>
+            <label for="nama_ustad_ustadzah" class="block text-gray-700 font-semibold mb-2">Nama Ustad / Ustadzah</label>
+            <input 
+                type="text" 
+                id="nama_ustad_ustadzah" 
+                name="nama_ustad_ustadzah" 
+                placeholder="Masukkan nama ustad / ustadzah" 
+                value="<%= data ? data.nama_ustad_ustadzah : '' %>" 
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
+            />
+        </div>
+      
+        <!-- Angkatan -->
+        <div>
+            <label for="posisi" class="block text-gray-700 font-semibold mb-2">Posisi</label>
+            <input 
+                type="input" 
+                id="posisi" 
+                name="posisi"  
+                value="<%= data ? data.posisi : '' %>"
+                placeholder="Masukan posisi" 
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
+            />
+        </div>
+
+        <!-- Gambar Alumni -->
+        <div class="text-sm lg:text-base">
+            <label for="img_ustad_ustadzah" class="block text-gray-700 font-semibold mb-2">Gambar Ustad / Ustadzah</label>
+                <div class="mb-2">
+                    <img src="/public/imagesUstadUstadzah/<%= data.img_ustad_ustadzah ? data.img_ustad_ustadzah : dataFile.img_ustad_ustadzah %>" alt="Gambar Ustad / Ustadzah" class="w-32 h-32 object-cover mb-2">
+                    <p class="text-sm text-gray-500">Gambar yang saat ini terpasang</p>
+                </div>
+        
+            <input 
+                type="file" 
+                id="img_ustad_ustadzah" 
+                name="img_ustad_ustadzah" 
+                accept="image/*" 
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
+            />
+            <input type="hidden" name="oldImg_ustad_ustadzah" value="<%=  data.img_ustad_ustadzah ? data.img_ustad_ustadzah : dataFile.img_ustad_ustadzah %>">
+         
+            <p class="text-xs md:text-sm text-gray-500 mt-2">Format yang diizinkan: JPG, JPEG, PNG (maksimal 1MB).</p>
+        </div>
+      
+        <!-- Tombol Aksi -->
+        <div class="flex justify-between items-center text-sm lg:text-bases">
+          <a href="/data-ustad-ustadzah" 
+              class="px-6 py-2 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-900 focus:ring focus:ring-blue-300">
+              Kembali
+            </a>
+            <button type="submit" 
+                class="bg-indigo-600 text-white px-6 py-2 rounded-lg shadow hover:bg-indigo-700 transition duration-200">
+                Simpan
+            </button>
+        </div>
+    </form>    
+    </div>
+  </div>
+  

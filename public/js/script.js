@@ -190,7 +190,7 @@ if (containerBerita) {
 }
 
 // tujuan higlight 
-const tujuan = ['img-6.jpg', 'img-7.jpg', 'img_8.jpg', 'img_9.jpg'];
+const tujuan = ['img_1.jpg', 'img_2.jpg', 'img_3.jpg', 'img_4.jpg', 'img_6.jpg', 'img_7.jpg', 'img_8.jpg', 'img_9.jpg'];
 
 // Ambil semua elemen grid
 const gridItems = [
@@ -218,7 +218,7 @@ if (gridItems) {
 
     setTimeout(() => {
       // Ganti gambar setelah fade-out selesai
-      innerDiv.style.backgroundImage = `url('/public/asset/${tujuan[currentIndex]}')`;
+      innerDiv.style.backgroundImage = `url('/public/asset/img/${tujuan[currentIndex]}')`;
 
       // Fade-in
       innerDiv.classList.remove('opacity-0');
@@ -232,7 +232,7 @@ if (gridItems) {
 
     setInterval(() => {
       updateImage(item, currentIndex);
-      currentIndex = (currentIndex + 1) % tujuan.length;
+      currentIndex = (currentIndex + 2) % tujuan.length;
     }, updateInterval + index * 1000); // Tambahkan delay berbeda untuk setiap elemen
   });
 }
@@ -358,3 +358,24 @@ if (psb) {
 
 
 
+
+const hamburger = document.getElementById('hamburger');
+const navbar = document.getElementById('navbar');
+if (navbar) {
+  // Toggle navbar visibility (untuk mobile dan desktop)
+  hamburger.addEventListener('click', (e) => {
+    // Prevent event bubbling so that clicking the hamburger does not close the navbar immediately
+    e.stopPropagation();
+    navbar.classList.toggle('-translate-x-72');
+    navbar.classList.toggle('md:-translate-x-72');
+  });
+
+  // Menutup navbar jika klik di luar navbar
+  document.addEventListener('click', (e) => {
+    if (!navbar.contains(e.target) && !hamburger.contains(e.target)) {
+      navbar.classList.add('-translate-x-72');
+      navbar.classList.add('md:-translate-x-72');
+    }
+  });
+
+}

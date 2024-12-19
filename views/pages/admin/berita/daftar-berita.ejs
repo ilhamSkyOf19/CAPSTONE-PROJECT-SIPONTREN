@@ -1,4 +1,4 @@
-<div class="flex-1 p-4 overflow-x-hidden">
+<div class="flex-1 p-4 overflow-x-hidden text-xs py-16">
   <div class="container mx-auto px-4">
     <!-- Pesan Sukses -->
     <% if (typeof msg !== 'undefined' && msg.length !== 0) { %>
@@ -24,16 +24,19 @@
               <p class="text-gray-600 text-sm mb-6">
                 <%= item.content.split(" ").slice(0, 15).join(" ") %>...
               </p>
-              <div class="flex items-center justify-between space-x-2">
+              <div class="flex items-center justify-between space-x-2 mb-4">
                 <a href="/detail-berita/<%= item.id %>" 
-                   class="bg-blue-600 text-white px-4 py-2 rounded-md">Baca Selengkapnya</a>
+                   class="bg-blue-600 text-white px-4 py-2 rounded-md">Selengkapnya</a>
+                
+              </div>
+              <div class="flex justify-between items-center gap-3">
                 <a href="/ubah-berita/<%= item.id %>" 
-                   class="bg-yellow-500 text-white px-4 py-2 rounded-md">Ubah</a>
-                <form action="/daftar-berita/<%= item.id %>?_method=DELETE" method="POST" class="inline">
-                  <button type="submit" 
-                          class="bg-red-600 text-white px-4 py-2 rounded-md" 
-                          onclick="return confirm('Apakah Anda yakin ingin menghapus berita ini?')">Hapus</button>
-                </form>
+                  class="bg-yellow-500 text-white px-4 py-2 rounded-md">Ubah</a>
+               <form action="/daftar-berita/<%= item.id %>?_method=DELETE" method="POST" class="inline">
+                 <button type="submit" 
+                         class="bg-red-600 text-white px-4 py-2 rounded-md" 
+                         onclick="return confirm('Apakah Anda yakin ingin menghapus berita ini?')">Hapus</button>
+               </form>
               </div>
             </div>
           </div>
