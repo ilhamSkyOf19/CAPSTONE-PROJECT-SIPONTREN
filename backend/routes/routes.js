@@ -24,6 +24,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+
 // router
 const router = express.Router();
 
@@ -262,7 +263,7 @@ router.post('/form-pendaftaran', [
             }
 
             // Hapus folder jika error
-            fs.rmdir(`public/imagesPendaftar/${req.body.nik}`, { recursive: true }, (err) => {
+            fs.rm(`public/imagesPendaftar/${req.body.nik}`, { recursive: true }, (err) => {
                 if (err) console.error('Error while deleting folder:', err);
             });
 

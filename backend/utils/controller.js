@@ -70,7 +70,7 @@ export async function deletePendaftarById(id) {
             });
 
             // Hapus folder setelah semua file di dalamnya terhapus
-            fs.rmdirSync(nikFolder);
+            fs.rmSync(nikFolder);
             console.log('Folder berhasil dihapus:', nikFolder);
         } else {
             console.log('Folder tidak ditemukan:', nikFolder);

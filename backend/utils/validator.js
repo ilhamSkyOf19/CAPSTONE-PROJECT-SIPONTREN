@@ -2,9 +2,9 @@ import { check } from "express-validator";
 
 // validator input pendaftar
 export const validatorResultPendaftar = [
-    check('nisn', 'nisn harus berisi angka!').isNumeric({ no_symbols: true }),  // cek nisn
-    check('nik', 'nik harus berisi angka!').isNumeric({ no_symbols: true }),    // cek nik
-    check('nama_lengkap', 'nama harus berisi huruf!').isAlpha('en-US', { ignore: ' ' }),    // cek nama_lengkap
+    check('nisn', 'nisn harus berisi angka').isNumeric({ no_symbols: true }),  // cek nisn
+    check('nik', 'nik harus berisi angka').isNumeric({ no_symbols: true }),    // cek nik
+    check('nama_lengkap', 'nama harus berisi huruf').isAlpha('en-US', { ignore: ' ' }),    // cek nama_lengkap
     check('usia')   // cek usia
         .notEmpty().withMessage('Usia harus diisi!') // Pastikan usia tidak kosong
         .bail() // Berhenti jika ada error sebelumnya

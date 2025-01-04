@@ -8,6 +8,7 @@ import Alumni from '../models/skemaAlumni.js';
 import Ustad from '../models/skemaUstad.js';
 import User from '../models/skemaLogin.js';
 
+
 const today = new Date().toISOString().split('T')[0];
 
 // listNavbar
@@ -86,7 +87,7 @@ class FileValidator {
                     }));
 
                     // Buat error custom dengan kode
-                    await fs.rmdir(`public/imagesPendaftar/${req.body.nik}`); // Hapus folder berdasarkan nik
+                    await fs.rm(`public/imagesPendaftar/${req.body.nik}`); // Hapus folder berdasarkan nik
                     const error = new Error('File tidak valid, harus berupa .jpg, .jpeg, atau .png');
                     error.code = 'INVALID_FILE_TYPE';
                     return res.render(fileLocation, {
@@ -137,7 +138,7 @@ class FileValidator {
                     }));
 
                     // Buat error custom dengan kode
-                    // await fs.rmdir(`images/${req.body.nik}`); // Hapus folder berdasarkan nik
+                    // await fs.rm(`images/${req.body.nik}`); // Hapus folder berdasarkan nik
                     const error = new Error('File tidak valid, harus berupa .jpg, .jpeg, atau .png');
                     error.code = 'INVALID_FILE_TYPE';
                     return res.render(fileLocation, {
