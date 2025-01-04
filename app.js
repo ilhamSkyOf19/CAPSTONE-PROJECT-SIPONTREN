@@ -26,7 +26,7 @@ app.use(express.json());
 dotenv.config();
 
 // set port 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT;
 
 // set view engine ejs
 app.use(expressLayouts);
